@@ -1,0 +1,73 @@
+<project name="calabash-android-java">
+	<tstamp>
+		<format property="current.date" pattern="yyyyMMdd" />
+	</tstamp>
+
+	<property name="version" value="0.9" />
+	<property name="build.dir" value="build" />
+	<property name="classes.dir" value="${build.dir}/classes" />
+	<property name="jar.dir" value="${build.dir}/jar" />
+	<property name="jar.file" value="${jar.dir}/${ant.project.name}-${version}.jar" />
+	<property name="doc.dir" value="${build.dir}/javadoc" />
+	<property name="doc.jar" value="${jar.dir}/${ant.project.name}-${version}-javadoc.jar" />
+	<property name="distro.dir" value="${build.dir}/${ant.project.name}-${version}" />
+	<property name="distro.file" value="${build.dir}/${ant.project.name}-${version}.zip" />
+	<property name="deps.dir" value="deps" />
+
+	<target name="clean">
+		<delete dir="${build.dir}" />
+	</target>
+
+	<target name="compile">
+		<mkdir dir="${classes.dir}" />
+		<javac srcdir="src" destdir="${classes.dir}" classpathref="classpath" />
+	</target>
+
+	<target name="doc">
+		<javadoc packagenames="calabash.java.*" sourcepath="src" defaultexcludes="yes" destdir="${doc.dir}" author="true" version="true" use="true" windowtitle="Calabash-android-java" classpathref="classpath">
+			<link href="http://developer.java.sun.com/developer/products/xml/docs/api/" />
+		</javadoc>
+	</target>
+
+	<path id="classpath">
+		<fileset dir="${deps.dir}" includes="**/*.jar" />
+	</path>
+
+	<target name="jar" depends="-ensure-gems-zip-is-present, compile, doc">
+		<property name="scripts.dir" value="${classes.dir}/scripts" />
+		<mkdir dir="${scripts.dir}" />
+		<copy file="${gems.zip.path}" todir="${scripts.dir}" />
+
+		<mkdir dir="${jar.dir}" />
+		<jar destfile="${jar.file}" basedir="${classes.dir}">
+			<manifest>
+				<attribute name="Project-Name" value="calabash-android-java" />
+				<attribute name="Built-By" value="${user.name}" />
+				<attribute name="Created-By" value="Thoughtworks studios - Twist" />
+				<attribute name="Manifest-Version" value="${version}" />
+				<attribute name="Built-Date" value="${current.date}" />
+				<attribute name="Implementation-Version" value="${version}" />
+			</manifest>
+		</jar>
+
+		<jar destfile="${doc.jar}" basedir="${doc.dir}" />
+
+	</target>
+
+	<target name="-ensure-gems-zip-is-present">
+		<fail message="Path to gems.zip is required. Provide it like 'ant -Dgems.zip.path=PATH'" unless="gems.zip.path" />
+	</target>
+
+	<target name="distro" depends="jar">
+		<mkdir dir="${distro.dir}" />
+		<copy file="${jar.file}" todir="${distro.dir}" />
+		<copy file="${doc.jar}" todir="${distro.dir}" />
+		<copy file="${deps.dir}/jruby-1.7.5.jar" todir="${distro.dir}" />
+		<copy file="${deps.dir}/log4j-1.2.17.jar" todir="${distro.dir}" />
+		<copy file="LICENSE.txt" todir="${distro.dir}" />
+		<copy file="README.md" todir="${distro.dir}" />
+		<copy file="CONTRIBUTORS.txt" todir="${distro.dir}" />
+		<zip basedir="${distro.dir}" includes="**" destfile="${distro.file}" />
+	</target>
+
+</project>
