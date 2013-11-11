@@ -64,7 +64,6 @@ public class AndroidRunner {
             Utils.unzip(gemszip, extractedDir);
             gemszip.delete();
             extracted.createNewFile();
-            copyFileFromBundleTo("lib", "jruby-1.7.5.jar", new File(extractedDir, "jruby.home"));
         } catch (Exception e) {
             throw new CalabashException("Failed to unzip gems", e);
         }

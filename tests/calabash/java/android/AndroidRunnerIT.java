@@ -13,7 +13,7 @@ import static calabash.java.android.TestUtils.createTempDir;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public class SampleTest {
+public class AndroidRunnerIT {
 
     private File tempDir;
     private File tempAndroidPath;
