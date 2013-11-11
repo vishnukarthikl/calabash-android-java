@@ -12,7 +12,7 @@
 	<property name="doc.jar" value="${jar.dir}/${ant.project.name}-${version}-javadoc.jar" />
 	<property name="distro.dir" value="${build.dir}/${ant.project.name}-${version}" />
 	<property name="distro.file" value="${build.dir}/${ant.project.name}-${version}.zip" />
-	<property name="deps.dir" value="deps" />
+	<property name="lib.dir" value="lib" />
 
 	<target name="clean">
 		<delete dir="${build.dir}" />
@@ -30,7 +30,7 @@
 	</target>
 
 	<path id="classpath">
-		<fileset dir="${deps.dir}" includes="**/*.jar" />
+		<fileset dir="${lib.dir}" includes="**/*.jar" />
 	</path>
 
 	<target name="jar" depends="-ensure-gems-zip-is-present, compile, doc">
@@ -41,7 +41,7 @@
 		<mkdir dir="${jar.dir}" />
 		<jar destfile="${jar.file}" basedir="${classes.dir}">
 			<manifest>
-				<attribute name="Project-Name" value="calabash-android-java" />
+				<attribute name="Project-x" value="calabash-android-java" />
 				<attribute name="Built-By" value="${user.name}" />
 				<attribute name="Created-By" value="Thoughtworks studios - Twist" />
 				<attribute name="Manifest-Version" value="${version}" />
@@ -62,8 +62,6 @@
 		<mkdir dir="${distro.dir}" />
 		<copy file="${jar.file}" todir="${distro.dir}" />
 		<copy file="${doc.jar}" todir="${distro.dir}" />
-		<copy file="${deps.dir}/jruby-1.7.5.jar" todir="${distro.dir}" />
-		<copy file="${deps.dir}/log4j-1.2.17.jar" todir="${distro.dir}" />
 		<copy file="LICENSE.txt" todir="${distro.dir}" />
 		<copy file="README.md" todir="${distro.dir}" />
 		<copy file="CONTRIBUTORS.txt" todir="${distro.dir}" />

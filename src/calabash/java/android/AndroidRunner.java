@@ -15,6 +15,12 @@ public class AndroidRunner {
     private final File apk;
     private AndroidCalabashWrapper calabashWrapper;
 
+    /**
+     *
+     * @param apkPath path of the .apk file
+     * @param configuration android configuration
+     * @throws CalabashException
+     */
     public AndroidRunner(String apkPath, AndroidConfiguration configuration) throws CalabashException {
         this.configuration = configuration;
 
@@ -29,39 +35,43 @@ public class AndroidRunner {
         setup();
     }
 
+    /**
+     *
+     * @param apkPath path of the .apk file
+     * @throws CalabashException
+     */
     public AndroidRunner(String apkPath) throws CalabashException {
-        this(apkPath, null);
+        this(apkPath, new AndroidConfiguration());
     }
 
     private void setup() throws CalabashException {
         File gemPath = extractGemsFromBundle();
-        calabashWrapper = new AndroidCalabashWrapper(gemPath, apk,
-                configuration);
+        calabashWrapper = new AndroidCalabashWrapper(gemPath, apk, configuration);
         calabashWrapper.setup();
     }
 
     private File extractGemsFromBundle() throws CalabashException {
-        File dir = getGemsExtractionDir();
-        File extracted = new File(dir, "extracted");
+        File extractedDir = getExtractionDir();
+        File extracted = new File(extractedDir, "extracted");
         if (extracted.exists()) {
             // Already extracted
-            return dir;
+            return extractedDir;
         }
 
-        copyFileFromBundleTo("scripts", "gems.zip", dir);
+        copyFileFromBundleTo("scripts", "gems.zip", extractedDir);
         try {
-            File gemszip = new File(dir, "gems.zip");
-            Utils.unzip(gemszip, dir);
+            File gemszip = new File(extractedDir, "gems.zip");
+            Utils.unzip(gemszip, extractedDir);
             gemszip.delete();
             extracted.createNewFile();
+            copyFileFromBundleTo("lib", "jruby-1.7.5.jar", new File(extractedDir, "jruby.home"));
         } catch (Exception e) {
             throw new CalabashException("Failed to unzip gems", e);
         }
-
-        return dir;
+        return extractedDir;
     }
 
-    private File getGemsExtractionDir() throws CalabashException {
+    private File getExtractionDir() throws CalabashException {
         try {
             File tempFile = File.createTempFile("foo", "bar");
             tempFile.delete();
@@ -122,11 +132,10 @@ public class AndroidRunner {
                 .getContextClassLoader();
         InputStream stream = classLoader.getResourceAsStream(sourceDir + "/"
                 + fileName);
-        if (stream == null)
-            throw new CalabashException(
-                    String.format(
-                            "Can't copy %s from the bundle. Make sure you are using the correct JAR file",
-                            fileName), null);
+        if (stream == null) {
+            String message = String.format("Can't copy %s from the bundle. Make sure you are using the correct JAR file", fileName);
+            throw new CalabashException(message, null);
+        }
 
         try {
             File file = new File(outDir, fileName);
@@ -139,10 +148,8 @@ public class AndroidRunner {
             }
             outFile.close();
         } catch (IOException e) {
-            throw new CalabashException(
-                    String.format(
-                            "Can't copy %s from the bundle to %s. Failed to create destination file",
-                            fileName, outDir.getAbsolutePath()), e);
+            String message = String.format("Can't copy %s from the bundle to %s. Failed to create destination file", fileName, outDir.getAbsolutePath());
+            throw new CalabashException(message, e);
         }
     }
 }
