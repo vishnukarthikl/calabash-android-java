@@ -1,5 +1,8 @@
 package calabash.java.android;
 
+import net.lingala.zip4j.core.ZipFile;
+import net.lingala.zip4j.exception.ZipException;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -17,8 +20,7 @@ public class AndroidRunner {
     private AndroidCalabashWrapper calabashWrapper;
 
     /**
-     *
-     * @param apkPath path of the .apk file
+     * @param apkPath       path of the .apk file
      * @param configuration android configuration
      * @throws CalabashException
      */
@@ -38,7 +40,6 @@ public class AndroidRunner {
 
 
     /**
-     *
      * @param apkPath path of the .apk file
      * @throws CalabashException
      */
@@ -63,13 +64,27 @@ public class AndroidRunner {
         copyFileFromBundleTo("scripts", "gems.zip", extractedDir);
         try {
             File gemszip = new File(extractedDir, "gems.zip");
-            Utils.unzip(gemszip, extractedDir);
+            unzipWithPermission(extractedDir, gemszip);
             gemszip.delete();
             extracted.createNewFile();
         } catch (Exception e) {
             throw new CalabashException("Failed to unzip gems", e);
         }
         return extractedDir;
+    }
+
+    private void unzipWithPermission(File extractedDir, File gemszip) throws ZipException, CalabashException {
+        ZipFile zipFile = new ZipFile(gemszip);
+        zipFile.extractAll(extractedDir.getAbsolutePath());
+        if (!isWindows()) {
+            File jrubyExecutable = new File(extractedDir + File.separator + "jruby.home" + File.separator + "bin" + File.separator + "jruby");
+            String[] chmod = {"chmod", "+x", jrubyExecutable.getAbsolutePath()};
+            Utils.runCommand(chmod, "Could not change excutable permission");
+        }
+    }
+
+    private boolean isWindows() {
+        return System.getProperty("os.name").contains("win");
     }
 
     private File getExtractionDir() throws CalabashException {
