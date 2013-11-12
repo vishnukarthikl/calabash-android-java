@@ -11,6 +11,7 @@ import java.io.StringWriter;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import static calabash.java.android.CalabashLogger.error;
@@ -23,12 +24,12 @@ public class AndroidCalabashWrapper {
     private final AndroidConfiguration configuration;
     private File gemsDir;
 
-    public AndroidCalabashWrapper(File rbScriptsPath, File apk, AndroidConfiguration configuration) throws CalabashException {
+    public AndroidCalabashWrapper(File rbScriptsPath, File apk, AndroidConfiguration configuration, Environment environment) throws CalabashException {
         this.rbScriptsPath = rbScriptsPath;
         this.gemsDir = new File(rbScriptsPath, "gems");
         this.apk = apk;
         this.configuration = configuration;
-        this.initializeScriptingContainer();
+        this.initializeScriptingContainer(environment);
     }
 
 
@@ -75,8 +76,14 @@ public class AndroidCalabashWrapper {
     }
 
 
-    private void initializeScriptingContainer() throws CalabashException {
+    private void initializeScriptingContainer(Environment environment) throws CalabashException {
         container.setHomeDirectory(new File(rbScriptsPath, "jruby.home").getAbsolutePath());
+
+        HashMap<String, String> environmentVariables = new HashMap<String, String>();
+        environmentVariables.putAll(System.getenv());
+        environmentVariables.putAll(environment.getEnvVariables());
+        container.setEnvironment(environmentVariables);
+
         container.getLoadPaths().addAll(getLoadPaths());
         container.setErrorWriter(new StringWriter());
     }

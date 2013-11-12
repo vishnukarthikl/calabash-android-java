@@ -13,6 +13,7 @@ public class AndroidRunner {
 
     private final AndroidConfiguration configuration;
     private final File apk;
+    private final Environment environment;
     private AndroidCalabashWrapper calabashWrapper;
 
     /**
@@ -22,8 +23,6 @@ public class AndroidRunner {
      * @throws CalabashException
      */
     public AndroidRunner(String apkPath, AndroidConfiguration configuration) throws CalabashException {
-        this.configuration = configuration;
-
         if (!apkPath.endsWith(".apk")) {
             throw new CalabashException("invalid path to apk file");
         }
@@ -32,8 +31,11 @@ public class AndroidRunner {
         if (!apk.exists()) {
             throw new CalabashException("invalid path to apk file");
         }
+        this.configuration = configuration;
+        environment = EnvironmentInitializer.initiaize(configuration);
         setup();
     }
+
 
     /**
      *
@@ -46,7 +48,7 @@ public class AndroidRunner {
 
     private void setup() throws CalabashException {
         File gemPath = extractGemsFromBundle();
-        calabashWrapper = new AndroidCalabashWrapper(gemPath, apk, configuration);
+        calabashWrapper = new AndroidCalabashWrapper(gemPath, apk, configuration, environment);
         calabashWrapper.setup();
     }
 
