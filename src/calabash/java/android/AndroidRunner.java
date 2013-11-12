@@ -92,25 +92,19 @@ public class AndroidRunner {
             File tempFile = File.createTempFile("foo", "bar");
             tempFile.delete();
 
-            File gemsDir = new File(tempFile.getParentFile(),
-                    "calabash-android-gems-" + getCurrentVersion());
+            File gemsDir = new File(tempFile.getParentFile(), "calabash-android-gems-" + getCurrentVersion());
             if (!gemsDir.exists()) {
                 boolean created = gemsDir.mkdir();
                 if (!created)
-                    throw new CalabashException(
-                            "Can't create gems extraction directory. "
-                                    + gemsDir.getAbsolutePath());
+                    throw new CalabashException("Can't create gems extraction directory. " + gemsDir.getAbsolutePath());
             }
 
             if (!gemsDir.isDirectory())
-                throw new CalabashException(String.format(
-                        "Gems directory is invalid. %s is not a directory",
-                        gemsDir.getAbsolutePath()));
+                throw new CalabashException(String.format("Gems directory is invalid. %s is not a directory", gemsDir.getAbsolutePath()));
 
             return gemsDir;
         } catch (IOException e) {
-            throw new CalabashException(
-                    "Can't create gems extraction directory.", e);
+            throw new CalabashException("Can't create gems extraction directory.", e);
         }
     }
 
