@@ -16,7 +16,7 @@ public class AndroidRunner {
 
     private final AndroidConfiguration configuration;
     private final File apk;
-    private final Environment environment;
+    private Environment environment;
     private AndroidCalabashWrapper calabashWrapper;
 
     /**
@@ -34,8 +34,13 @@ public class AndroidRunner {
             throw new CalabashException("invalid path to apk file");
         }
         this.configuration = configuration;
-        environment = EnvironmentInitializer.initiaize(configuration);
-        setup();
+        CalabashLogger.initialize(this.configuration);
+        try {
+            setup();
+        } catch (Exception e) {
+            CalabashLogger.error(e.getMessage(), e);
+            throw new CalabashException("calabash android setup failed", e);
+        }
     }
 
 
@@ -48,6 +53,7 @@ public class AndroidRunner {
     }
 
     private void setup() throws CalabashException {
+        environment = EnvironmentInitializer.initialize(configuration);
         File gemPath = extractGemsFromBundle();
         calabashWrapper = new AndroidCalabashWrapper(gemPath, apk, configuration, environment);
         calabashWrapper.setup();
@@ -57,10 +63,10 @@ public class AndroidRunner {
         File extractedDir = getExtractionDir();
         File extracted = new File(extractedDir, "extracted");
         if (extracted.exists()) {
-            // Already extracted
+            CalabashLogger.info("Gems already present in temp dir");
             return extractedDir;
         }
-
+        CalabashLogger.info("Extracting gems to temp dir");
         copyFileFromBundleTo("scripts", "gems.zip", extractedDir);
         try {
             File gemszip = new File(extractedDir, "gems.zip");

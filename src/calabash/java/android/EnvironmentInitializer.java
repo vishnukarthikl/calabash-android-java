@@ -10,12 +10,13 @@ public class EnvironmentInitializer {
     public static final String KEYTOOL = "keytool";
     public static final String JARSIGNER = "jarsigner";
 
-    public static Environment initiaize(AndroidConfiguration configuration) throws CalabashException {
+    public static Environment initialize(AndroidConfiguration configuration) throws CalabashException {
         String javaHome = null;
         String androidHome = findAndroidHome(configuration);
         String keytool = findExecutableFromPath("keytool");
         String jarsigner = findExecutableFromPath("jarsigner");
         if (keytool == null || jarsigner == null) {
+            CalabashLogger.info("Finding executables relative to " + ENV_JAVA_HOME);
             javaHome = findJavaHome(configuration);
 
             if (javaHome == null) {
@@ -34,6 +35,7 @@ public class EnvironmentInitializer {
         for (String pathEntry : pathEntries) {
             File executable = new File(pathEntry, getExecutable(execName));
             if (executable.exists()) {
+                CalabashLogger.info(String.format(String.format("%s found at %s", execName, executable.getAbsolutePath())));
                 return executable.getAbsolutePath();
             }
         }
@@ -43,10 +45,12 @@ public class EnvironmentInitializer {
     private static String findJavaHome(AndroidConfiguration configuration) throws CalabashException {
         String javaHomeFromConfig = configuration.getJavaHome();
         if (isNotEmpty(javaHomeFromConfig)) {
+            CalabashLogger.info(String.format("%s = %s from configuration", ENV_JAVA_HOME, javaHomeFromConfig));
             return javaHomeFromConfig;
         }
         String javaHomeFromEnv = System.getenv(ENV_JAVA_HOME);
         if (isNotEmpty(javaHomeFromEnv)) {
+            CalabashLogger.info(String.format("%s = %s from environment", ENV_JAVA_HOME, javaHomeFromEnv));
             return javaHomeFromEnv;
         }
         return null;
@@ -62,10 +66,12 @@ public class EnvironmentInitializer {
         String androidHomeFromConfig = configuration.getAndroidHome();
         if (isNotEmpty(androidHomeFromConfig)) {
             androidHome = androidHomeFromConfig;
+            CalabashLogger.info(String.format("%s = %s from configuration", ENV_ANDROID_HOME, androidHome));
         } else {
             String envValue = System.getenv(ENV_ANDROID_HOME);
             if (isNotEmpty(envValue)) {
                 androidHome = envValue;
+                CalabashLogger.info(String.format("%s = %s from environment", ENV_ANDROID_HOME, androidHome));
             }
         }
         if (androidHome == null) {

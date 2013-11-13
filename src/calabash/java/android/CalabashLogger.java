@@ -16,10 +16,8 @@ class CalabashLogger {
 			try {
 				BasicConfigurator.configure();
 
-				String logFile = new File(configuration.getLogsDirectory(),
-						"calabash-ios-java.log").getAbsolutePath();
-				RollingFileAppender fileAppender = new RollingFileAppender(
-						new PatternLayout("%d %-5p - %m%n"), logFile);
+				String logFile = new File(configuration.getLogsDirectory(),"calabash-android-java.log").getAbsolutePath();
+				RollingFileAppender fileAppender = new RollingFileAppender(new PatternLayout("%d %-5p - %m%n"), logFile);
 				fileAppender.setMaxFileSize("20MB");
 				fileAppender.setAppend(true);
 				fileAppender.activateOptions();
@@ -30,8 +28,7 @@ class CalabashLogger {
 				log.setLevel(Level.INFO);
 				shouldLog = true;
 			} catch (IOException e) {
-				throw new CalabashException("Can't setup logging system. "
-						+ e.getMessage(), e);
+				throw new CalabashException("Can't setup logging system. "+ e.getMessage(), e);
 			}
 		}
 	}

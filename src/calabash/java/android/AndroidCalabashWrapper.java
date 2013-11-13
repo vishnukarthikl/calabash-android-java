@@ -59,8 +59,10 @@ public class AndroidCalabashWrapper {
     private void createDebugCertificateIfMissing() throws CalabashException {
         List<File> keystoreLocation = getKeystoreLocation();
         for (File file : keystoreLocation) {
-            if (file.exists())
+            if (file.exists()) {
+                CalabashLogger.info("Keystore found at %s", file.getAbsolutePath());
                 return;
+            }
         }
         generateDefaultAndroidKeyStore();
     }
@@ -68,6 +70,7 @@ public class AndroidCalabashWrapper {
     private void generateDefaultAndroidKeyStore() throws CalabashException {
         File destinationKeystoreLocation = new File(apk.getParentFile(), "debug.keystore");
         String[] keygenCommand = getKeygenCommand(destinationKeystoreLocation.getAbsolutePath());
+        CalabashLogger.info("Generating keystore at %s", destinationKeystoreLocation.getAbsolutePath());
         Utils.runCommand(keygenCommand, "could not generate debug.keystore");
     }
 
