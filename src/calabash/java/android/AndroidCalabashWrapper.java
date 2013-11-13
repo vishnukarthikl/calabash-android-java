@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import static calabash.java.android.CalabashLogger.error;
+import static java.io.File.separator;
 
 public class AndroidCalabashWrapper {
     private final ScriptingContainer container = new ScriptingContainer(
@@ -22,6 +23,7 @@ public class AndroidCalabashWrapper {
     private final File rbScriptsPath;
     private final File apk;
     private final AndroidConfiguration configuration;
+    private final Environment environment;
     private File gemsDir;
 
     public AndroidCalabashWrapper(File rbScriptsPath, File apk, AndroidConfiguration configuration, Environment environment) throws CalabashException {
@@ -29,12 +31,15 @@ public class AndroidCalabashWrapper {
         this.gemsDir = new File(rbScriptsPath, "gems");
         this.apk = apk;
         this.configuration = configuration;
-        this.initializeScriptingContainer(environment);
+        this.environment = environment;
+        this.initializeScriptingContainer();
     }
 
 
     public void setup() throws CalabashException {
         try {
+            createDebugCertificateIfMissing();
+
             //Todo: check if it works on eclipse
             String jrubyClasspath = getClasspathFor("jruby");
             container.runScriptlet(String.format("ENV['CLASSPATH'] = \"%s\"", jrubyClasspath));
@@ -49,6 +54,42 @@ public class AndroidCalabashWrapper {
             error("Failed to setup calabash for project: %s", e, apk.getAbsolutePath());
             throw new CalabashException(String.format("Failed to setup calabash. %s", e.getMessage()));
         }
+    }
+
+    private void createDebugCertificateIfMissing() throws CalabashException {
+        List<File> keystoreLocation = getKeystoreLocation();
+        for (File file : keystoreLocation) {
+            if (file.exists())
+                return;
+        }
+        generateDefaultAndroidKeyStore();
+    }
+
+    private void generateDefaultAndroidKeyStore() throws CalabashException {
+        File destinationKeystoreLocation = new File(apk.getParentFile(), "debug.keystore");
+        String[] keygenCommand = getKeygenCommand(destinationKeystoreLocation.getAbsolutePath());
+        Utils.runCommand(keygenCommand, "could not generate debug.keystore");
+    }
+
+    private String[] getKeygenCommand(final String keystore) {
+        return new String[]{environment.getKeytool(), "-genkey", "-v",
+                "-keystore", keystore,
+                "-alias", "androiddebugkey",
+                "-storepass", "android",
+                "-keypass", "android",
+                "-keyalg", "RSA",
+                "-keysize", "2048",
+                "-validity", "10000",
+                "-dname", "CN=AndroidDebug,O=Android,C=US"};
+    }
+
+    private List<File> getKeystoreLocation() {
+        return new ArrayList<File>() {{
+            new File(System.getProperty("user.home") + separator + ".android" + separator + "debug.keystore");
+            new File(System.getProperty("user.home") + separator + ".local" + separator + "share" + separator + "Xamarin" + separator + "Mono for Android" + separator + "debug.keystore");
+            new File(apk, "deubug.keystore");
+            new File("AppData" + separator + "Local" + separator + "Xamarin" + separator + "Mono for Android" + separator + "debug.keystore");
+        }};
     }
 
     private String getClasspathFor(String resource) {
@@ -76,7 +117,7 @@ public class AndroidCalabashWrapper {
     }
 
 
-    private void initializeScriptingContainer(Environment environment) throws CalabashException {
+    private void initializeScriptingContainer() throws CalabashException {
         container.setHomeDirectory(new File(rbScriptsPath, "jruby.home").getAbsolutePath());
 
         HashMap<String, String> environmentVariables = new HashMap<String, String>();

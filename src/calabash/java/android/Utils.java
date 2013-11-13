@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package calabash.java.android;
 
@@ -7,7 +7,10 @@ import org.jruby.RubyArray;
 import org.jruby.RubyHash;
 import org.jruby.RubyObject;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -57,9 +60,9 @@ final class Utils {
 			throws CalabashException {
 		int exitCode;
 		try {
-			Process Process = Runtime.getRuntime().exec(command);
-			exitCode = Process.waitFor();
-			if (exitCode == 0)
+			Process process = Runtime.getRuntime().exec(command);
+			exitCode = process.waitFor();
+            if (exitCode == 0)
 				return;
 			else
 				throw new CalabashException(onExceptionMessage);
