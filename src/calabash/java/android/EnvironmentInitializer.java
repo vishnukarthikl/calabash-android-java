@@ -4,6 +4,7 @@ import java.io.File;
 
 import static calabash.java.android.Environment.ENV_ANDROID_HOME;
 import static calabash.java.android.Environment.ENV_JAVA_HOME;
+import static calabash.java.android.Utils.isWindows;
 
 public class EnvironmentInitializer {
 
@@ -57,7 +58,7 @@ public class EnvironmentInitializer {
     }
 
     private static String getExecutable(String executable) {
-        return System.getProperty("os.name").toLowerCase().contains("win") ? executable + ".exe" : executable;
+        return isWindows() ? executable + ".exe" : executable;
     }
 
     private static String findAndroidHome(AndroidConfiguration configuration) throws CalabashException {

@@ -12,6 +12,8 @@ import java.util.Enumeration;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 
+import static calabash.java.android.Utils.isWindows;
+
 public class AndroidRunner {
 
     private final AndroidConfiguration configuration;
@@ -87,10 +89,6 @@ public class AndroidRunner {
             String[] chmod = {"chmod", "+x", jrubyExecutable.getAbsolutePath()};
             Utils.runCommand(chmod, "Could not change executable permission");
         }
-    }
-
-    private boolean isWindows() {
-        return System.getProperty("os.name").toLowerCase().contains("win");
     }
 
     private File getExtractionDir() throws CalabashException {

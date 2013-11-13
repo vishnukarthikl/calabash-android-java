@@ -11,10 +11,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 final class Utils {
 
@@ -62,10 +59,16 @@ final class Utils {
 		try {
 			Process process = Runtime.getRuntime().exec(command);
 			exitCode = process.waitFor();
+            String error = toString(process.getErrorStream());
             if (exitCode == 0)
 				return;
 			else
-				throw new CalabashException(onExceptionMessage);
+            {
+                String cmd = Arrays.toString(command).replaceAll("\\[|,|]", "");
+                CalabashLogger.error("Executing command failed");
+                CalabashLogger.error(cmd);
+                throw new CalabashException(onExceptionMessage);
+            }
 		} catch (Exception e) {
 			throw new CalabashException(onExceptionMessage);
 		}
@@ -87,4 +90,7 @@ final class Utils {
 		return sb.toString();
 	}
 
+    public static boolean isWindows() {
+        return System.getProperty("os.name").toLowerCase().contains("win");
+    }
 }
