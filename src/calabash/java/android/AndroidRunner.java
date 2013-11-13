@@ -79,12 +79,12 @@ public class AndroidRunner {
         if (!isWindows()) {
             File jrubyExecutable = new File(extractedDir + File.separator + "jruby.home" + File.separator + "bin" + File.separator + "jruby");
             String[] chmod = {"chmod", "+x", jrubyExecutable.getAbsolutePath()};
-            Utils.runCommand(chmod, "Could not change excutable permission");
+            Utils.runCommand(chmod, "Could not change executable permission");
         }
     }
 
     private boolean isWindows() {
-        return System.getProperty("os.name").contains("win");
+        return System.getProperty("os.name").toLowerCase().contains("win");
     }
 
     private File getExtractionDir() throws CalabashException {
