@@ -67,6 +67,7 @@ final class Utils {
                 String cmd = Arrays.toString(command).replaceAll("\\[|,|]", "");
                 CalabashLogger.error("Executing command failed");
                 CalabashLogger.error(cmd);
+                CalabashLogger.error(error);
                 throw new CalabashException(onExceptionMessage);
             }
 		} catch (Exception e) {
