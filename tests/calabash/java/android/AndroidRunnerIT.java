@@ -42,7 +42,6 @@ public class AndroidRunnerIT {
 
         assertTrue(testServersDir.exists());
         File[] testServerApk = testServersDir.listFiles(new FileFilter() {
-            @Override
             public boolean accept(File pathname) {
                 return pathname.getName().endsWith(".apk");
             }

@@ -20,11 +20,11 @@ public class Environment {
     }
 
     public String getKeytool() {
-        return keytool;
+        return "\"" + keytool + "\"";
     }
 
     public String getJarsigner() {
-        return jarsigner;
+        return "\"" + jarsigner + "\"";
     }
 
     public Map<String, String> getEnvVariables() {
