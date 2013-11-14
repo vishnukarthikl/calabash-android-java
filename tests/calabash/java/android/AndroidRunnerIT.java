@@ -38,6 +38,7 @@ public class AndroidRunnerIT {
     @Test
     public void shouldCreateTestServerApk() throws CalabashException, IOException {
         AndroidRunner androidRunner = new AndroidRunner(tempAndroidPath.getAbsolutePath());
+        androidRunner.setup();
         File testServersDir = new File(tempDir, "test_servers");
 
         assertTrue(testServersDir.exists());

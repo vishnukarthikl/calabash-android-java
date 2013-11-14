@@ -37,12 +37,7 @@ public class AndroidRunner {
         }
         this.configuration = configuration;
         CalabashLogger.initialize(this.configuration);
-        try {
-            setup();
-        } catch (Exception e) {
-            CalabashLogger.error(e.getMessage(), e);
-            throw new CalabashException("calabash android setup failed", e);
-        }
+
     }
 
 
@@ -54,11 +49,18 @@ public class AndroidRunner {
         this(apkPath, new AndroidConfiguration());
     }
 
-    private void setup() throws CalabashException {
-        environment = EnvironmentInitializer.initialize(configuration);
-        File gemPath = extractGemsFromBundle();
-        calabashWrapper = new AndroidCalabashWrapper(gemPath, apk, configuration, environment);
-        calabashWrapper.setup();
+    public void setup() throws CalabashException {
+        try {
+            environment = EnvironmentInitializer.initialize(configuration);
+            File gemPath = extractGemsFromBundle();
+            calabashWrapper = new AndroidCalabashWrapper(gemPath, apk, configuration, environment);
+            calabashWrapper.setup();
+
+        } catch (Exception e) {
+            String errorMessage = "calabash android setup failed: " + e.getMessage();
+            CalabashLogger.error(errorMessage, e);
+            throw new CalabashException(errorMessage, e);
+        }
     }
 
     private File extractGemsFromBundle() throws CalabashException {

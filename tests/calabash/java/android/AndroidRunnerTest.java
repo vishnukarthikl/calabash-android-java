@@ -27,6 +27,7 @@ public class AndroidRunnerTest {
 
             File apk = new File("tests/resources/MyAndroidApp.apk");
             AndroidRunner androidRunner = new AndroidRunner(apk.getAbsolutePath());
+            androidRunner.setup();
         }
     }
 
@@ -41,5 +42,6 @@ public class AndroidRunnerTest {
         configuration.setAndroidHome(androidHome);
         File apk = new File("tests/resources/MyAndroidApp.apk");
         AndroidRunner androidRunner = new AndroidRunner(apk.getAbsolutePath(), configuration);
+        androidRunner.setup();
     }
 }
