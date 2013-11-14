@@ -60,17 +60,20 @@ final class Utils {
 			Process process = Runtime.getRuntime().exec(command);
 			exitCode = process.waitFor();
             String error = toString(process.getErrorStream());
-            if (exitCode == 0)
-				return;
-			else
-            {
+            String input = toString(process.getInputStream());
+            CalabashLogger.info(input);
+
+            if (exitCode == 0) {
+                return;
+            }
+			else {
                 String cmd = Arrays.toString(command).replaceAll("\\[|,|]", "");
                 CalabashLogger.error("Executing command failed");
                 CalabashLogger.error(cmd);
                 CalabashLogger.error(error);
                 throw new CalabashException(onExceptionMessage);
             }
-		} catch (Exception e) {
+        } catch (Exception e) {
 			throw new CalabashException(onExceptionMessage);
 		}
 	}

@@ -48,8 +48,12 @@ public class AndroidCalabashWrapper {
             String calabashAndroid = new File(getCalabashGemDirectory(), "calabash-android").getAbsolutePath();
             container.runScriptlet(PathType.ABSOLUTE, calabashAndroid);
 
+            CalabashLogger.info("Done signing the app");
             container.put("ARGV", new String[]{"build", apk.getAbsolutePath()});
             container.runScriptlet(PathType.ABSOLUTE, calabashAndroid);
+
+            CalabashLogger.info("App build complete");
+
         } catch (Exception e) {
             error("Failed to setup calabash for project: %s", e, apk.getAbsolutePath());
             throw new CalabashException(String.format("Failed to setup calabash. %s", e.getMessage()));
@@ -60,9 +64,10 @@ public class AndroidCalabashWrapper {
         List<File> keystoreLocation = getKeystoreLocation();
         for (File file : keystoreLocation) {
             if (file.exists()) {
-                CalabashLogger.info("Keystore found at %s", file.getAbsolutePath());
+                CalabashLogger.info("Debug Keystore found at %s", file.getAbsolutePath());
                 return;
             }
+            CalabashLogger.info("Could not find debug keystore at %s", file.getAbsolutePath());
         }
         generateDefaultAndroidKeyStore();
     }
@@ -88,10 +93,10 @@ public class AndroidCalabashWrapper {
 
     private List<File> getKeystoreLocation() {
         return new ArrayList<File>() {{
-            new File(System.getProperty("user.home") + separator + ".android" + separator + "debug.keystore");
-            new File(System.getProperty("user.home") + separator + ".local" + separator + "share" + separator + "Xamarin" + separator + "Mono for Android" + separator + "debug.keystore");
-            new File(apk, "deubug.keystore");
-            new File("AppData" + separator + "Local" + separator + "Xamarin" + separator + "Mono for Android" + separator + "debug.keystore");
+            add(new File(System.getProperty("user.home") + separator + ".android" + separator + "debug.keystore"));
+            add(new File(System.getProperty("user.home") + separator + ".local" + separator + "share" + separator + "Xamarin" + separator + "Mono for Android" + separator + "debug.keystore"));
+            add(new File(apk.getParentFile(), "debug.keystore"));
+            add(new File("AppData" + separator + "Local" + separator + "Xamarin" + separator + "Mono for Android" + separator + "debug.keystore"));
         }};
     }
 
@@ -99,9 +104,12 @@ public class AndroidCalabashWrapper {
         URLClassLoader classLoader = (URLClassLoader) container.getClassLoader();
         URL[] urls = classLoader.getURLs();
         for (URL url : urls) {
-            if (url.toString().contains(resource))
-                return url.toString();
+            if (url.toString().contains(resource)) {
+                CalabashLogger.info("Found %s in classpath at : %s", resource, url.getFile());
+                return url.getFile();
+            }
         }
+        CalabashLogger.error("Could not find %s in classpath", resource);
         return null;
     }
 
