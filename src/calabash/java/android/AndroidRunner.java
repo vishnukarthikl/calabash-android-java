@@ -63,16 +63,18 @@ public class AndroidRunner {
 
     public AndroidApplication start() throws CalabashException {
         if (!alreadySetup()) {
-           CalabashLogger.info("Application not setup. Performing setup...");
+            CalabashLogger.info("Application not setup. Performing setup...");
             setup();
         }
         AndroidBridge androidBridge = new AndroidBridge(environment);
-        androidBridge.launchEmulator(configuration);
+        String serial = androidBridge.launchEmulator(configuration);
+        calabashWrapper.start(serial);
+
         return null;
     }
 
     private boolean alreadySetup() {
-        File test_servers = new File(apk, TEST_SERVERS);
+        File test_servers = new File(getApkDir(), TEST_SERVERS);
         if (!test_servers.exists()) {
             return false;
         }
@@ -84,6 +86,10 @@ public class AndroidRunner {
         });
 
         return files.length > 0;
+    }
+
+    private File getApkDir() {
+        return apk.getParentFile();
     }
 
     private File extractGemsFromBundle() throws CalabashException {

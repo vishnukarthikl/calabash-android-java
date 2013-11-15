@@ -6,7 +6,8 @@ public class AndroidConfiguration {
     private String androidHome;
     private String javaHome;
     private File logsDirectory;
-    private String deviceSerial;
+    private String serial;
+    private boolean shouldReinstallApp;
 
     public boolean isLoggingEnabled() {
         return getLogsDirectory() != null;
@@ -23,12 +24,10 @@ public class AndroidConfiguration {
         }
 
         if (!logsDirectory.isDirectory())
-            throw new CalabashException(logsDirectory.getAbsolutePath()
-                    + " is not a directory");
+            throw new CalabashException(logsDirectory.getAbsolutePath() + " is not a directory");
 
         if (!logsDirectory.canWrite())
-            throw new CalabashException(logsDirectory.getAbsolutePath()
-                    + " is not writable");
+            throw new CalabashException(logsDirectory.getAbsolutePath() + " is not writable");
 
         this.logsDirectory = logsDirectory;
     }
@@ -49,11 +48,19 @@ public class AndroidConfiguration {
         this.javaHome = javaHome;
     }
 
-    public String getDeviceSerial() {
-        return deviceSerial;
+    public String getSerial() {
+        return serial;
     }
 
-    public void setDeviceSerial(String deviceSerial) {
-        this.deviceSerial = deviceSerial;
+    public void setSerial(String serial) {
+        this.serial = serial;
+    }
+
+    public boolean shouldReinstallApp() {
+        return this.shouldReinstallApp;
+    }
+
+    public void setShouldReinstallApp(boolean reinstallApp) {
+        this.shouldReinstallApp = reinstallApp;
     }
 }

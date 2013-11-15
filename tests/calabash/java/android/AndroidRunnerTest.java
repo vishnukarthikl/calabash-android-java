@@ -21,7 +21,7 @@ public class AndroidRunnerTest {
 
     @Test
     public void shouldFailIfAndroidHomeIsNotSet() throws IOException, CalabashException {
-        if (System.getenv("ANDROID_HOME") != null) {
+        if (System.getenv("ANDROID_HOME") == null) {
             expectedException.expect(CalabashException.class);
             expectedException.expectMessage("ANDROID_HOME is not set");
 
@@ -36,7 +36,7 @@ public class AndroidRunnerTest {
         String androidHome = "/user/android/sdk";
 
         expectedException.expect(CalabashException.class);
-        expectedException.expectMessage("Invalid ANDROID_HOME " + androidHome);
+        expectedException.expectMessage("Invalid ANDROID_HOME : " + androidHome);
 
         AndroidConfiguration configuration = new AndroidConfiguration();
         configuration.setAndroidHome(androidHome);

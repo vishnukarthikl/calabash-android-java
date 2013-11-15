@@ -4,7 +4,6 @@ import java.io.File;
 
 import static calabash.java.android.Environment.ENV_ANDROID_HOME;
 import static calabash.java.android.Environment.ENV_JAVA_HOME;
-import static calabash.java.android.Utils.isWindows;
 
 public class EnvironmentInitializer {
 
@@ -24,8 +23,8 @@ public class EnvironmentInitializer {
                 throw new CalabashException(ENV_JAVA_HOME + " is not set");
             }
             File bin = new File(javaHome, "bin");
-            keytool = new File(bin, getExecutable(KEYTOOL)).getAbsolutePath();
-            jarsigner = new File(bin, getExecutable(JARSIGNER)).getAbsolutePath();
+            keytool = new File(bin, KEYTOOL).getAbsolutePath();
+            jarsigner = new File(bin, JARSIGNER).getAbsolutePath();
         }
         return new Environment(androidHome, javaHome, keytool, jarsigner);
     }
@@ -34,7 +33,7 @@ public class EnvironmentInitializer {
         String path = System.getenv("PATH");
         String[] pathEntries = path.split(":");
         for (String pathEntry : pathEntries) {
-            File executable = new File(pathEntry, getExecutable(execName));
+            File executable = new File(pathEntry, execName);
             if (executable.exists()) {
                 CalabashLogger.info(String.format(String.format("%s found at %s", execName, executable.getAbsolutePath())));
                 return executable.getAbsolutePath();
@@ -57,10 +56,6 @@ public class EnvironmentInitializer {
         return null;
     }
 
-    private static String getExecutable(String executable) {
-        return isWindows() ? executable + ".exe" : executable;
-    }
-
     private static String findAndroidHome(AndroidConfiguration configuration) throws CalabashException {
         String androidHome = null;
 
@@ -78,18 +73,10 @@ public class EnvironmentInitializer {
         if (androidHome == null) {
             throw new CalabashException("Could not find " + ENV_ANDROID_HOME);
         }
-        if (isValidAndroidHome(androidHome)) {
-            return androidHome;
-        } else {
-            throw new CalabashException(String.format("Invalid %s %s ", ENV_ANDROID_HOME, androidHome));
-        }
+        return androidHome;
 
     }
 
-    private static boolean isValidAndroidHome(String androidHome) {
-        File adb = new File(androidHome + File.separator + "platform-tools" + File.separator + getExecutable("adb"));
-        return adb.exists();
-    }
 
     private static boolean isNotEmpty(String value) {
         return value != null && !value.isEmpty();

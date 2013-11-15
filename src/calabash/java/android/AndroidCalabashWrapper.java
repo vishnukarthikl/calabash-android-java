@@ -16,8 +16,12 @@ import java.util.List;
 
 import static calabash.java.android.CalabashLogger.error;
 import static java.io.File.separator;
+import static java.lang.String.format;
 
 public class AndroidCalabashWrapper {
+    private static final String ADB_DEVICE_ARG = "ADB_DEVICE_ARG";
+    private static final String APP_PATH = "APP_PATH";
+    private static final String TEST_SERVER_PATH = "TEST_APP_PATH";
     private final ScriptingContainer container = new ScriptingContainer(
             LocalContextScope.SINGLETHREAD, LocalVariableBehavior.PERSISTENT);
     private final File rbScriptsPath;
@@ -25,6 +29,7 @@ public class AndroidCalabashWrapper {
     private final AndroidConfiguration configuration;
     private final Environment environment;
     private File gemsDir;
+    private AndroidBridge androidBridge;
 
     public AndroidCalabashWrapper(File rbScriptsPath, File apk, AndroidConfiguration configuration, Environment environment) throws CalabashException {
         this.rbScriptsPath = rbScriptsPath;
@@ -32,9 +37,9 @@ public class AndroidCalabashWrapper {
         this.apk = apk;
         this.configuration = configuration;
         this.environment = environment;
+        this.androidBridge = new AndroidBridge(environment);
         this.initializeScriptingContainer();
     }
-
 
     public void setup() throws CalabashException {
         try {
@@ -42,8 +47,8 @@ public class AndroidCalabashWrapper {
 
             //Todo: check if it works on eclipse
             String jrubyClasspath = getClasspathFor("jruby");
-            container.runScriptlet(String.format("ENV['CLASSPATH'] = \"%s\"", jrubyClasspath));
-            container.runScriptlet(String.format("Dir.chdir '%s'", apk.getParent()));
+            container.runScriptlet(format("ENV['CLASSPATH'] = \"%s\"", jrubyClasspath));
+            container.runScriptlet(format("Dir.chdir '%s'", apk.getParent()));
             container.put("ARGV", new String[]{"resign", apk.getAbsolutePath()});
             String calabashAndroid = new File(getCalabashGemDirectory(), "calabash-android").getAbsolutePath();
             container.runScriptlet(PathType.ABSOLUTE, calabashAndroid);
@@ -56,8 +61,45 @@ public class AndroidCalabashWrapper {
 
         } catch (Exception e) {
             error("Failed to setup calabash for project: %s", e, apk.getAbsolutePath());
-            throw new CalabashException(String.format("Failed to setup calabash. %s", e.getMessage()));
+            throw new CalabashException(format("Failed to setup calabash. %s", e.getMessage()));
         }
+    }
+
+    public void start(String serial) throws CalabashException {
+        try {
+            addRequiresAndIncludes("Calabash::Android::Operations");
+            container.runScriptlet(format("Dir.chdir '%s'", apk.getParent()));
+            addContainerEnv(ADB_DEVICE_ARG, serial);
+            addContainerEnv(APP_PATH, apk.getAbsolutePath());
+            String testServerPath = container.runScriptlet(format("test_server_path(\"%s\")", apk.getAbsolutePath())).toString();
+            addContainerEnv(TEST_SERVER_PATH, testServerPath);
+
+            String packageName = container.runScriptlet(format("package_name(\"%s\")", apk.getAbsolutePath())).toString();
+            if (configuration.shouldReinstallApp() || !androidBridge.isAppInstalled(packageName, serial)) {
+                CalabashLogger.info("Reinstalling app %s and test server on %s", packageName, serial);
+                container.runScriptlet("reinstall_apps");
+            } else {
+                CalabashLogger.info("Reinstalling test server on %s", serial);
+                container.runScriptlet("reinstall_test_server");
+            }
+            container.runScriptlet("start_test_server_in_background");
+            CalabashLogger.info("Started the app");
+        } catch (Exception e) {
+            throw new CalabashException("Error starting the app", e);
+        }
+    }
+
+    private void addContainerEnv(String envName, String envValue) {
+        container.runScriptlet(format("ENV['%s'] = \"%s\"", envName, envValue));
+    }
+
+    private void addRequiresAndIncludes(String... modules) throws CalabashException {
+        StringBuilder script = new StringBuilder("require 'calabash-android'\n");
+        for (String module : modules) {
+            script.append(String.format("extend %s\n", module));
+        }
+
+        container.runScriptlet(script.toString());
     }
 
     private void createDebugCertificateIfMissing() throws CalabashException {
@@ -121,12 +163,11 @@ public class AndroidCalabashWrapper {
         });
 
         if (calabashGemPath.length == 0)
-            throw new CalabashException(String.format("Error finding 'calabash-android' in the gempath : %s", gemsDir.getAbsolutePath()));
+            throw new CalabashException(format("Error finding 'calabash-android' in the gempath : %s", gemsDir.getAbsolutePath()));
         if (calabashGemPath.length > 1)
-            throw new CalabashException(String.format("Multiple matches for 'calabash-android' in the gempath : %s", gemsDir.getAbsolutePath()));
+            throw new CalabashException(format("Multiple matches for 'calabash-android' in the gempath : %s", gemsDir.getAbsolutePath()));
         return new File(calabashGemPath[0], "bin");
     }
-
 
     private void initializeScriptingContainer() throws CalabashException {
         container.setHomeDirectory(new File(rbScriptsPath, "jruby.home").getAbsolutePath());
@@ -159,5 +200,4 @@ public class AndroidCalabashWrapper {
 
         return loadPaths;
     }
-
 }

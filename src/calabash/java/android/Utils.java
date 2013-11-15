@@ -52,24 +52,25 @@ final class Utils {
 		return map;
 	}
 
-
-	public static void runCommand(String[] command, String onExceptionMessage)
+	public static String runCommand(String[] command, String onExceptionMessage)
 			throws CalabashException {
 		int exitCode;
 		try {
+            String cmd = Arrays.toString(command).replaceAll("\\[|,|]", "");
+            CalabashLogger.info("Executing command");
+            CalabashLogger.info(cmd);
 			Process process = Runtime.getRuntime().exec(command);
 			exitCode = process.waitFor();
             String error = toString(process.getErrorStream());
-            String input = toString(process.getInputStream());
-            CalabashLogger.info(input);
+            String ouput = toString(process.getInputStream());
+            CalabashLogger.info(ouput);
 
             if (exitCode == 0) {
-                return;
+                return ouput;
             }
 			else {
-                String cmd = Arrays.toString(command).replaceAll("\\[|,|]", "");
                 CalabashLogger.error("Executing command failed");
-                CalabashLogger.error(cmd);
+                CalabashLogger.info(ouput);
                 CalabashLogger.error(error);
                 throw new CalabashException(onExceptionMessage);
             }
