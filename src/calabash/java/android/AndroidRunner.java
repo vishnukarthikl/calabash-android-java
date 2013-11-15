@@ -3,10 +3,7 @@ package calabash.java.android;
 import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.URL;
 import java.util.Enumeration;
 import java.util.jar.Attributes;
@@ -16,6 +13,7 @@ import static calabash.java.android.Utils.isWindows;
 
 public class AndroidRunner {
 
+    public static final String TEST_SERVERS = "test_servers";
     private final AndroidConfiguration configuration;
     private final File apk;
     private Environment environment;
@@ -61,6 +59,31 @@ public class AndroidRunner {
             CalabashLogger.error(errorMessage, e);
             throw new CalabashException(errorMessage, e);
         }
+    }
+
+    public AndroidApplication start() throws CalabashException {
+        if (!alreadySetup()) {
+           CalabashLogger.info("Application not setup. Performing setup...");
+            setup();
+        }
+        AndroidBridge androidBridge = new AndroidBridge(environment);
+        androidBridge.launchEmulator(configuration);
+        return null;
+    }
+
+    private boolean alreadySetup() {
+        File test_servers = new File(apk, TEST_SERVERS);
+        if (!test_servers.exists()) {
+            return false;
+        }
+
+        File[] files = test_servers.listFiles(new FilenameFilter() {
+            public boolean accept(File file, String name) {
+                return name.endsWith(".apk");
+            }
+        });
+
+        return files.length > 0;
     }
 
     private File extractGemsFromBundle() throws CalabashException {
