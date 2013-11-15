@@ -144,7 +144,6 @@ public class AndroidCalabashWrapper {
         ArrayList<String> loadPaths = new ArrayList<String>();
         File[] gems = gemsDir.listFiles(new FileFilter() {
 
-            @Override
             public boolean accept(File arg0) {
                 return arg0.isDirectory();
             }
