@@ -12,6 +12,7 @@ import java.io.FileFilter;
 import java.io.IOException;
 
 import static calabash.java.android.TestUtils.createTempDir;
+import static calabash.java.android.Utils.runCommand;
 import static org.junit.Assert.*;
 
 public class AndroidRunnerIT {
@@ -72,35 +73,55 @@ public class AndroidRunnerIT {
     public void shouldInstallApplicationIfSerialIsProvided() throws CalabashException {
         //note: emulator should be launched
         String packageName = "com.foo.android";
+        String serial = "emulator-5554";
         uninstall(packageName);
         AndroidConfiguration configuration = new AndroidConfiguration();
-        configuration.setSerial("emulator-5554");
+        configuration.setSerial(serial);
+        configuration.setLogsDirectory(new File("logs"));
         AndroidRunner androidRunner = new AndroidRunner(tempAndroidPath.getAbsolutePath(), configuration);
+
         androidRunner.setup();
         androidRunner.start();
 
-        assertTrue(isAppInstalled(packageName, "emulator-5554"));
-        assertTrue(isMainActivity(packageName));
+        assertTrue(isAppInstalled(packageName, serial));
+        assertTrue(isMainActivity(packageName, serial));
+    }
+
+    @Test
+    public void shouldInstallAppOnDeviceWithName() throws CalabashException {
+        String packageName = "com.foo.android";
+        AndroidConfiguration configuration = new AndroidConfiguration();
+        configuration.setDeviceName("device");
+        configuration.setLogsDirectory(new File("logs"));
+        configuration.setShouldReinstallApp(true);
+        AndroidRunner androidRunner = new AndroidRunner(tempAndroidPath.getAbsolutePath(), configuration);
+
+        androidRunner.setup();
+        AndroidApplication application = androidRunner.start();
+
+        assertTrue(isAppInstalled(packageName, application.getInstalledOn()));
+        assertTrue(isMainActivity(packageName, application.getInstalledOn()));
     }
 
     private void uninstall(String packageName) {
         String[] command = {"adb", "uninstall", packageName};
         try {
-            Utils.runCommand(command, "failed");
+            runCommand(command, "failed");
         } catch (CalabashException e) {
             fail();
         }
 
     }
 
-    private boolean isMainActivity(String packageName) {
-        String[] command = {"adb", "shell", "dumpsys", "activity"};
+    private boolean isMainActivity(String packageName, String serial) {
+        String[] command = {"adb", "-s", serial, "shell", "dumpsys", "activity"};
         try {
-            String output = Utils.runCommand(command, "failed");
+            String output = runCommand(command, "failed");
             int beginIndex = output.indexOf("Main stack");
+            if (beginIndex == -1) fail("Main activity not found");
             return output.substring(beginIndex, beginIndex + 100).contains(packageName);
         } catch (CalabashException e) {
-            fail();
+            fail("Main activity not found");
         }
         return false;
     }
@@ -108,7 +129,7 @@ public class AndroidRunnerIT {
     private boolean isAppInstalled(String appPackageName, final String serialNo) {
         String[] cmd = new String[]{"adb", "-s", serialNo, "shell", "pm", "path", appPackageName};
         try {
-            String output = Utils.runCommand(cmd, "failed");
+            String output = runCommand(cmd, "failed");
             return output.contains(appPackageName);
         } catch (CalabashException e) {
             fail("failed to see if app is installed");

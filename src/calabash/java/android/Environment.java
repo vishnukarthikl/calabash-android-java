@@ -13,6 +13,7 @@ public class Environment {
     private final String jarsigner;
     private final Map<String, String> envVariables = new HashMap<String, String>();
     private final String androidHome;
+    private String emulator;
 
     public Environment(String androidHome, String javaHome, String keytool, String jarsigner) throws CalabashException {
         this.keytool = keytool;
@@ -23,6 +24,10 @@ public class Environment {
         envVariables.put(ENV_ANDROID_HOME, androidHome);
         if (javaHome != null && !javaHome.isEmpty())
             envVariables.put(ENV_JAVA_HOME, javaHome);
+    }
+
+    private static String getPlatformExecutable(String executable) {
+        return isWindows() ? executable + ".exe" : executable;
     }
 
     private boolean isValidAndroidHome(String androidHome) {
@@ -51,12 +56,16 @@ public class Environment {
         return new File(androidHome + File.separator + "platform-tools" + File.separator + getPlatformExecutable("adb"));
     }
 
+    public String getEmulator() {
+        return getPlatformExecutablePath(getEmulatorFile(androidHome).getAbsolutePath());
+    }
+
+    private File getEmulatorFile(String androidHome) {
+        return new File(androidHome + File.separator + "tools" + File.separator + getPlatformExecutable("emulator"));
+    }
+
     private String getPlatformExecutablePath(String executable) {
         String platformExecutable = getPlatformExecutable(executable);
         return isWindows() ? "\"" + platformExecutable + "\"" : platformExecutable;
-    }
-
-    private static String getPlatformExecutable(String executable) {
-        return isWindows() ? executable + ".exe" : executable;
     }
 }

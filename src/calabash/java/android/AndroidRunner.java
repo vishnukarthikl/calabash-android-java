@@ -47,6 +47,10 @@ public class AndroidRunner {
         this(apkPath, new AndroidConfiguration());
     }
 
+    /**
+     * generate the instrumentation test server apk, resign the application with debug keystore
+     * @throws CalabashException
+     */
     public void setup() throws CalabashException {
         try {
             environment = EnvironmentInitializer.initialize(configuration);
@@ -61,6 +65,11 @@ public class AndroidRunner {
         }
     }
 
+    /**
+     * install the signed apk and test server apk
+     * @return handle to the android application
+     * @throws CalabashException
+     */
     public AndroidApplication start() throws CalabashException {
         if (!alreadySetup()) {
             CalabashLogger.info("Application not setup. Performing setup...");
@@ -68,9 +77,10 @@ public class AndroidRunner {
         }
         AndroidBridge androidBridge = new AndroidBridge(environment);
         String serial = androidBridge.launchEmulator(configuration);
+        androidBridge.unlockKeyguard(serial);
         calabashWrapper.start(serial);
 
-        return null;
+        return new AndroidApplication(serial);
     }
 
     private boolean alreadySetup() {

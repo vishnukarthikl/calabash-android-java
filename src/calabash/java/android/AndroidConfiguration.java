@@ -8,6 +8,7 @@ public class AndroidConfiguration {
     private File logsDirectory;
     private String serial;
     private boolean shouldReinstallApp;
+    private String deviceName;
 
     public boolean isLoggingEnabled() {
         return getLogsDirectory() != null;
@@ -62,5 +63,13 @@ public class AndroidConfiguration {
 
     public void setShouldReinstallApp(boolean reinstallApp) {
         this.shouldReinstallApp = reinstallApp;
+    }
+
+    public void setDeviceName(String deviceName) {
+        this.deviceName = deviceName;
+    }
+
+    public String getDeviceName() {
+        return deviceName;
     }
 }
