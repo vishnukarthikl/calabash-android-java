@@ -25,7 +25,6 @@ public class Device {
         Device device = (Device) o;
 
         if (!serial.equals(device.serial)) return false;
-        if (!state.equals(device.state)) return false;
 
         return true;
     }

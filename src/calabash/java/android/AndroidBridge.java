@@ -1,11 +1,18 @@
 package calabash.java.android;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.net.Socket;
+
 import static calabash.java.android.Utils.runCommand;
 import static java.lang.String.format;
 
 public class AndroidBridge {
 
     public static final String BOOT_ANIM_STOPPED = "stopped";
+    public static final String EMULATOR_PREFIX = "emulator-";
     private final Environment environment;
 
     public AndroidBridge(Environment environment) {
@@ -46,6 +53,7 @@ public class AndroidBridge {
             });
             waitForBootAnim.run(20, 5);
             waitForPackageManager.run(5, 5);
+            unlockKeyguard(newSerial);
             return newSerial;
         }
         return deviceSerial;
@@ -54,6 +62,10 @@ public class AndroidBridge {
     private String launchEmulatorWithName(String deviceName) throws CalabashException {
         String[] launchCommand = getLaunchCommand(deviceName);
         final DeviceList deviceList = getDeviceList();
+        String launchedDeviceSerial = getSerialIfDeviceAlreadyLaunched(deviceList, deviceName);
+        if (launchedDeviceSerial != null) {
+            return launchedDeviceSerial;
+        }
         Process process = Utils.runCommandInBackGround(launchCommand, format("failed to launch the emulator %s", deviceName));
         ConditionalWaiter conditionalWaiter = new ConditionalWaiter(new ICondition(String.format("Unable to launch emulator: %s", deviceName)) {
             public boolean test() throws CalabashException {
@@ -65,6 +77,51 @@ public class AndroidBridge {
 
         DeviceList newDeviceList = getDeviceList();
         return getNewSerial(deviceList, newDeviceList);
+    }
+
+    private String getSerialIfDeviceAlreadyLaunched(DeviceList deviceList, String deviceName) throws CalabashException {
+        CalabashLogger.info("Checking if %s is already launched", deviceName);
+        for (Device device : deviceList.devices) {
+            String serial = device.getSerial();
+            try {
+                if (isDeviceRunningWithSerial(deviceName, serial)) {
+                    CalabashLogger.info("%s is running with serial %s", deviceName, serial);
+                    return serial;
+                }
+            } catch (IOException e) {
+                CalabashLogger.error(e);
+                throw new CalabashException("could not get the device name from serial %s", e);
+            }
+        }
+        return null;
+    }
+
+    private boolean isDeviceRunningWithSerial(String deviceName, String serial) throws IOException, CalabashException {
+        int index = serial.indexOf(EMULATOR_PREFIX);
+        if (index != -1) {
+            String port = serial.substring(EMULATOR_PREFIX.length());
+            Socket emulatorSocket = new Socket("localhost", Integer.parseInt(port));
+            BufferedReader in = new BufferedReader(new InputStreamReader(emulatorSocket.getInputStream()));
+            PrintWriter out = new PrintWriter(emulatorSocket.getOutputStream(), true);
+            BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+            try {
+                in.readLine();
+                in.readLine();
+                out.println("avd name");
+                String runningDeviceName = in.readLine();
+                if (deviceName.equals(runningDeviceName.trim())) {
+                    return true;
+                }
+            } catch (Exception e) {
+                throw new CalabashException(String.format("could not get the device name from serial %s", serial), e);
+            } finally {
+                emulatorSocket.close();
+                in.close();
+                out.close();
+                br.close();
+            }
+        }
+        return false;
     }
 
     private String getNewSerial(DeviceList oldDeviceList, DeviceList newDeviceList) {

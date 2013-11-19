@@ -24,7 +24,7 @@ public class DeviceListTest {
 
     @Test
     public void shouldReturnEmptyDevice() {
-        String deviceListOutput = "List of devices attached ";
+        String deviceListOutput = "List of devices attached";
 
         DeviceList deviceList = new DeviceList(deviceListOutput);
 

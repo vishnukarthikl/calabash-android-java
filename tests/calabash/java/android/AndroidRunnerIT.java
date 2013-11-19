@@ -14,7 +14,7 @@ import java.io.IOException;
 import static calabash.java.android.TestUtils.createTempDir;
 import static calabash.java.android.Utils.runCommand;
 import static org.junit.Assert.*;
-
+//Just run all the test. Can't help with emulator state dependency.
 public class AndroidRunnerIT {
 
     @Rule
@@ -70,6 +70,21 @@ public class AndroidRunnerIT {
     }
 
     @Test
+    public void shouldInstallAppOnDeviceWithName() throws CalabashException {
+        String packageName = "com.foo.android";
+        AndroidConfiguration configuration = new AndroidConfiguration();
+        configuration.setDeviceName("device");
+        configuration.setShouldReinstallApp(true);
+        AndroidRunner androidRunner = new AndroidRunner(tempAndroidPath.getAbsolutePath(), configuration);
+
+        androidRunner.setup();
+        AndroidApplication application = androidRunner.start();
+
+        assertTrue(isAppInstalled(packageName, application.getInstalledOn()));
+        assertTrue(isMainActivity(packageName, application.getInstalledOn()));
+    }
+
+    @Test
     public void shouldInstallApplicationIfSerialIsProvided() throws CalabashException {
         //note: emulator should be launched
         String packageName = "com.foo.android";
@@ -77,7 +92,6 @@ public class AndroidRunnerIT {
         uninstall(packageName);
         AndroidConfiguration configuration = new AndroidConfiguration();
         configuration.setSerial(serial);
-        configuration.setLogsDirectory(new File("logs"));
         AndroidRunner androidRunner = new AndroidRunner(tempAndroidPath.getAbsolutePath(), configuration);
 
         androidRunner.setup();
@@ -88,19 +102,22 @@ public class AndroidRunnerIT {
     }
 
     @Test
-    public void shouldInstallAppOnDeviceWithName() throws CalabashException {
+    public void shouldInstallApplicationAlreadyRunningDevice() throws CalabashException {
+        //note: emulator with name 'device' should be launched with serial 'emulator-5554'
+
         String packageName = "com.foo.android";
+        String device = "device";
+        String serial = "emulator-5554";
+        uninstall(packageName);
         AndroidConfiguration configuration = new AndroidConfiguration();
-        configuration.setDeviceName("device");
-        configuration.setLogsDirectory(new File("logs"));
-        configuration.setShouldReinstallApp(true);
+        configuration.setDeviceName(device);
         AndroidRunner androidRunner = new AndroidRunner(tempAndroidPath.getAbsolutePath(), configuration);
 
         androidRunner.setup();
-        AndroidApplication application = androidRunner.start();
+        androidRunner.start();
 
-        assertTrue(isAppInstalled(packageName, application.getInstalledOn()));
-        assertTrue(isMainActivity(packageName, application.getInstalledOn()));
+        assertTrue(isAppInstalled(packageName, serial));
+        assertTrue(isMainActivity(packageName, serial));
     }
 
     private void uninstall(String packageName) {

@@ -13,7 +13,6 @@ public class Environment {
     private final String jarsigner;
     private final Map<String, String> envVariables = new HashMap<String, String>();
     private final String androidHome;
-    private String emulator;
 
     public Environment(String androidHome, String javaHome, String keytool, String jarsigner) throws CalabashException {
         this.keytool = keytool;

@@ -77,7 +77,6 @@ public class AndroidRunner {
         }
         AndroidBridge androidBridge = new AndroidBridge(environment);
         String serial = androidBridge.launchEmulator(configuration);
-        androidBridge.unlockKeyguard(serial);
         calabashWrapper.start(serial);
 
         return new AndroidApplication(serial);
