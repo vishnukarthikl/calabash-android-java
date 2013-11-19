@@ -104,7 +104,7 @@ public class UIElement {
         }
 
         return new Rect(getIntFromHash(rect, "x"), getIntFromHash(rect, "y"), getIntFromHash(rect, "width"), getIntFromHash(rect, "height"),
-                getIntFromHash(rect, "center_x"), getIntFromHash(rect,"center_y"));
+                getIntFromHash(rect, "center_x"), getIntFromHash(rect, "center_y"));
     }
 
     public String toString() {
@@ -128,14 +128,26 @@ public class UIElement {
      * Inspects the current element and it's child elements and call callback
      * for each element
      *
-     * @param callback
-     *            Callback to be invoked
+     * @param callback Callback to be invoked
      * @throws CalabashException
      */
     public void inspect(InspectCallback callback) throws CalabashException {
         Utils.inspectElement(this, 0, callback);
     }
 
+    /**
+     * performs touch operation on the particular element
+     *
+     * @throws CalabashException
+     */
+    public void touch() throws CalabashException {
+        calabashWrapper.touch(query);
+    }
+
+    public void enterText(String text) throws CalabashException {
+        calabashWrapper.enterText(text, this.getQuery());
+
+    }
 
     public boolean equals(Object obj) {
         if (obj instanceof UIElement) {
@@ -159,5 +171,4 @@ public class UIElement {
 
         return super.equals(obj);
     }
-
 }

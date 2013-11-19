@@ -22,10 +22,12 @@ public class AndroidRunnerIT {
     public ExpectedException expectedException = ExpectedException.none();
     private File tempDir;
     private File tempAndroidPath;
+    private String packageName;
 
     @Before
     public void setUp() throws IOException {
-        createTempDirWithProj("MyAndroidApp.apk");
+        packageName = "com.example.AndroidTestApplication";
+        createTempDirWithProj("AndroidTestApplication.apk");
     }
 
     private void createTempDirWithProj(String androidApp) throws IOException {
@@ -72,7 +74,6 @@ public class AndroidRunnerIT {
 
     @Test
     public void shouldInstallAppOnDeviceWithName() throws CalabashException {
-        String packageName = "com.foo.android";
         AndroidConfiguration configuration = new AndroidConfiguration();
         configuration.setDeviceName("device");
         configuration.setShouldReinstallApp(true);
@@ -88,7 +89,6 @@ public class AndroidRunnerIT {
     @Test
     public void shouldInstallApplicationIfSerialIsProvided() throws CalabashException {
         //note: emulator should be launched with serial 'emulator-5554
-        String packageName = "com.foo.android";
         String serial = "emulator-5554";
         uninstall(packageName);
         AndroidConfiguration configuration = new AndroidConfiguration();
@@ -106,7 +106,6 @@ public class AndroidRunnerIT {
     public void shouldInstallApplicationAlreadyRunningDevice() throws CalabashException {
         //note: emulator with name 'device' should be launched with serial 'emulator-5554'
 
-        String packageName = "com.foo.android";
         String device = "device";
         String serial = "emulator-5554";
         uninstall(packageName);
@@ -123,7 +122,6 @@ public class AndroidRunnerIT {
 
     @Test
     public void shouldQueryForElements() throws CalabashException {
-        String packageName = "com.foo.android";
         String serial = "emulator-5554";
         uninstall(packageName);
         AndroidConfiguration configuration = new AndroidConfiguration();
@@ -142,11 +140,11 @@ public class AndroidRunnerIT {
 
     @Test
     public void shouldInspectApplicationElements() throws CalabashException {
-        String packageName = "com.foo.android";
         String serial = "emulator-5554";
         uninstall(packageName);
         AndroidConfiguration configuration = new AndroidConfiguration();
         configuration.setSerial(serial);
+        configuration.setLogsDirectory(new File("logs"));
         AndroidRunner androidRunner = new AndroidRunner(tempAndroidPath.getAbsolutePath(), configuration);
 
         androidRunner.setup();
@@ -155,17 +153,16 @@ public class AndroidRunnerIT {
         assertTrue(isMainActivity(packageName, serial));
 
         String expectedElementCollection = "Element : com.android.internal.policy.impl.PhoneWindow$DecorView , Nesting : 0\n" +
-                          "Element : android.widget.LinearLayout , Nesting : 1\n" +
-                          "Element : com.android.internal.widget.ActionBarContainer , Nesting : 2\n" +
-                          "Element : com.android.internal.widget.ActionBarView , Nesting : 3\n" +
-                          "Element : android.widget.LinearLayout , Nesting : 4\n" +
-                          "Element : android.widget.LinearLayout , Nesting : 5\n" +
-                          "Element : android.widget.TextView , Nesting : 6\n" +
-                          "Element : com.android.internal.widget.ActionBarView$HomeView , Nesting : 4\n" +
-                          "Element : android.widget.ImageView , Nesting : 5\n" +
-                          "Element : android.widget.FrameLayout , Nesting : 2\n" +
-                          "Element : android.widget.RelativeLayout , Nesting : 3\n" +
-                          "Element : android.widget.TextView , Nesting : 4\n";
+                "Element : android.widget.LinearLayout , Nesting : 1\n" +
+                "Element : android.widget.FrameLayout , Nesting : 2\n" +
+                "Element : android.widget.TextView , Nesting : 3\n" +
+                "Element : android.widget.FrameLayout , Nesting : 2\n" +
+                "Element : android.widget.LinearLayout , Nesting : 3\n" +
+                "Element : android.widget.TextView , Nesting : 4\n" +
+                "Element : android.widget.LinearLayout , Nesting : 4\n" +
+                "Element : android.widget.TextView , Nesting : 5\n" +
+                "Element : android.widget.EditText , Nesting : 5\n" +
+                "Element : android.widget.Button , Nesting : 4\n";
         final StringBuilder actualElementCollection = new StringBuilder();
         application.inspect(new InspectCallback() {
             public void onEachElement(UIElement element, int nestingLevel) {
@@ -173,6 +170,30 @@ public class AndroidRunnerIT {
             }
         });
         assertEquals(expectedElementCollection, actualElementCollection.toString());
+    }
+
+    @Test
+    public void shouldTouchElements() throws CalabashException {
+        String serial = "emulator-5554";
+        uninstall(packageName);
+        AndroidConfiguration configuration = new AndroidConfiguration();
+        configuration.setSerial(serial);
+        configuration.setLogsDirectory(new File("logs"));
+        AndroidRunner androidRunner = new AndroidRunner(tempAndroidPath.getAbsolutePath(), configuration);
+
+        androidRunner.setup();
+        AndroidApplication application = androidRunner.start();
+        assertTrue(isAppInstalled(packageName, serial));
+        assertTrue(isMainActivity(packageName, serial));
+
+
+        application.query("edittext").enterText("foo");
+        UIElement button = application.query("button").first();
+        button.touch();
+        UIElement result = application.query("textview marked:'Hi there foo'").first();
+        assertEquals("Hi there foo", result.getText());
+        assertEquals("click here to greet", button.getContentDescription());
+
     }
 
     private void uninstall(String packageName) {

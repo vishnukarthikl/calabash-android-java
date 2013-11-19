@@ -224,6 +224,34 @@ public class AndroidCalabashWrapper {
         }
     }
 
+    public void touch(String query) throws CalabashException {
+        try {
+            info("Touching - %s", query);
+            container.clear();
+            container.put("cajQueryString", query);
+            container.runScriptlet("touch(cajQueryString)");
+        } catch (Exception e) {
+            error("Failed to touch on: %s", e, query);
+            throw new CalabashException(String.format("Failed to touch on: %s. %s", query, e.getMessage()));
+        }
+
+    }
+
+    public void enterText(String text, String query) throws CalabashException {
+        try {
+            info("Entering text %s into %s", text, query);
+            container.clear();
+            container.put("cajQueryString", query);
+            String setText = String.format("{:setText => '%s'}", text);
+            container.runScriptlet(String.format("query(cajQueryString, %s)", setText));
+        } catch (Exception e) {
+            error("Failed to enter text %s into %s", e, text, query);
+            throw new CalabashException(String.format("Failed to enter text %s into %s :%s", text, query, e.getMessage()));
+        }
+
+
+    }
+
     private void ensureNotDisposed() throws CalabashException {
         if (disposed)
             throw new CalabashException("Object is disposed.");
@@ -241,5 +269,4 @@ public class AndroidCalabashWrapper {
                     + e.getMessage());
         }
     }
-
 }
