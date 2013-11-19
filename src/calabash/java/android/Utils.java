@@ -15,6 +15,30 @@ import java.util.*;
 
 final class Utils {
 
+    public static String getStringFromHash(RubyHash target, String key) {
+        try {
+            Object value = target.get(key);
+            if (value != null)
+                return value.toString();
+            return null;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public static Integer getIntFromHash(RubyHash target, String key) {
+        String value = getStringFromHash(target, key);
+        if (value != null) {
+            try {
+                return Integer.parseInt(value);
+            } catch (NumberFormatException e) {
+                return null;
+            }
+        }
+
+        return null;
+    }
+
     public static Object[] toJavaArray(RubyArray array) {
         ArrayList<Object> result = new ArrayList<Object>();
         for (int i = 0; i < array.size(); i++) {
@@ -50,6 +74,15 @@ final class Utils {
             map.put(javaKey, javaValue);
         }
         return map;
+    }
+
+    public static void inspectElement(UIElement element, int nestingLevel,
+                                      InspectCallback callback) throws CalabashException {
+        callback.onEachElement(element, nestingLevel);
+        UIElements children = element.children();
+        for (UIElement child : children) {
+            inspectElement(child, nestingLevel + 1, callback);
+        }
     }
 
     public static String runCommand(String[] command, String onExceptionMessage) throws CalabashException {

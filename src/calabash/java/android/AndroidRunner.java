@@ -79,7 +79,7 @@ public class AndroidRunner {
         String serial = androidBridge.launchEmulator(configuration);
         calabashWrapper.start(serial);
 
-        return new AndroidApplication(serial);
+        return new AndroidApplication(calabashWrapper,serial);
     }
 
     private boolean alreadySetup() {

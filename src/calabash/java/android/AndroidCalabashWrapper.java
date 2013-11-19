@@ -1,5 +1,6 @@
 package calabash.java.android;
 
+import org.jruby.RubyArray;
 import org.jruby.embed.LocalContextScope;
 import org.jruby.embed.LocalVariableBehavior;
 import org.jruby.embed.PathType;
@@ -15,6 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import static calabash.java.android.CalabashLogger.error;
+import static calabash.java.android.CalabashLogger.info;
 import static java.io.File.separator;
 import static java.lang.String.format;
 
@@ -22,14 +24,14 @@ public class AndroidCalabashWrapper {
     private static final String ADB_DEVICE_ARG = "ADB_DEVICE_ARG";
     private static final String APP_PATH = "APP_PATH";
     private static final String TEST_SERVER_PATH = "TEST_APP_PATH";
-    private final ScriptingContainer container = new ScriptingContainer(
-            LocalContextScope.SINGLETHREAD, LocalVariableBehavior.PERSISTENT);
+    private final ScriptingContainer container = new ScriptingContainer(LocalContextScope.SINGLETHREAD, LocalVariableBehavior.PERSISTENT);
     private final File rbScriptsPath;
     private final File apk;
     private final AndroidConfiguration configuration;
     private final Environment environment;
     private File gemsDir;
     private AndroidBridge androidBridge;
+    private boolean disposed = false;
 
     public AndroidCalabashWrapper(File rbScriptsPath, File apk, AndroidConfiguration configuration, Environment environment) throws CalabashException {
         this.rbScriptsPath = rbScriptsPath;
@@ -53,11 +55,11 @@ public class AndroidCalabashWrapper {
             String calabashAndroid = new File(getCalabashGemDirectory(), "calabash-android").getAbsolutePath();
             container.runScriptlet(PathType.ABSOLUTE, calabashAndroid);
 
-            CalabashLogger.info("Done signing the app");
+            info("Done signing the app");
             container.put("ARGV", new String[]{"build", apk.getAbsolutePath()});
             container.runScriptlet(PathType.ABSOLUTE, calabashAndroid);
 
-            CalabashLogger.info("App build complete");
+            info("App build complete");
 
         } catch (Exception e) {
             error("Failed to setup calabash for project: %s", e, apk.getAbsolutePath());
@@ -76,14 +78,14 @@ public class AndroidCalabashWrapper {
 
             String packageName = container.runScriptlet(format("package_name(\"%s\")", apk.getAbsolutePath())).toString();
             if (configuration.shouldReinstallApp() || !androidBridge.isAppInstalled(packageName, serial)) {
-                CalabashLogger.info("Reinstalling app %s and test server on %s", packageName, serial);
+                info("Reinstalling app %s and test server on %s", packageName, serial);
                 container.runScriptlet("reinstall_apps");
             } else {
-                CalabashLogger.info("Reinstalling test server on %s", serial);
+                info("Reinstalling test server on %s", serial);
                 container.runScriptlet("reinstall_test_server");
             }
             container.runScriptlet("start_test_server_in_background");
-            CalabashLogger.info("Started the app");
+            info("Started the app");
         } catch (Exception e) {
             throw new CalabashException("Error starting the app", e);
         }
@@ -106,10 +108,10 @@ public class AndroidCalabashWrapper {
         List<File> keystoreLocation = getKeystoreLocation();
         for (File file : keystoreLocation) {
             if (file.exists()) {
-                CalabashLogger.info("Debug Keystore found at %s", file.getAbsolutePath());
+                info("Debug Keystore found at %s", file.getAbsolutePath());
                 return;
             }
-            CalabashLogger.info("Could not find debug keystore at %s", file.getAbsolutePath());
+            info("Could not find debug keystore at %s", file.getAbsolutePath());
         }
         generateDefaultAndroidKeyStore();
     }
@@ -117,7 +119,7 @@ public class AndroidCalabashWrapper {
     private void generateDefaultAndroidKeyStore() throws CalabashException {
         File destinationKeystoreLocation = new File(apk.getParentFile(), "debug.keystore");
         String[] keygenCommand = getKeygenCommand(destinationKeystoreLocation.getAbsolutePath());
-        CalabashLogger.info("Generating keystore at %s", destinationKeystoreLocation.getAbsolutePath());
+        info("Generating keystore at %s", destinationKeystoreLocation.getAbsolutePath());
         Utils.runCommand(keygenCommand, "could not generate debug.keystore");
     }
 
@@ -147,7 +149,7 @@ public class AndroidCalabashWrapper {
         URL[] urls = classLoader.getURLs();
         for (URL url : urls) {
             if (url.toString().contains(resource)) {
-                CalabashLogger.info("Found %s in classpath at : %s", resource, url.getFile());
+                info("Found %s in classpath at : %s", resource, url.getFile());
                 return url.getFile();
             }
         }
@@ -200,4 +202,44 @@ public class AndroidCalabashWrapper {
 
         return loadPaths;
     }
+
+    public RubyArray query(String query, String... args) throws CalabashException {
+        ensureNotDisposed();
+        try {
+            info("Executing query - %s", query);
+            container.clear();
+            container.put("cajQueryString", query);
+            container.put("cajQueryArgs", args);
+
+            RubyArray queryResults = null;
+            if (args != null && args.length > 0)
+                queryResults = (RubyArray) container.runScriptlet("query(cajQueryString, *cajQueryArgs)");
+            else
+                queryResults = (RubyArray) container.runScriptlet("query(cajQueryString)");
+
+            return queryResults;
+        } catch (Exception e) {
+            error("Execution of query: %s, failed", e, query);
+            throw new CalabashException(String.format("Failed to execute '%s'. %s", query, e.getMessage()));
+        }
+    }
+
+    private void ensureNotDisposed() throws CalabashException {
+        if (disposed)
+            throw new CalabashException("Object is disposed.");
+    }
+
+    public void dispose() throws CalabashException {
+        try {
+            container.clear();
+            container.getProvider().getRuntime().tearDown(true);
+            container.terminate();
+            disposed = true;
+        } catch (Throwable e) {
+            error("Failed to dispose container. ", e);
+            throw new CalabashException("Failed to dispose container. "
+                    + e.getMessage());
+        }
+    }
+
 }

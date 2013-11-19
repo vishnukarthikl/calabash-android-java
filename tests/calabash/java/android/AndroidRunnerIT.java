@@ -14,6 +14,7 @@ import java.io.IOException;
 import static calabash.java.android.TestUtils.createTempDir;
 import static calabash.java.android.Utils.runCommand;
 import static org.junit.Assert.*;
+
 //Just run all the test. Can't help with emulator state dependency.
 public class AndroidRunnerIT {
 
@@ -86,7 +87,7 @@ public class AndroidRunnerIT {
 
     @Test
     public void shouldInstallApplicationIfSerialIsProvided() throws CalabashException {
-        //note: emulator should be launched
+        //note: emulator should be launched with serial 'emulator-5554
         String packageName = "com.foo.android";
         String serial = "emulator-5554";
         uninstall(packageName);
@@ -118,6 +119,60 @@ public class AndroidRunnerIT {
 
         assertTrue(isAppInstalled(packageName, serial));
         assertTrue(isMainActivity(packageName, serial));
+    }
+
+    @Test
+    public void shouldQueryForElements() throws CalabashException {
+        String packageName = "com.foo.android";
+        String serial = "emulator-5554";
+        uninstall(packageName);
+        AndroidConfiguration configuration = new AndroidConfiguration();
+        configuration.setSerial(serial);
+        AndroidRunner androidRunner = new AndroidRunner(tempAndroidPath.getAbsolutePath(), configuration);
+
+        androidRunner.setup();
+        AndroidApplication application = androidRunner.start();
+        assertTrue(isAppInstalled(packageName, serial));
+        assertTrue(isMainActivity(packageName, serial));
+
+        UIElements elements = application.query("textview marked:'Hello world!'");
+        assertEquals(1, elements.size());
+        assertEquals("Hello world!", elements.first().getText());
+    }
+
+    @Test
+    public void shouldInspectApplicationElements() throws CalabashException {
+        String packageName = "com.foo.android";
+        String serial = "emulator-5554";
+        uninstall(packageName);
+        AndroidConfiguration configuration = new AndroidConfiguration();
+        configuration.setSerial(serial);
+        AndroidRunner androidRunner = new AndroidRunner(tempAndroidPath.getAbsolutePath(), configuration);
+
+        androidRunner.setup();
+        AndroidApplication application = androidRunner.start();
+        assertTrue(isAppInstalled(packageName, serial));
+        assertTrue(isMainActivity(packageName, serial));
+
+        String expectedElementCollection = "Element : com.android.internal.policy.impl.PhoneWindow$DecorView , Nesting : 0\n" +
+                          "Element : android.widget.LinearLayout , Nesting : 1\n" +
+                          "Element : com.android.internal.widget.ActionBarContainer , Nesting : 2\n" +
+                          "Element : com.android.internal.widget.ActionBarView , Nesting : 3\n" +
+                          "Element : android.widget.LinearLayout , Nesting : 4\n" +
+                          "Element : android.widget.LinearLayout , Nesting : 5\n" +
+                          "Element : android.widget.TextView , Nesting : 6\n" +
+                          "Element : com.android.internal.widget.ActionBarView$HomeView , Nesting : 4\n" +
+                          "Element : android.widget.ImageView , Nesting : 5\n" +
+                          "Element : android.widget.FrameLayout , Nesting : 2\n" +
+                          "Element : android.widget.RelativeLayout , Nesting : 3\n" +
+                          "Element : android.widget.TextView , Nesting : 4\n";
+        final StringBuilder actualElementCollection = new StringBuilder();
+        application.inspect(new InspectCallback() {
+            public void onEachElement(UIElement element, int nestingLevel) {
+                actualElementCollection.append(String.format("Element : %s , Nesting : %d\n", element.getElementClass(), nestingLevel));
+            }
+        });
+        assertEquals(expectedElementCollection, actualElementCollection.toString());
     }
 
     private void uninstall(String packageName) {
