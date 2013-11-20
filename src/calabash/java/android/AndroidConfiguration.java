@@ -9,6 +9,7 @@ public class AndroidConfiguration {
     private String serial;
     private boolean shouldReinstallApp;
     private String deviceName;
+    private ScreenshotListener screenshotListener;
 
     public boolean isLoggingEnabled() {
         return getLogsDirectory() != null;
@@ -65,11 +66,19 @@ public class AndroidConfiguration {
         this.shouldReinstallApp = reinstallApp;
     }
 
+    public String getDeviceName() {
+        return deviceName;
+    }
+
     public void setDeviceName(String deviceName) {
         this.deviceName = deviceName;
     }
 
-    public String getDeviceName() {
-        return deviceName;
+    public ScreenshotListener getScreenshotListener() {
+        return screenshotListener;
+    }
+
+    public void setScreenshotListener(ScreenshotListener screenshotListener) {
+        this.screenshotListener = screenshotListener;
     }
 }
