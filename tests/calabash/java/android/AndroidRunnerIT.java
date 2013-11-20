@@ -10,6 +10,7 @@ import org.junit.rules.ExpectedException;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
+import java.util.Map;
 
 import static calabash.java.android.TestUtils.createTempDir;
 import static calabash.java.android.Utils.runCommand;
@@ -122,7 +123,7 @@ public class AndroidRunnerIT {
 
     @Test
     public void shouldQueryForElements() throws CalabashException {
-        AndroidApplication application = installAppOnEmulator("emulator-5554", new AndroidConfiguration());
+        AndroidApplication application = installAppOnEmulator("emulator-5554");
 
         UIElements elements = application.query("textview marked:'Hello world!'");
         assertEquals(1, elements.size());
@@ -131,7 +132,7 @@ public class AndroidRunnerIT {
 
     @Test
     public void shouldInspectApplicationElements() throws CalabashException {
-        AndroidApplication application = installAppOnEmulator("emulator-5554", new AndroidConfiguration());
+        AndroidApplication application = installAppOnEmulator("emulator-5554");
 
         String expectedElementCollection = "Element : com.android.internal.policy.impl.PhoneWindow$DecorView , Nesting : 0\n" +
                 "Element : android.widget.LinearLayout , Nesting : 1\n" +
@@ -155,7 +156,7 @@ public class AndroidRunnerIT {
 
     @Test
     public void shouldTouchElements() throws CalabashException {
-        AndroidApplication application = installAppOnEmulator("emulator-5554", new AndroidConfiguration());
+        AndroidApplication application = installAppOnEmulator("emulator-5554");
 
         application.query("edittext").enterText("foo");
         UIElement button = application.query("button").first();
@@ -169,7 +170,7 @@ public class AndroidRunnerIT {
 
     @Test
     public void shouldTakeScreenshot() throws CalabashException {
-        AndroidApplication application = installAppOnEmulator("emulator-5554", new AndroidConfiguration());
+        AndroidApplication application = installAppOnEmulator("emulator-5554");
         File screenshotsDir = new File(tempDir, "screenshots");
         screenshotsDir.mkdirs();
 
@@ -177,12 +178,23 @@ public class AndroidRunnerIT {
         File screenshot = new File(screenshotsDir, "first_0.png");
 
         assertTrue(screenshot.exists());
+    }
 
+    @Test
+    public void shouldGetSharedPreferences() throws CalabashException {
+        AndroidApplication application = installAppOnEmulator("emulator-5554");
+        Map<String,String> preferences = application.getSharedPreferences("my_preferences");
+
+        assertEquals("true", preferences.get("a boolean"));
+        assertEquals("my string", preferences.get("a string"));
+        assertEquals("1.5", preferences.get("a float"));
+        assertEquals("123", preferences.get("an int"));
 
     }
 
-    private AndroidApplication installAppOnEmulator(String serial, AndroidConfiguration configuration) throws CalabashException {
+    private AndroidApplication installAppOnEmulator(String serial) throws CalabashException {
         uninstall(packageName);
+        AndroidConfiguration configuration = new AndroidConfiguration();
         configuration.setSerial(serial);
         AndroidRunner androidRunner = new AndroidRunner(tempAndroidPath.getAbsolutePath(), configuration);
         androidRunner.setup();

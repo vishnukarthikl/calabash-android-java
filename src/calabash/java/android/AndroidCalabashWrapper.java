@@ -1,6 +1,7 @@
 package calabash.java.android;
 
 import org.jruby.RubyArray;
+import org.jruby.RubyHash;
 import org.jruby.embed.LocalContextScope;
 import org.jruby.embed.LocalVariableBehavior;
 import org.jruby.embed.PathType;
@@ -14,6 +15,7 @@ import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static calabash.java.android.CalabashLogger.error;
 import static calabash.java.android.CalabashLogger.info;
@@ -287,6 +289,20 @@ public class AndroidCalabashWrapper {
         } catch (Exception e) {
             error("Failed to take screenshot.", e);
             throw new CalabashException(String.format("Failed to take screenshot. %s", e.getMessage()));
+        }
+    }
+
+    public Map<String, String> getPreferences(String preferenceName) throws CalabashException {
+        try {
+            info("Finding preferences: %s", preferenceName);
+            container.clear();
+            container.put("cajPreferenceName", preferenceName);
+            RubyHash preferenceHash = (RubyHash) container.runScriptlet("get_preferences(cajPreferenceName)");
+            return (Map<String, String>) Utils.toJavaHash(preferenceHash);
+
+        } catch (Exception e) {
+            error("Failed to get preferences: %s", preferenceName);
+            throw new CalabashException(String.format("Failed to find preferences: %s", preferenceName));
         }
     }
 }

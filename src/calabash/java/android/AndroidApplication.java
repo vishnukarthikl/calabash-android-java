@@ -3,6 +3,7 @@ package calabash.java.android;
 import org.jruby.RubyArray;
 
 import java.io.File;
+import java.util.Map;
 
 public class AndroidApplication {
     private String installedOn;
@@ -101,5 +102,12 @@ public class AndroidApplication {
             throw new CalabashException(dir.getAbsolutePath() + " is not writeable");
 
         calabashWrapper.takeScreenShot(dir, fileName);
+    }
+
+    public Map<String, String> getSharedPreferences(String preferenceName) throws CalabashException {
+         if (preferenceName == null || preferenceName.isEmpty()) {
+             throw new CalabashException("Invalid preference name");
+         }
+        return calabashWrapper.getPreferences(preferenceName);
     }
 }
