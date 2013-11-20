@@ -122,16 +122,7 @@ public class AndroidRunnerIT {
 
     @Test
     public void shouldQueryForElements() throws CalabashException {
-        String serial = "emulator-5554";
-        uninstall(packageName);
-        AndroidConfiguration configuration = new AndroidConfiguration();
-        configuration.setSerial(serial);
-        AndroidRunner androidRunner = new AndroidRunner(tempAndroidPath.getAbsolutePath(), configuration);
-
-        androidRunner.setup();
-        AndroidApplication application = androidRunner.start();
-        assertTrue(isAppInstalled(packageName, serial));
-        assertTrue(isMainActivity(packageName, serial));
+        AndroidApplication application = installAppOnEmulator("emulator-5554", new AndroidConfiguration());
 
         UIElements elements = application.query("textview marked:'Hello world!'");
         assertEquals(1, elements.size());
@@ -140,17 +131,7 @@ public class AndroidRunnerIT {
 
     @Test
     public void shouldInspectApplicationElements() throws CalabashException {
-        String serial = "emulator-5554";
-        uninstall(packageName);
-        AndroidConfiguration configuration = new AndroidConfiguration();
-        configuration.setSerial(serial);
-        configuration.setLogsDirectory(new File("logs"));
-        AndroidRunner androidRunner = new AndroidRunner(tempAndroidPath.getAbsolutePath(), configuration);
-
-        androidRunner.setup();
-        AndroidApplication application = androidRunner.start();
-        assertTrue(isAppInstalled(packageName, serial));
-        assertTrue(isMainActivity(packageName, serial));
+        AndroidApplication application = installAppOnEmulator("emulator-5554", new AndroidConfiguration());
 
         String expectedElementCollection = "Element : com.android.internal.policy.impl.PhoneWindow$DecorView , Nesting : 0\n" +
                 "Element : android.widget.LinearLayout , Nesting : 1\n" +
@@ -174,26 +155,41 @@ public class AndroidRunnerIT {
 
     @Test
     public void shouldTouchElements() throws CalabashException {
-        String serial = "emulator-5554";
-        uninstall(packageName);
-        AndroidConfiguration configuration = new AndroidConfiguration();
-        configuration.setSerial(serial);
-        configuration.setLogsDirectory(new File("logs"));
-        AndroidRunner androidRunner = new AndroidRunner(tempAndroidPath.getAbsolutePath(), configuration);
-
-        androidRunner.setup();
-        AndroidApplication application = androidRunner.start();
-        assertTrue(isAppInstalled(packageName, serial));
-        assertTrue(isMainActivity(packageName, serial));
-
+        AndroidApplication application = installAppOnEmulator("emulator-5554", new AndroidConfiguration());
 
         application.query("edittext").enterText("foo");
         UIElement button = application.query("button").first();
         button.touch();
         UIElement result = application.query("textview marked:'Hi there foo'").first();
+
         assertEquals("Hi there foo", result.getText());
         assertEquals("click here to greet", button.getContentDescription());
 
+    }
+
+    @Test
+    public void shouldTakeScreenshot() throws CalabashException {
+        AndroidApplication application = installAppOnEmulator("emulator-5554", new AndroidConfiguration());
+        File screenshotsDir = new File(tempDir, "screenshots");
+        screenshotsDir.mkdirs();
+
+        application.takeScreenshot(screenshotsDir, "first");
+        File screenshot = new File(screenshotsDir, "first_0.png");
+
+        assertTrue(screenshot.exists());
+
+
+    }
+
+    private AndroidApplication installAppOnEmulator(String serial, AndroidConfiguration configuration) throws CalabashException {
+        uninstall(packageName);
+        configuration.setSerial(serial);
+        AndroidRunner androidRunner = new AndroidRunner(tempAndroidPath.getAbsolutePath(), configuration);
+        androidRunner.setup();
+        AndroidApplication application = androidRunner.start();
+        assertTrue(isAppInstalled(packageName, serial));
+        assertTrue(isMainActivity(packageName, serial));
+        return application;
     }
 
     private void uninstall(String packageName) {

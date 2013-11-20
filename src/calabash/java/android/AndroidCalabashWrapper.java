@@ -248,8 +248,6 @@ public class AndroidCalabashWrapper {
             error("Failed to enter text %s into %s", e, text, query);
             throw new CalabashException(String.format("Failed to enter text %s into %s :%s", text, query, e.getMessage()));
         }
-
-
     }
 
     private void ensureNotDisposed() throws CalabashException {
@@ -265,8 +263,20 @@ public class AndroidCalabashWrapper {
             disposed = true;
         } catch (Throwable e) {
             error("Failed to dispose container. ", e);
-            throw new CalabashException("Failed to dispose container. "
-                    + e.getMessage());
+            throw new CalabashException("Failed to dispose container. "+ e.getMessage());
+        }
+    }
+
+    public void takeScreenShot(File dir, String fileName) throws CalabashException {
+        try {
+            info("Taking screenshot");
+            container.clear();
+            container.put("cajPrefix", dir.getAbsolutePath() + "/");
+            container.put("cajFileName", fileName);
+            container.runScriptlet("screenshot(options={:prefix => cajPrefix, :name => cajFileName})");
+        } catch (Exception e) {
+            error("Failed to take screenshot.", e);
+            throw new CalabashException(String.format("Failed to take screenshot. %s", e.getMessage()));
         }
     }
 }

@@ -2,6 +2,8 @@ package calabash.java.android;
 
 import org.jruby.RubyArray;
 
+import java.io.File;
+
 public class AndroidApplication {
     private String installedOn;
     private AndroidCalabashWrapper calabashWrapper;
@@ -79,5 +81,25 @@ public class AndroidApplication {
         }
 
         return rootElement;
+    }
+
+    /**
+     *
+     * @param dir Existing directory where the screenshot is saved
+     * @param fileName the name of the screenshot
+     * @throws CalabashException
+     */
+    public void takeScreenshot(File dir, String fileName) throws CalabashException {
+        if (dir == null)
+            throw new CalabashException("Empty directory name");
+        if (fileName == null)
+            throw new CalabashException("Empty file name");
+
+        if (!dir.isDirectory())
+            throw new CalabashException(dir.getAbsolutePath() + " is not a directory");
+        if (!dir.canWrite())
+            throw new CalabashException(dir.getAbsolutePath() + " is not writeable");
+
+        calabashWrapper.takeScreenShot(dir, fileName);
     }
 }
