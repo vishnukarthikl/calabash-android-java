@@ -68,7 +68,7 @@ public final class UIElements extends ArrayList<UIElement> {
         get(0).touch();
     }
 
-    public void enterText(String text) throws CalabashException {
+    public void setText(String text) throws CalabashException {
         ensureCollectionIsNotEmpty();
         get(0).enterText(text);
     }

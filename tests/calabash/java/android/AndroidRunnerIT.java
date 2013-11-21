@@ -158,7 +158,7 @@ public class AndroidRunnerIT {
     public void shouldTouchElements() throws CalabashException {
         AndroidApplication application = installAppOnEmulator("emulator-5554");
 
-        application.query("edittext").enterText("foo");
+        application.query("edittext").setText("foo");
         UIElement button = application.query("button").first();
         button.touch();
         UIElement result = application.query("textview marked:'Hi there foo'").first();
