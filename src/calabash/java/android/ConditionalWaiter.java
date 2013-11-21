@@ -28,4 +28,13 @@ public class ConditionalWaiter {
             throw new CalabashException(condition.getErrorMessage());
 
     }
+
+    public void run(int timeoutInMillis) throws CalabashException {
+        long startTime = System.currentTimeMillis();
+        do {
+            if (condition.test()) {
+                return;
+            }
+        } while ((System.currentTimeMillis() - startTime) < timeoutInMillis);
+    }
 }

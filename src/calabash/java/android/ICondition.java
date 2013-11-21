@@ -6,6 +6,11 @@ public abstract class ICondition {
     public ICondition(String errorMessage){
         this.errorMessage = errorMessage;
     }
+
+    protected ICondition() {
+        errorMessage = null;
+    }
+
     public abstract boolean test() throws CalabashException;
 
     public String getErrorMessage() {

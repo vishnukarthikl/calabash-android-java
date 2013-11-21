@@ -123,49 +123,87 @@ public class AndroidRunnerIT {
 
     @Test
     public void shouldQueryForElements() throws CalabashException {
-        AndroidApplication application = installAppOnEmulator("emulator-5554");
+        final AndroidApplication application = installAppOnEmulator("emulator-5554");
+        goToActivity(application, "Simple Elements");
+        application.waitFor(new ICondition() {
+            @Override
+            public boolean test() throws CalabashException {
+                return application.query("imageButton").size() == 1;
+            }
+        }, 5000);
 
         UIElements elements = application.query("textview marked:'Hello world!'");
+
         assertEquals(1, elements.size());
         assertEquals("Hello world!", elements.first().getText());
     }
 
     @Test
     public void shouldInspectApplicationElements() throws CalabashException {
-        AndroidApplication application = installAppOnEmulator("emulator-5554");
-
-        String expectedElementCollection = "Element : com.android.internal.policy.impl.PhoneWindow$DecorView , Nesting : 0\n" +
-                "Element : android.widget.LinearLayout , Nesting : 1\n" +
-                "Element : android.widget.FrameLayout , Nesting : 2\n" +
-                "Element : android.widget.TextView , Nesting : 3\n" +
-                "Element : android.widget.FrameLayout , Nesting : 2\n" +
-                "Element : android.widget.LinearLayout , Nesting : 3\n" +
-                "Element : android.widget.TextView , Nesting : 4\n" +
-                "Element : android.widget.LinearLayout , Nesting : 4\n" +
-                "Element : android.widget.TextView , Nesting : 5\n" +
-                "Element : android.widget.EditText , Nesting : 5\n" +
-                "Element : android.widget.Button , Nesting : 4\n";
+        final AndroidApplication application = installAppOnEmulator("emulator-5554");
+        goToActivity(application, "Nested Views");
+        application.waitFor(new ICondition() {
+            @Override
+            public boolean test() throws CalabashException {
+                return application.query("progressBar").size() == 1;
+            }
+        }, 5000);
+        String expectedElementCollection = "";
         final StringBuilder actualElementCollection = new StringBuilder();
+
         application.inspect(new InspectCallback() {
             public void onEachElement(UIElement element, int nestingLevel) {
                 actualElementCollection.append(String.format("Element : %s , Nesting : %d\n", element.getElementClass(), nestingLevel));
             }
         });
+
         assertEquals(expectedElementCollection, actualElementCollection.toString());
     }
 
     @Test
     public void shouldTouchElements() throws CalabashException {
-        AndroidApplication application = installAppOnEmulator("emulator-5554");
+        final AndroidApplication application = installAppOnEmulator("emulator-5554");
 
-        application.query("edittext").setText("foo");
+        goToActivity(application, "Simple Elements");
+        application.waitFor(new ICondition() {
+            @Override
+            public boolean test() throws CalabashException {
+                return application.query("imageButton").size() == 1;
+            }
+        }, 5000);
         UIElement button = application.query("button").first();
+        UIElement radioButton = application.query("radioButton").first();
+        UIElement imageButton = application.query("imageButton").first();
+
         button.touch();
-        UIElement result = application.query("textview marked:'Hi there foo'").first();
+        UIElement textView = application.query("textView index:1").first();
+        assertEquals("normal button was clicked", textView.getText());
 
-        assertEquals("Hi there foo", result.getText());
-        assertEquals("click here to greet", button.getContentDescription());
+        radioButton.touch();
+        textView = application.query("textView index:1").first();
+        assertEquals("radio button was clicked", textView.getText());
 
+        imageButton.touch();
+        textView = application.query("textView index:1").first();
+        assertEquals("image button was clicked", textView.getText());
+    }
+
+    @Test
+    public void shouldSetText() throws CalabashException {
+        final AndroidApplication application = installAppOnEmulator("emulator-5554");
+        goToActivity(application, "Simple Elements");
+        application.waitFor(new ICondition() {
+            @Override
+            public boolean test() throws CalabashException {
+                return application.query("imageButton").size() == 1;
+            }
+        }, 5000);
+        UIElement editText = application.query("editText").first();
+
+        editText.setText("foo bar");
+
+        UIElement textView = application.query("textView index:1").first();
+        assertEquals("foo bar was entered", textView.getText());
     }
 
     @Test
@@ -183,7 +221,7 @@ public class AndroidRunnerIT {
     @Test
     public void shouldGetSharedPreferences() throws CalabashException {
         AndroidApplication application = installAppOnEmulator("emulator-5554");
-        Map<String,String> preferences = application.getSharedPreferences("my_preferences");
+        Map<String, String> preferences = application.getSharedPreferences("my_preferences");
 
         assertEquals("true", preferences.get("a boolean"));
         assertEquals("my string", preferences.get("a string"));
@@ -192,10 +230,15 @@ public class AndroidRunnerIT {
 
     }
 
+    private void goToActivity(AndroidApplication application, final String activityName) throws CalabashException {
+        application.query("* marked:'" + activityName + "'").touch();
+    }
+
     private AndroidApplication installAppOnEmulator(String serial) throws CalabashException {
         uninstall(packageName);
         AndroidConfiguration configuration = new AndroidConfiguration();
         configuration.setSerial(serial);
+        configuration.setLogsDirectory(new File("logs"));
         AndroidRunner androidRunner = new AndroidRunner(tempAndroidPath.getAbsolutePath(), configuration);
         androidRunner.setup();
         AndroidApplication application = androidRunner.start();
@@ -207,7 +250,7 @@ public class AndroidRunnerIT {
     private void uninstall(String packageName) {
         String[] command = {"adb", "uninstall", packageName};
         try {
-            runCommand(command, "failed");
+            runCommand(command);
         } catch (CalabashException e) {
             fail();
         }

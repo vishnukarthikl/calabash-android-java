@@ -110,4 +110,9 @@ public class AndroidApplication {
          }
         return calabashWrapper.getPreferences(preferenceName);
     }
+
+    public void waitFor(ICondition condition, int timeout) throws CalabashException {
+        ConditionalWaiter conditionalWaiter = new ConditionalWaiter(condition);
+        conditionalWaiter.run(timeout);
+    }
 }

@@ -144,7 +144,7 @@ public class UIElement {
         calabashWrapper.touch(query);
     }
 
-    public void enterText(String text) throws CalabashException {
+    public void setText(String text) throws CalabashException {
         calabashWrapper.enterText(text, this.getQuery());
 
     }

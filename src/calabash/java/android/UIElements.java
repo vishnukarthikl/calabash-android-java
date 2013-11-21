@@ -70,6 +70,6 @@ public final class UIElements extends ArrayList<UIElement> {
 
     public void setText(String text) throws CalabashException {
         ensureCollectionIsNotEmpty();
-        get(0).enterText(text);
+        get(0).setText(text);
     }
 }
