@@ -9,6 +9,7 @@ public class EnvironmentInitializer {
 
     public static final String KEYTOOL = "keytool";
     public static final String JARSIGNER = "jarsigner";
+    public static final String PROPERTY_JAVA_HOME = "java.home";
 
     public static Environment initialize(AndroidConfiguration configuration) throws CalabashException {
         String javaHome = null;
@@ -48,9 +49,18 @@ public class EnvironmentInitializer {
             CalabashLogger.info(String.format("%s = %s from configuration", ENV_JAVA_HOME, javaHomeFromConfig));
             return javaHomeFromConfig;
         }
+        String javaHomeFromSystemProp = System.getProperty(PROPERTY_JAVA_HOME);
+
+        if (isNotEmpty(javaHomeFromSystemProp)) {
+
+            CalabashLogger.info(String.format("%s = %s from system property", PROPERTY_JAVA_HOME, javaHomeFromSystemProp));
+            return javaHomeFromSystemProp;
+        }
+
         String javaHomeFromEnv = System.getenv(ENV_JAVA_HOME);
         if (isNotEmpty(javaHomeFromEnv)) {
-            CalabashLogger.info(String.format("%s = %s from environment", ENV_JAVA_HOME, javaHomeFromEnv));
+
+            CalabashLogger.info(String.format("%s = %s from environment variable", ENV_JAVA_HOME, javaHomeFromEnv));
             return javaHomeFromEnv;
         }
         return null;

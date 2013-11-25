@@ -25,7 +25,7 @@ public class AndroidRunnerTest {
             expectedException.expect(CalabashException.class);
             expectedException.expectMessage("ANDROID_HOME is not set");
 
-            File apk = new File("tests/resources/MyAndroidApp.apk");
+            File apk = new File("tests/resources/AndroidTestApplication.apk");
             AndroidRunner androidRunner = new AndroidRunner(apk.getAbsolutePath());
             androidRunner.setup();
         }
@@ -40,8 +40,9 @@ public class AndroidRunnerTest {
 
         AndroidConfiguration configuration = new AndroidConfiguration();
         configuration.setAndroidHome(androidHome);
-        File apk = new File("tests/resources/MyAndroidApp.apk");
+        File apk = new File("tests/resources/AndroidTestApplication.apk");
         AndroidRunner androidRunner = new AndroidRunner(apk.getAbsolutePath(), configuration);
         androidRunner.setup();
     }
+
 }
