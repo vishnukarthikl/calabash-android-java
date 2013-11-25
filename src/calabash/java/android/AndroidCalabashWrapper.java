@@ -310,7 +310,7 @@ public class AndroidCalabashWrapper {
         try {
             info("Getting current activity");
             container.clear();
-            RubyHash activityInfoMap = (RubyHash) container.runScriptlet("performAction('cajActivityName')");
+            RubyHash activityInfoMap = (RubyHash) container.runScriptlet("performAction('get_activity_name')");
             return (String) Utils.toJavaHash(activityInfoMap).get("message");
         } catch (Exception e) {
             String message = "Failed to get Current Activity";
