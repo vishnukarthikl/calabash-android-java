@@ -195,7 +195,7 @@ public class AndroidRunnerIT {
         application.waitFor(new ICondition() {
             @Override
             public boolean test() throws CalabashException {
-                return application.query("imageButton").size() == 1;
+                return application.getCurrentActivity().contains("SimpleElementsActivity");
             }
         }, 5000);
         UIElement editText = application.query("editText").first();
@@ -258,10 +258,13 @@ public class AndroidRunnerIT {
     }
 
     private boolean isMainActivity(String packageName, String serial) {
-        String[] command = {"adb", "-s", serial, "shell", "dumpsys", "activity"};
+        String[] command = {"adb", "-s", serial, "shell", "dumpsys", "window", "windows"};
         try {
             String output = runCommand(command, "failed");
-            int beginIndex = output.indexOf("Main stack");
+            int beginIndex = output.indexOf("mCurrentFocus"); {
+                if (beginIndex == -1)
+                    beginIndex =  output.indexOf("mFocusedApp");
+            }
             if (beginIndex == -1) fail("Main activity not found");
             return output.substring(beginIndex, beginIndex + 100).contains(packageName);
         } catch (CalabashException e) {

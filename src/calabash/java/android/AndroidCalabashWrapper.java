@@ -305,4 +305,17 @@ public class AndroidCalabashWrapper {
             throw new CalabashException(String.format("Failed to find preferences: %s", preferenceName));
         }
     }
+
+    public String getCurrentActivity() throws CalabashException {
+        try {
+            info("Getting current activity");
+            container.clear();
+            RubyHash activityInfoMap = (RubyHash) container.runScriptlet("performAction('cajActivityName')");
+            return (String) Utils.toJavaHash(activityInfoMap).get("message");
+        } catch (Exception e) {
+            String message = "Failed to get Current Activity";
+            error(message);
+            throw new CalabashException(message, e);
+        }
+    }
 }

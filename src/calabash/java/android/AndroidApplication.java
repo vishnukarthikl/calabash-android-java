@@ -115,4 +115,14 @@ public class AndroidApplication {
         ConditionalWaiter conditionalWaiter = new ConditionalWaiter(condition);
         conditionalWaiter.run(timeout);
     }
+
+
+    /**
+     * Gets the name of the current activity on the application.
+     *
+     * @return
+     */
+    public String getCurrentActivity() throws CalabashException {
+        return calabashWrapper.getCurrentActivity();
+    }
 }
