@@ -171,4 +171,12 @@ public class UIElement {
 
         return super.equals(obj);
     }
+
+    public boolean isChecked() throws CalabashException {
+        return calabashWrapper.isChecked(this.getQuery());
+    }
+
+    public void setChecked(boolean checked) throws CalabashException {
+        calabashWrapper.setChecked(this.getQuery(), checked);
+    }
 }

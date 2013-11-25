@@ -318,4 +318,32 @@ public class AndroidCalabashWrapper {
             throw new CalabashException(message, e);
         }
     }
+
+    public boolean isChecked(String query) throws CalabashException {
+        try {
+            info("Getting isChecked property");
+            container.clear();
+            container.put("cajQueryString", query);
+            RubyArray rubyArray = (RubyArray) container.runScriptlet("query(cajQueryString, :isChecked)");
+            Object[] javaArray = Utils.toJavaArray(rubyArray);
+            return Boolean.parseBoolean(javaArray[0].toString());
+        } catch (Exception e) {
+            String message = "Failed to get isChecked property";
+            error(message);
+            throw new CalabashException(message, e);
+        }
+    }
+
+    public void setChecked(String query, boolean checked) throws CalabashException {
+        try {
+            info("Setting checked to : %s", checked);
+            container.clear();
+            container.put("cajQueryString", query);
+            container.runScriptlet(String.format("query(cajQueryString, {:method_name => :setChecked, :arguments => [%s] })", checked));
+        } catch (Exception e) {
+            String message = String.format("Failed to set checked property to: %s", checked);
+            error(message);
+            throw new CalabashException(message, e);
+        }
+    }
 }

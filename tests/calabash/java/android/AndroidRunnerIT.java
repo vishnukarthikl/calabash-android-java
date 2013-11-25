@@ -204,6 +204,36 @@ public class AndroidRunnerIT {
         assertEquals("foo bar was entered", textView.getText());
     }
 
+
+    @Test
+    public void shouldPerformCheckboxActions() throws CalabashException {
+        final AndroidApplication application = installAppOnEmulator("emulator-5554");
+        goToActivity(application, "Nested Views");
+        application.waitFor(new ICondition() {
+            @Override
+            public boolean test() throws CalabashException {
+                return application.getCurrentActivity().contains("NestedViewsActivity");
+            }
+        }, 5000);
+
+        UIElement checkBox = application.query("checkBox").first();
+        boolean isChecked = checkBox.isChecked();
+        assertEquals(isChecked, false);
+
+        checkBox.setChecked(true);
+        isChecked = checkBox.isChecked();
+        assertEquals(isChecked, true);
+
+        checkBox.setChecked(false);
+        isChecked = checkBox.isChecked();
+        assertEquals(isChecked, false);
+
+
+
+    }
+
+
+
     @Test
     public void shouldTakeScreenshot() throws CalabashException {
         AndroidApplication application = installAppOnEmulator("emulator-5554");
