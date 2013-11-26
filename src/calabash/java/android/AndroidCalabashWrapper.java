@@ -51,7 +51,7 @@ public class AndroidCalabashWrapper {
 
             //Todo: check if it works on eclipse
             String jrubyClasspath = getClasspathFor("jruby");
-            container.runScriptlet(format("ENV['CLASSPATH'] = \"%s\"", jrubyClasspath));
+            addContainerEnv("CLASSPATH",jrubyClasspath);
             container.runScriptlet(format("Dir.chdir '%s'", apk.getParent()));
             container.put("ARGV", new String[]{"resign", apk.getAbsolutePath()});
             String calabashAndroid = new File(getCalabashGemDirectory(), "calabash-android").getAbsolutePath();
@@ -86,6 +86,7 @@ public class AndroidCalabashWrapper {
                 info("Reinstalling test server on %s", serial);
                 container.runScriptlet("reinstall_test_server");
             }
+
             container.runScriptlet("start_test_server_in_background");
             info("Started the app");
         } catch (Exception e) {
@@ -94,7 +95,7 @@ public class AndroidCalabashWrapper {
     }
 
     private void addContainerEnv(String envName, String envValue) {
-        container.runScriptlet(format("ENV['%s'] = \"%s\"", envName, envValue));
+        container.runScriptlet(format("ENV['%s'] = '%s'", envName, envValue));
     }
 
     private void addRequiresAndIncludes(String... modules) throws CalabashException {

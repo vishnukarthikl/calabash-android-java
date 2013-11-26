@@ -39,16 +39,16 @@ public class Environment {
 
     public String getKeytool() {
         String keytool = getPlatformExecutable(this.keytool);
-        return getPlatformExecutablePath(keytool);
+        return quoteIfWindows(keytool);
     }
 
     public String getJarsigner() {
         String jarsigner = getPlatformExecutable(this.jarsigner);
-        return getPlatformExecutablePath(jarsigner);
+        return quoteIfWindows(jarsigner);
     }
 
     public String getAdb() {
-        return getPlatformExecutablePath(getAdbFile(androidHome).getAbsolutePath());
+        return quoteIfWindows(getAdbFile(androidHome).getAbsolutePath());
     }
 
     private File getAdbFile(String androidHome) {
@@ -56,15 +56,14 @@ public class Environment {
     }
 
     public String getEmulator() {
-        return getPlatformExecutablePath(getEmulatorFile(androidHome).getAbsolutePath());
+        return quoteIfWindows(getEmulatorFile(androidHome).getAbsolutePath());
     }
 
     private File getEmulatorFile(String androidHome) {
         return new File(androidHome + File.separator + "tools" + File.separator + getPlatformExecutable("emulator"));
     }
 
-    private String getPlatformExecutablePath(String executable) {
-        String platformExecutable = getPlatformExecutable(executable);
-        return isWindows() ? "\"" + platformExecutable + "\"" : platformExecutable;
+    private String quoteIfWindows(String executable) {
+        return isWindows() ? "\"" + executable + "\"" : executable;
     }
 }
