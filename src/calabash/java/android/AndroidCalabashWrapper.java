@@ -75,10 +75,10 @@ public class AndroidCalabashWrapper {
             container.runScriptlet(format("Dir.chdir '%s'", apk.getParent()));
             addContainerEnv(ADB_DEVICE_ARG, serial);
             addContainerEnv(APP_PATH, apk.getAbsolutePath());
-            String testServerPath = container.runScriptlet(format("test_server_path(\"%s\")", apk.getAbsolutePath())).toString();
+            String testServerPath = container.runScriptlet("test_server_path(ENV['APP_PATH'])").toString();
             addContainerEnv(TEST_SERVER_PATH, testServerPath);
 
-            String packageName = container.runScriptlet(format("package_name(\"%s\")", apk.getAbsolutePath())).toString();
+            String packageName = container.runScriptlet("package_name(ENV['APP_PATH'])").toString();
             if (configuration.shouldReinstallApp() || !androidBridge.isAppInstalled(packageName, serial)) {
                 info("Reinstalling app %s and test server on %s", packageName, serial);
                 container.runScriptlet("reinstall_apps");
@@ -95,7 +95,9 @@ public class AndroidCalabashWrapper {
     }
 
     private void addContainerEnv(String envName, String envValue) {
-        container.runScriptlet(format("ENV['%s'] = '%s'", envName, envValue));
+    	String cajEnv = "cajEnv";
+		container.put(cajEnv, envValue);
+        container.runScriptlet(format("ENV['%s'] = %s", envName, cajEnv));
     }
 
     private void addRequiresAndIncludes(String... modules) throws CalabashException {
