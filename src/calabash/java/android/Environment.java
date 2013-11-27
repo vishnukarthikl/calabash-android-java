@@ -39,31 +39,31 @@ public class Environment {
 
     public String getKeytool() {
         String keytool = getPlatformExecutable(this.keytool);
-        return quotify(keytool);
+        return quoteIfWindows(keytool);
     }
 
     public String getJarsigner() {
         String jarsigner = getPlatformExecutable(this.jarsigner);
-        return quotify(jarsigner);
+        return quoteIfWindows(jarsigner);
     }
 
     public String getAdb() {
-        return quotify(getAdbFile(androidHome).getAbsolutePath());
+        return quoteIfWindows(getAdbFile(androidHome).getAbsolutePath());
     }
 
     private File getAdbFile(String androidHome) {
         return new File(androidHome + File.separator + "platform-tools" + File.separator + getPlatformExecutable("adb"));
     }
 
+    public String getEmulator() {
+        return quoteIfWindows(getEmulatorFile(androidHome).getAbsolutePath());
+    }
+
     private File getEmulatorFile(String androidHome) {
         return new File(androidHome + File.separator + "tools" + File.separator + getPlatformExecutable("emulator"));
     }
 
-    public String getEmulator() {
-        return quotify(getEmulatorFile(androidHome).getAbsolutePath());
-    }
-
-    private String quotify(String executable) {
-        return  "\"" + executable + "\"";
+    private String quoteIfWindows(String executable) {
+        return isWindows() ? "\"" + executable + "\"" : executable;
     }
 }
