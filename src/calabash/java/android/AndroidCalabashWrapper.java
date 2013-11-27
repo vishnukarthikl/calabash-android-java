@@ -51,7 +51,7 @@ public class AndroidCalabashWrapper {
 
             //Todo: check if it works on eclipse
             String jrubyClasspath = getClasspathFor("jruby");
-            addContainerEnv("CLASSPATH",jrubyClasspath);
+            addContainerEnv("CLASSPATH", jrubyClasspath);
             container.runScriptlet(format("Dir.chdir '%s'", apk.getParent()));
             container.put("ARGV", new String[]{"resign", apk.getAbsolutePath()});
             String calabashAndroid = new File(getCalabashGemDirectory(), "calabash-android").getAbsolutePath();
@@ -95,8 +95,8 @@ public class AndroidCalabashWrapper {
     }
 
     private void addContainerEnv(String envName, String envValue) {
-    	String cajEnv = "cajEnv";
-		container.put(cajEnv, envValue);
+        String cajEnv = "cajEnv";
+        container.put(cajEnv, envValue);
         container.runScriptlet(format("ENV['%s'] = %s", envName, cajEnv));
     }
 
@@ -278,7 +278,7 @@ public class AndroidCalabashWrapper {
             disposed = true;
         } catch (Throwable e) {
             error("Failed to dispose container. ", e);
-            throw new CalabashException("Failed to dispose container. "+ e.getMessage());
+            throw new CalabashException("Failed to dispose container. " + e.getMessage());
         }
     }
 
@@ -348,5 +348,18 @@ public class AndroidCalabashWrapper {
             error(message);
             throw new CalabashException(message, e);
         }
+    }
+
+    public void performGoBack() throws CalabashException {
+        try {
+            info("Pressing back button");
+            container.clear();
+            container.runScriptlet("performAction('go_back')");
+        } catch (Exception e) {
+            String message = "Failed to go back";
+            error(message);
+            throw new CalabashException(message, e);
+        }
+
     }
 }

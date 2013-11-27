@@ -1,7 +1,10 @@
 package calabash.java.android;
 
 import org.apache.commons.io.FileUtils;
-import org.junit.*;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import java.io.File;
@@ -9,8 +12,8 @@ import java.io.FileFilter;
 import java.io.IOException;
 
 import static calabash.java.android.TestUtils.*;
-import static calabash.java.android.Utils.runCommand;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 //Just run all the test. Can't help with emulator state dependency.
 public class AndroidRunnerIT {
@@ -18,14 +21,14 @@ public class AndroidRunnerIT {
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
     private File tempDir;
-    private File tempAndroidPath;
+    private File tempAndroidApkPath;
     private String packageName;
 
     @Before
     public void setUp() throws IOException {
         packageName = "com.example.AndroidTestApplication";
         tempDir = createTempDir("TestAndroidApps");
-        tempAndroidPath = createTempDirWithProj("AndroidTestApplication.apk", tempDir);
+        tempAndroidApkPath = createTempDirWithProj("AndroidTestApplication.apk", tempDir);
     }
 
     private File createTempDirWithProj(String androidApp, File dir) throws IOException {
@@ -42,7 +45,7 @@ public class AndroidRunnerIT {
 
     @Test
     public void shouldCreateTestServerApk() throws CalabashException, IOException {
-        AndroidRunner androidRunner = new AndroidRunner(tempAndroidPath.getAbsolutePath());
+        AndroidRunner androidRunner = new AndroidRunner(tempAndroidApkPath.getAbsolutePath());
         androidRunner.setup();
         File testServersDir = new File(tempDir, "test_servers");
 
@@ -64,7 +67,7 @@ public class AndroidRunnerIT {
 
         AndroidConfiguration configuration = new AndroidConfiguration();
         configuration.setSerial(serial);
-        AndroidRunner androidRunner = new AndroidRunner(tempAndroidPath.getAbsolutePath(), configuration);
+        AndroidRunner androidRunner = new AndroidRunner(tempAndroidApkPath.getAbsolutePath(), configuration);
         androidRunner.setup();
         androidRunner.start();
 
@@ -75,7 +78,7 @@ public class AndroidRunnerIT {
         AndroidConfiguration configuration = new AndroidConfiguration();
         configuration.setDeviceName("device");
         configuration.setShouldReinstallApp(true);
-        AndroidRunner androidRunner = new AndroidRunner(tempAndroidPath.getAbsolutePath(), configuration);
+        AndroidRunner androidRunner = new AndroidRunner(tempAndroidApkPath.getAbsolutePath(), configuration);
 
         androidRunner.setup();
         AndroidApplication application = androidRunner.start();
@@ -91,7 +94,7 @@ public class AndroidRunnerIT {
         uninstall(packageName);
         AndroidConfiguration configuration = new AndroidConfiguration();
         configuration.setSerial(serial);
-        AndroidRunner androidRunner = new AndroidRunner(tempAndroidPath.getAbsolutePath(), configuration);
+        AndroidRunner androidRunner = new AndroidRunner(tempAndroidApkPath.getAbsolutePath(), configuration);
 
         androidRunner.setup();
         AndroidApplication application = androidRunner.start();
@@ -103,13 +106,12 @@ public class AndroidRunnerIT {
     @Test
     public void shouldInstallApplicationAlreadyRunningDevice() throws CalabashException {
         //note: emulator with name 'device' should be launched with serial 'emulator-5554'
-
         String device = "device";
         String serial = "emulator-5554";
         uninstall(packageName);
         AndroidConfiguration configuration = new AndroidConfiguration();
         configuration.setDeviceName(device);
-        AndroidRunner androidRunner = new AndroidRunner(tempAndroidPath.getAbsolutePath(), configuration);
+        AndroidRunner androidRunner = new AndroidRunner(tempAndroidApkPath.getAbsolutePath(), configuration);
 
         androidRunner.setup();
         AndroidApplication application = androidRunner.start();
@@ -118,7 +120,14 @@ public class AndroidRunnerIT {
         assertTrue(isMainActivity(application, "MyActivity"));
     }
 
-    public static AndroidApplication installAppOnEmulator(String serial, String packageName, File androidPath) throws CalabashException {
-        return TestUtils.installAppOnEmulator(serial, packageName, androidPath);
+    @Test
+    public void shouldTestGoBack() throws CalabashException {
+        final AndroidApplication application = TestUtils.installAppOnEmulator("emulator-5554", packageName, tempAndroidApkPath);
+
+        goToActivity(application, "Nested Views");
+        application.goBack();
+
+        application.waitForActivity("MyActivity", 2000);
+        assertEquals("MyActivity", application.getCurrentActivity());
     }
 }

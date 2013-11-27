@@ -14,7 +14,6 @@ public class AndroidApplication {
         this.installedOn = serial;
     }
 
-
     public String getInstalledOn() {
         return installedOn;
     }
@@ -32,8 +31,7 @@ public class AndroidApplication {
      * Fetches all elements in this application and executes callback for each
      * of them
      *
-     * @param callback
-     *            Callback to be executed for each element
+     * @param callback Callback to be executed for each element
      * @throws CalabashException
      */
     public void inspect(InspectCallback callback) throws CalabashException {
@@ -85,8 +83,7 @@ public class AndroidApplication {
     }
 
     /**
-     *
-     * @param dir Existing directory where the screenshot is saved
+     * @param dir      Existing directory where the screenshot is saved
      * @param fileName the name of the screenshot
      * @throws CalabashException
      */
@@ -105,9 +102,9 @@ public class AndroidApplication {
     }
 
     public Map<String, String> getSharedPreferences(String preferenceName) throws CalabashException {
-         if (preferenceName == null || preferenceName.isEmpty()) {
-             throw new CalabashException("Invalid preference name");
-         }
+        if (preferenceName == null || preferenceName.isEmpty()) {
+            throw new CalabashException("Invalid preference name");
+        }
         return calabashWrapper.getPreferences(preferenceName);
     }
 
@@ -116,7 +113,6 @@ public class AndroidApplication {
         conditionalWaiter.run(timeout);
     }
 
-
     /**
      * Gets the name of the current activity on the application.
      *
@@ -124,5 +120,20 @@ public class AndroidApplication {
      */
     public String getCurrentActivity() throws CalabashException {
         return calabashWrapper.getCurrentActivity();
+    }
+
+    public void goBack() throws CalabashException {
+        calabashWrapper.performGoBack();
+
+    }
+
+    public void waitForActivity(final String activityName, int timeoutMillis) throws CalabashException {
+        waitFor(new ICondition() {
+            @Override
+            public boolean test() throws CalabashException {
+                return getCurrentActivity().contains(activityName);
+            }
+        }, timeoutMillis);
+
     }
 }

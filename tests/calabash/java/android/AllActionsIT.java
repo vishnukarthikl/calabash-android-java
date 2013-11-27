@@ -10,42 +10,37 @@ import static calabash.java.android.TestUtils.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public class UIElementsActionIT {
+public class AllActionsIT {
 
-    private AndroidApplication application;
-    private String packageName;
-    private File tempDir;
-    private File apkPath;
+
+    private static String packageName;
+    private static File tempDir;
+    private static File apkPath;
+    private static AndroidApplication application;
 
     @BeforeClass
-    public void installApp() throws Exception {
+    public static void installApp() throws Exception {
         packageName = "com.example.AndroidTestApplication";
         tempDir = createTempDir("TestAndroidApps");
         apkPath = createTempDirWithProj("AndroidTestApplication.apk", tempDir);
-        application = TestUtils.installAppOnEmulator("emulator-5554", packageName, tempDir);
+        application = TestUtils.installAppOnEmulator("emulator-5554", packageName, apkPath);
     }
 
     @AfterClass
-    public void tearDown() {
+    public static void tearDown() {
         tempDir.delete();
     }
 
     @After
-    public void goToMainActivity(){
-
+    public void goToMainActivity() throws CalabashException {
+        application.goBack();
+        assertEquals("MyActivity", application.getCurrentActivity());
     }
-
 
     @Test
     public void shouldQueryForElements() throws CalabashException {
-
         goToActivity(application, "Simple Elements");
-        application.waitFor(new ICondition() {
-            @Override
-            public boolean test() throws CalabashException {
-                return application.getCurrentActivity().contains("SimpleElementsActivity");
-            }
-        }, 5000);
+        application.waitForActivity("SimpleElementsActivity", 5000);
 
         UIElements elements = application.query("textview marked:'Hello world!'");
 
@@ -57,12 +52,7 @@ public class UIElementsActionIT {
     @Ignore("Need to speed up inspect..taking too long")
     public void shouldInspectApplicationElements() throws CalabashException {
         goToActivity(application, "Nested Views");
-        application.waitFor(new ICondition() {
-            @Override
-            public boolean test() throws CalabashException {
-                return application.getCurrentActivity().contains("NestedViewsActivity");
-            }
-        }, 5000);
+        application.waitForActivity("NestedViewsActivity", 5000);
         String expectedElementCollection = "";
         final StringBuilder actualElementCollection = new StringBuilder();
 
@@ -77,14 +67,8 @@ public class UIElementsActionIT {
 
     @Test
     public void shouldTouchElements() throws CalabashException {
-
         goToActivity(application, "Simple Elements");
-        application.waitFor(new ICondition() {
-            @Override
-            public boolean test() throws CalabashException {
-                return application.getCurrentActivity().contains("SimpleElementsActivity");
-            }
-        }, 5000);
+        application.waitForActivity("SimpleViewActivity ", 5000);
         UIElement button = application.query("button").first();
         UIElement radioButton = application.query("radioButton").first();
         UIElement imageButton = application.query("imageButton").first();
@@ -105,12 +89,7 @@ public class UIElementsActionIT {
     @Test
     public void shouldSetText() throws CalabashException {
         goToActivity(application, "Simple Elements");
-        application.waitFor(new ICondition() {
-            @Override
-            public boolean test() throws CalabashException {
-                return application.getCurrentActivity().contains("SimpleElementsActivity");
-            }
-        }, 5000);
+        application.waitForActivity("SimpleElementsActivity", 5000);
         UIElement editText = application.query("editText").first();
 
         editText.setText("foo bar");
@@ -119,16 +98,10 @@ public class UIElementsActionIT {
         assertEquals("foo bar was entered", textView.getText());
     }
 
-
     @Test
     public void shouldPerformCheckboxActions() throws CalabashException {
         goToActivity(application, "Nested Views");
-        application.waitFor(new ICondition() {
-            @Override
-            public boolean test() throws CalabashException {
-                return application.getCurrentActivity().contains("NestedViewsActivity");
-            }
-        }, 5000);
+        application.waitForActivity("NestedViewsActivity", 5000);
 
         UIElement checkBox = application.query("checkBox").first();
         boolean isChecked = checkBox.isChecked();

@@ -56,6 +56,7 @@ public class AndroidBridge {
             unlockKeyguard(newSerial);
             return newSerial;
         }
+        //deviceserial is null!!
         return deviceSerial;
     }
 

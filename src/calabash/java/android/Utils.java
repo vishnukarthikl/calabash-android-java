@@ -90,7 +90,6 @@ final class Utils {
         try {
             Process process = executeCommand(command);
             exitCode = process.waitFor();
-            System.out.println(getCommandString(command) +" executed");
             String error = toString(process.getErrorStream());
             String output = toString(process.getInputStream());
             CalabashLogger.info(output);

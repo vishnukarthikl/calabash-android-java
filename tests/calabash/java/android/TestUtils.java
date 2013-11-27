@@ -31,7 +31,6 @@ public class TestUtils {
         return tempAndroidPath;
     }
 
-
     public static void goToActivity(AndroidApplication application, final String activityName) throws CalabashException {
         application.query("* marked:'" + activityName + "'").touch();
     }
