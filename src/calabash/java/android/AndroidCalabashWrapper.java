@@ -362,4 +362,28 @@ public class AndroidCalabashWrapper {
         }
 
     }
+
+    public void scrollDown() throws CalabashException {
+        try {
+            info("Scrolling down");
+            container.clear();
+            container.runScriptlet("performAction('scroll_down')");
+        } catch (Exception e) {
+            String message = "Failed to scroll down";
+            error(message);
+            throw new CalabashException(message, e);
+        }
+    }
+
+    public void scrollUp() throws CalabashException {
+        try {
+            info("Scrolling up");
+            container.clear();
+            container.runScriptlet("performAction('scroll_up')");
+        } catch (Exception e) {
+            String message = "Failed to scroll up";
+            error(message);
+            throw new CalabashException(message, e);
+        }
+    }
 }

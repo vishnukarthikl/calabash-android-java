@@ -136,4 +136,18 @@ public class AndroidApplication {
         }, timeoutMillis);
 
     }
+
+    /**
+     * Scroll Down by one page
+     */
+    public void scrollDown() throws CalabashException {
+        calabashWrapper.scrollDown();
+    }
+
+    /**
+     * Scroll Up by one page
+     */
+    public void scrollUp() throws CalabashException {
+        calabashWrapper.scrollUp();
+    }
 }

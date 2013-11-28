@@ -117,6 +117,25 @@ public class AllActionsIT {
     }
 
     @Test
+    public void shouldPerformScrollActions() throws CalabashException {
+        goToActivity(application, "Scroll List");
+        application.waitForActivity("ScrollListActivity", 5000);
+
+        String queryForSecondPageElement = "textView marked:'The House of Mirth'";
+        assertEquals(0, application.query(queryForSecondPageElement).size());
+
+        application.scrollDown();
+        assertEquals(1, application.query(queryForSecondPageElement).size());
+
+        String queryForFirstPageElement = "textView marked:'A Time to Kill'";
+        assertEquals(0, application.query(queryForFirstPageElement).size());
+
+        application.scrollUp();
+        assertEquals(1, application.query(queryForFirstPageElement).size());
+
+    }
+
+    @Test
     public void shouldTakeScreenshot() throws CalabashException {
         File screenshotsDir = new File(tempDir, "screenshots");
         screenshotsDir.mkdirs();
