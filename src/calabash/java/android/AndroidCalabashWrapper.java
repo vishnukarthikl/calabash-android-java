@@ -386,4 +386,17 @@ public class AndroidCalabashWrapper {
             throw new CalabashException(message, e);
         }
     }
+
+    public void selectMenuItem(String menuItem) throws CalabashException {
+        try {
+            info("Selecting menu item %s", menuItem);
+            container.clear();
+            container.put("cajMenuItem", menuItem);
+            container.runScriptlet("performAction('select_from_menu', cajMenuItem)");
+        } catch (Exception e) {
+            String message = "Failed to Select menu item" + menuItem;
+            error(message);
+            throw new CalabashException(message, e);
+        }
+    }
 }

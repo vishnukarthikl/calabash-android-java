@@ -150,4 +150,14 @@ public class AndroidApplication {
     public void scrollUp() throws CalabashException {
         calabashWrapper.scrollUp();
     }
+
+    /**
+     * Selects a menu item from the menu
+     *
+     * @param menuItem The name of the menu item to be selected
+     * @throws CalabashException
+     */
+    public void selectMenuItem(String menuItem) throws CalabashException {
+        calabashWrapper.selectMenuItem(menuItem);
+    }
 }

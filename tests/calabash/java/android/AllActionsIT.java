@@ -147,6 +147,21 @@ public class AllActionsIT {
     }
 
     @Test
+    public void shouldSelectMenuOptions() throws CalabashException {
+        goToActivity(application, "Simple Elements");
+
+        application.selectMenuItem("Third");
+        UIElement textView = application.query("textView index:1").first();
+        assertEquals("Third menu item was selected", textView.getText());
+
+
+        application.selectMenuItem("Fourth");
+        textView = application.query("textView index:1").first();
+        assertEquals("Fourth menu item was selected", textView.getText());
+
+    }
+
+    @Test
     public void shouldGetSharedPreferences() throws CalabashException {
         Map<String, String> preferences = application.getSharedPreferences("my_preferences");
 
