@@ -160,4 +160,13 @@ public class AndroidApplication {
     public void selectMenuItem(String menuItem) throws CalabashException {
         calabashWrapper.selectMenuItem(menuItem);
     }
+
+    public void swipe(Direction direction) throws CalabashException {
+        switch (direction) {
+            case LEFT:calabashWrapper.drag(1, 99, 50, 50, 5);
+                 break;
+            case RIGHT:calabashWrapper.drag(99, 1, 50, 50, 5);
+                 break;
+        }
+    }
 }

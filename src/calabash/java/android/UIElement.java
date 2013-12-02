@@ -179,4 +179,9 @@ public class UIElement {
     public void setChecked(boolean checked) throws CalabashException {
         calabashWrapper.setChecked(this.getQuery(), checked);
     }
+
+    public Object getProperty(String selector) throws CalabashException {
+        RubyArray rubyArray = calabashWrapper.query(this.getQuery(), selector);
+        return Utils.toJavaObject(rubyArray.get(0));
+    }
 }

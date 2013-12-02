@@ -162,6 +162,21 @@ public class AllActionsIT {
     }
 
     @Test
+    public void shouldPerformSwipeActions() throws CalabashException {
+        goToActivity(application, "Swipe Page");
+
+        application.swipe(Direction.RIGHT);
+        int index = Integer.parseInt((String) application.query("* id:'pager'").first().getProperty("currentItem"));
+        assertEquals(1, index);
+
+
+        application.swipe(Direction.LEFT);
+        index = Integer.parseInt((String) application.query("* id:'pager'").first().getProperty("currentItem"));
+        assertEquals(0, index);
+
+    }
+
+    @Test
     public void shouldGetSharedPreferences() throws CalabashException {
         Map<String, String> preferences = application.getSharedPreferences("my_preferences");
 

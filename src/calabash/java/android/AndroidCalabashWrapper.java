@@ -399,4 +399,17 @@ public class AndroidCalabashWrapper {
             throw new CalabashException(message, e);
         }
     }
+
+    public void drag(Integer fromX, Integer toX, Integer fromY, Integer toY, Integer steps) throws CalabashException {
+        try {
+            info("Performing drag from: (%s,%s) to: (%s,%s) in %s steps", fromX, toX, fromY, toY, steps);
+            container.clear();
+            container.runScriptlet(String.format("performAction('drag', '%d', '%d', '%d', '%d', '%d')" , fromX, toX, fromY, toY, steps  ));
+        } catch (Exception e) {
+
+            String message = "Error performing drag";
+            error(message);
+            throw new CalabashException(message, e);
+        }
+    }
 }
