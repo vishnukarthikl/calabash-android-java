@@ -317,7 +317,7 @@ public class AndroidCalabashWrapper {
             return (String) Utils.toJavaHash(activityInfoMap).get("message");
         } catch (Exception e) {
             String message = "Failed to get Current Activity";
-            error(message);
+            error(message, e);
             throw new CalabashException(message, e);
         }
     }
@@ -332,7 +332,7 @@ public class AndroidCalabashWrapper {
             return Boolean.parseBoolean(javaArray[0].toString());
         } catch (Exception e) {
             String message = "Failed to get isChecked property";
-            error(message);
+            error(message, e);
             throw new CalabashException(message, e);
         }
     }
@@ -345,7 +345,7 @@ public class AndroidCalabashWrapper {
             container.runScriptlet(String.format("query(cajQueryString, {:method_name => :setChecked, :arguments => [%s] })", checked));
         } catch (Exception e) {
             String message = String.format("Failed to set checked property to: %s", checked);
-            error(message);
+            error(message, e);
             throw new CalabashException(message, e);
         }
     }
@@ -357,7 +357,7 @@ public class AndroidCalabashWrapper {
             container.runScriptlet("performAction('go_back')");
         } catch (Exception e) {
             String message = "Failed to go back";
-            error(message);
+            error(message, e);
             throw new CalabashException(message, e);
         }
 
@@ -370,7 +370,7 @@ public class AndroidCalabashWrapper {
             container.runScriptlet("performAction('scroll_down')");
         } catch (Exception e) {
             String message = "Failed to scroll down";
-            error(message);
+            error(message, e);
             throw new CalabashException(message, e);
         }
     }
@@ -382,7 +382,7 @@ public class AndroidCalabashWrapper {
             container.runScriptlet("performAction('scroll_up')");
         } catch (Exception e) {
             String message = "Failed to scroll up";
-            error(message);
+            error(message, e);
             throw new CalabashException(message, e);
         }
     }
@@ -395,7 +395,7 @@ public class AndroidCalabashWrapper {
             container.runScriptlet("performAction('select_from_menu', cajMenuItem)");
         } catch (Exception e) {
             String message = "Failed to Select menu item" + menuItem;
-            error(message);
+            error(message, e);
             throw new CalabashException(message, e);
         }
     }
@@ -404,11 +404,29 @@ public class AndroidCalabashWrapper {
         try {
             info("Performing drag from: (%s,%s) to: (%s,%s) in %s steps", fromX, toX, fromY, toY, steps);
             container.clear();
-            container.runScriptlet(String.format("performAction('drag', '%d', '%d', '%d', '%d', '%d')" , fromX, toX, fromY, toY, steps  ));
+            container.runScriptlet(String.format("performAction('drag', '%d', '%d', '%d', '%d', '%d')", fromX, toX, fromY, toY, steps));
         } catch (Exception e) {
-
             String message = "Error performing drag";
-            error(message);
+            error(message, e);
+            throw new CalabashException(message, e);
+        }
+    }
+
+    public void longPress(PropertyType withProperty, String property) throws CalabashException {
+        String actionName = null;
+        try {
+            container.clear();
+            switch (withProperty) {
+                case id:
+                    actionName = "long_press_on_view_by_id";
+                    break;
+                case text:
+                    actionName = "press_long_on_text";
+            }
+            container.runScriptlet(String.format("performAction('%s', '%s')", actionName, property));
+        } catch (Exception e) {
+            String message = "Failed to long press";
+            error(message, e);
             throw new CalabashException(message, e);
         }
     }

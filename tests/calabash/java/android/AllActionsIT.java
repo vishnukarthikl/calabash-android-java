@@ -13,6 +13,10 @@ import static org.junit.Assert.assertTrue;
 public class AllActionsIT {
 
 
+    public static final String ACTIVITY_SIMPLE_ELEMENTS = "Simple Elements";
+    public static final String ACTIVITY_SWIPE_PAGE = "Swipe Page";
+    public static final String ACTIVITY_NESTED_VIEWS = "Nested Views";
+    public static final String ACTIVITY_SCROLL_LIST = "Scroll List";
     private static String packageName;
     private static File tempDir;
     private static File apkPath;
@@ -34,13 +38,12 @@ public class AllActionsIT {
     @After
     public void goToMainActivity() throws CalabashException {
         application.goBack();
-        assertEquals("MyActivity", application.getCurrentActivity());
+        application.waitForActivity("MyActivity", 5000);
     }
 
     @Test
     public void shouldQueryForElements() throws CalabashException {
-        goToActivity(application, "Simple Elements");
-        application.waitForActivity("SimpleElementsActivity", 5000);
+        goToActivity(application, ACTIVITY_SIMPLE_ELEMENTS);
 
         UIElements elements = application.query("textview marked:'Hello world!'");
 
@@ -51,8 +54,7 @@ public class AllActionsIT {
     @Test
     @Ignore("Need to speed up inspect..taking too long")
     public void shouldInspectApplicationElements() throws CalabashException {
-        goToActivity(application, "Nested Views");
-        application.waitForActivity("NestedViewsActivity", 5000);
+        goToActivity(application, ACTIVITY_NESTED_VIEWS);
         String expectedElementCollection = "";
         final StringBuilder actualElementCollection = new StringBuilder();
 
@@ -67,9 +69,8 @@ public class AllActionsIT {
 
     @Test
     public void shouldTouchElements() throws CalabashException {
-        goToActivity(application, "Simple Elements");
-        application.waitForActivity("SimpleViewActivity ", 5000);
-        UIElement button = application.query("button").first();
+        goToActivity(application, ACTIVITY_SIMPLE_ELEMENTS);
+        UIElement button = application.query("button marked:'Normal Button'").first();
         UIElement radioButton = application.query("radioButton").first();
         UIElement imageButton = application.query("imageButton").first();
 
@@ -88,8 +89,7 @@ public class AllActionsIT {
 
     @Test
     public void shouldSetText() throws CalabashException {
-        goToActivity(application, "Simple Elements");
-        application.waitForActivity("SimpleElementsActivity", 5000);
+        goToActivity(application, ACTIVITY_SIMPLE_ELEMENTS);
         UIElement editText = application.query("editText").first();
 
         editText.setText("foo bar");
@@ -100,8 +100,7 @@ public class AllActionsIT {
 
     @Test
     public void shouldPerformCheckboxActions() throws CalabashException {
-        goToActivity(application, "Nested Views");
-        application.waitForActivity("NestedViewsActivity", 5000);
+        goToActivity(application, ACTIVITY_NESTED_VIEWS);
 
         UIElement checkBox = application.query("checkBox").first();
         boolean isChecked = checkBox.isChecked();
@@ -118,8 +117,7 @@ public class AllActionsIT {
 
     @Test
     public void shouldPerformScrollActions() throws CalabashException {
-        goToActivity(application, "Scroll List");
-        application.waitForActivity("ScrollListActivity", 5000);
+        goToActivity(application, ACTIVITY_SCROLL_LIST);
 
         String queryForSecondPageElement = "textView marked:'The House of Mirth'";
         assertEquals(0, application.query(queryForSecondPageElement).size());
@@ -148,12 +146,11 @@ public class AllActionsIT {
 
     @Test
     public void shouldSelectMenuOptions() throws CalabashException {
-        goToActivity(application, "Simple Elements");
+        goToActivity(application, ACTIVITY_SIMPLE_ELEMENTS);
 
         application.selectMenuItem("Third");
         UIElement textView = application.query("textView index:1").first();
         assertEquals("Third menu item was selected", textView.getText());
-
 
         application.selectMenuItem("Fourth");
         textView = application.query("textView index:1").first();
@@ -163,17 +160,28 @@ public class AllActionsIT {
 
     @Test
     public void shouldPerformSwipeActions() throws CalabashException {
-        goToActivity(application, "Swipe Page");
+        goToActivity(application, ACTIVITY_SWIPE_PAGE);
 
         application.swipe(Direction.RIGHT);
         int index = Integer.parseInt((String) application.query("* id:'pager'").first().getProperty("currentItem"));
         assertEquals(1, index);
 
-
         application.swipe(Direction.LEFT);
         index = Integer.parseInt((String) application.query("* id:'pager'").first().getProperty("currentItem"));
         assertEquals(0, index);
+    }
 
+    @Test
+    public void shouldPerformLongPress() throws CalabashException {
+        goToActivity(application, ACTIVITY_SIMPLE_ELEMENTS);
+
+        application.query("textView marked:'Long press text'").first().longPress();
+        UIElement resultTextView = application.query("textView id:'textView'").first();
+        assertEquals("long press text was long pressed", resultTextView.getText());
+
+        application.query("imageView id:'longPressImage'").first().longPress();
+        UIElement resultTextViewAfter = application.query("textView id:'textView'").first();
+        assertEquals("long press image was long pressed", resultTextViewAfter.getText());
     }
 
     @Test

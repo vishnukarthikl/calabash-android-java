@@ -52,6 +52,11 @@ public class UIElement {
         return getStringFromHash(data, "text");
     }
 
+    public void setText(String text) throws CalabashException {
+        calabashWrapper.enterText(text, this.getQuery());
+
+    }
+
     /**
      * Get description about this element
      *
@@ -144,11 +149,6 @@ public class UIElement {
         calabashWrapper.touch(query);
     }
 
-    public void setText(String text) throws CalabashException {
-        calabashWrapper.enterText(text, this.getQuery());
-
-    }
-
     public boolean equals(Object obj) {
         if (obj instanceof UIElement) {
             UIElement that = (UIElement) obj;
@@ -183,5 +183,17 @@ public class UIElement {
     public Object getProperty(String selector) throws CalabashException {
         RubyArray rubyArray = calabashWrapper.query(this.getQuery(), selector);
         return Utils.toJavaObject(rubyArray.get(0));
+    }
+
+    public void longPress() throws CalabashException {
+        String elementId = getId();
+        String text = getText();
+        if (elementId != null)
+            calabashWrapper.longPress(PropertyType.id, elementId);
+        else if (text != null && !text.isEmpty()) {
+            calabashWrapper.longPress(PropertyType.text, text);
+        } else {
+            throw new CalabashException("Failed to long press - The element doesn't have an id or text property");
+        }
     }
 }
