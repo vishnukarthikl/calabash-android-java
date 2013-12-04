@@ -169,4 +169,12 @@ public class AndroidApplication {
                  break;
         }
     }
+
+    public void setGPSCoordinates(double latitude, double longitude) throws CalabashException {
+        calabashWrapper.setGPSCoordinates(latitude, longitude);
+    }
+
+    public void setGPSLocation(String location) throws CalabashException {
+        calabashWrapper.setGPSLocation(location);
+    }
 }

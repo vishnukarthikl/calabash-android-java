@@ -430,4 +430,30 @@ public class AndroidCalabashWrapper {
             throw new CalabashException(message, e);
         }
     }
+
+    public void setGPSCoordinates(double latitude, double longitude) throws CalabashException {
+        try {
+            info("Setting gps coordinates %f : %f", latitude, longitude);
+            container.clear();
+            container.runScriptlet(String.format("set_gps_coordinates(%f, %f)", latitude, longitude));
+
+        } catch (Exception e) {
+            String message = String.format("Failed to set coordinates %f : %f", latitude, longitude);
+            error(message, e);
+            throw new CalabashException(message, e);
+        }
+
+    }
+
+    public void setGPSLocation(String location) throws CalabashException {
+        try {
+            info("Setting GPS location to : %s", location);
+            container.clear();
+            container.runScriptlet(String.format("set_gps_coordinates_from_location('%s')", location));
+        }  catch (Exception e) {
+            String message = "Failed to set gps location to : " + location;
+            error(message, e);
+            throw new CalabashException(message, e);
+        }
+    }
 }

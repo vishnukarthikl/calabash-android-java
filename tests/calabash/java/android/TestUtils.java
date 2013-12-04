@@ -12,12 +12,18 @@ import static org.junit.Assert.fail;
 
 public class TestUtils {
 
-    private static HashMap<String, String> activityMap = new HashMap<String, String>(){{
-        put(AllActionsIT.ACTIVITY_SIMPLE_ELEMENTS, "SimpleElementsActivity");
-        put(AllActionsIT.ACTIVITY_SWIPE_PAGE, "SwipePageActivity");
-        put(AllActionsIT.ACTIVITY_SCROLL_LIST, "ScrollListActivity");
-        put(AllActionsIT.ACTIVITY_NESTED_VIEWS, "NestedViewsActivity");
+    public static final String ACTIVITY_CURRENT_LOCATION = "Current Location";
+    public static final String ACTIVITY_SCROLL_LIST = "Scroll List";
+    public static final String ACTIVITY_NESTED_VIEWS = "Nested Views";
+    public static final String ACTIVITY_SWIPE_PAGE = "Swipe Page";
+    public static final String ACTIVITY_SIMPLE_ELEMENTS = "Simple Elements";
 
+    private static HashMap<String, String> activityMap = new HashMap<String, String>(){{
+        put(ACTIVITY_SIMPLE_ELEMENTS, "SimpleElementsActivity");
+        put(ACTIVITY_SWIPE_PAGE, "SwipePageActivity");
+        put(ACTIVITY_SCROLL_LIST, "ScrollListActivity");
+        put(ACTIVITY_NESTED_VIEWS, "NestedViewsActivity");
+        put(ACTIVITY_CURRENT_LOCATION, "CurrentLocationActivity");
     }};
 
     public static File createTempDir(String directoryName) throws IOException {

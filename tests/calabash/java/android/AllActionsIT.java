@@ -13,10 +13,6 @@ import static org.junit.Assert.assertTrue;
 public class AllActionsIT {
 
 
-    public static final String ACTIVITY_SIMPLE_ELEMENTS = "Simple Elements";
-    public static final String ACTIVITY_SWIPE_PAGE = "Swipe Page";
-    public static final String ACTIVITY_NESTED_VIEWS = "Nested Views";
-    public static final String ACTIVITY_SCROLL_LIST = "Scroll List";
     private static String packageName;
     private static File tempDir;
     private static File apkPath;
@@ -181,7 +177,29 @@ public class AllActionsIT {
 
         application.query("imageView id:'longPressImage'").first().longPress();
         UIElement resultTextViewAfter = application.query("textView id:'textView'").first();
-        assertEquals("long press image was long pressed", resultTextViewAfter.getText());
+        assertEquals("long press image   was long pressed", resultTextViewAfter.getText());
+    }
+
+    @Test
+    public void shouldSetGPSCoordinates() throws CalabashException {
+        goToActivity(application, ACTIVITY_CURRENT_LOCATION);
+
+        application.setGPSCoordinates(12.928909, 77.628906);
+        UIElement latitudeText = application.query("textView id:'latitude'").first();
+        UIElement longitudeText = application.query("textView id:'longitude'").first();
+        assertEquals(Double.parseDouble(latitudeText.getText()), 12.928909, .001);
+        assertEquals(Double.parseDouble(longitudeText.getText()), 77.628906, .001);
+
+        application.setGPSLocation("Thoughtworks inc, San Francisco");
+        latitudeText = application.query("textView id:'latitude'").first();
+        longitudeText = application.query("textView id:'longitude'").first();
+
+        assertEquals(Double.parseDouble(latitudeText.getText()), 37.792626, .05);
+        assertEquals(Double.parseDouble(longitudeText.getText()), -122.402698, .05);
+
+
+
+
     }
 
     @Test
