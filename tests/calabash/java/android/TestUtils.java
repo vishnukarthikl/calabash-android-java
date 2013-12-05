@@ -52,7 +52,7 @@ public class TestUtils {
     }
 
     public static AndroidApplication installAppOnEmulator(String serial, String packageName, File androidApkPath) throws CalabashException {
-        uninstall(packageName);
+        uninstall(packageName, serial);
         AndroidConfiguration configuration = new AndroidConfiguration();
         configuration.setSerial(serial);
         configuration.setLogsDirectory(new File("logs"));
@@ -64,8 +64,8 @@ public class TestUtils {
         return application;
     }
 
-    public static void uninstall(String packageName) {
-        String[] command = {"adb", "uninstall", packageName};
+    public static void uninstall(String packageName, String serial) {
+        String[] command = {"adb", "-s", serial, "uninstall", packageName};
         try {
             runCommand(command);
         } catch (CalabashException e) {

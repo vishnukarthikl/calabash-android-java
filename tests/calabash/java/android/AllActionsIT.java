@@ -50,8 +50,30 @@ public class AllActionsIT {
     @Test
     @Ignore("Need to speed up inspect..taking too long")
     public void shouldInspectApplicationElements() throws CalabashException {
-        goToActivity(application, ACTIVITY_NESTED_VIEWS);
-        String expectedElementCollection = "";
+        goToActivity(application, ACTIVITY_SIMPLE_ELEMENTS);
+        String expectedElementCollection = "Element : com.android.internal.policy.impl.PhoneWindow$DecorView , Nesting : 0\n" +
+                "Element : com.android.internal.widget.ActionBarOverlayLayout , Nesting : 1\n" +
+                "Element : android.widget.FrameLayout , Nesting : 2\n" +
+                "Element : android.widget.LinearLayout , Nesting : 3\n" +
+                "Element : android.widget.TextView , Nesting : 4\n" +
+                "Element : android.widget.EditText , Nesting : 4\n" +
+                "Element : android.widget.Button , Nesting : 4\n" +
+                "Element : android.widget.RadioButton , Nesting : 4\n" +
+                "Element : android.widget.ImageButton , Nesting : 4\n" +
+                "Element : android.widget.TextView , Nesting : 4\n" +
+                "Element : android.widget.ImageView , Nesting : 4\n" +
+                "Element : android.widget.LinearLayout , Nesting : 2\n" +
+                "Element : com.android.internal.widget.ActionBarContainer , Nesting : 3\n" +
+                "Element : com.android.internal.widget.ActionBarView , Nesting : 4\n" +
+                "Element : android.widget.LinearLayout , Nesting : 5\n" +
+                "Element : com.android.internal.widget.ActionBarView$HomeView , Nesting : 6\n" +
+                "Element : android.widget.ImageView , Nesting : 7\n" +
+                "Element : android.widget.LinearLayout , Nesting : 6\n" +
+                "Element : android.widget.LinearLayout , Nesting : 7\n" +
+                "Element : android.widget.TextView , Nesting : 8\n" +
+                "Element : com.android.internal.view.menu.ActionMenuView , Nesting : 5\n" +
+                "Element : com.android.internal.view.menu.ActionMenuItemView , Nesting : 6\n" +
+                "Element : com.android.internal.view.menu.ActionMenuPresenter$OverflowMenuButton , Nesting : 6\n";
         final StringBuilder actualElementCollection = new StringBuilder();
 
         application.inspect(new InspectCallback() {
@@ -71,15 +93,15 @@ public class AllActionsIT {
         UIElement imageButton = application.query("imageButton").first();
 
         button.touch();
-        UIElement textView = application.query("textView index:1").first();
+        UIElement textView = application.query("textView id:'textView'").first();
         assertEquals("normal button was clicked", textView.getText());
 
         radioButton.touch();
-        textView = application.query("textView index:1").first();
+        textView = application.query("textView id:'textView'").first();
         assertEquals("radio button was clicked", textView.getText());
 
         imageButton.touch();
-        textView = application.query("textView index:1").first();
+        textView = application.query("textView id:'textView'").first();
         assertEquals("image button was clicked", textView.getText());
     }
 
@@ -90,7 +112,7 @@ public class AllActionsIT {
 
         editText.setText("foo bar");
 
-        UIElement textView = application.query("textView index:1").first();
+        UIElement textView = application.query("textView id:'textView'").first();
         assertEquals("foo bar was entered", textView.getText());
     }
 
@@ -131,6 +153,7 @@ public class AllActionsIT {
 
     @Test
     public void shouldTakeScreenshot() throws CalabashException {
+        goToActivity(application, ACTIVITY_NESTED_VIEWS);
         File screenshotsDir = new File(tempDir, "screenshots");
         screenshotsDir.mkdirs();
 
@@ -145,11 +168,11 @@ public class AllActionsIT {
         goToActivity(application, ACTIVITY_SIMPLE_ELEMENTS);
 
         application.selectMenuItem("Third");
-        UIElement textView = application.query("textView index:1").first();
+        UIElement textView = application.query("textView id:'textView'").first();
         assertEquals("Third menu item was selected", textView.getText());
 
         application.selectMenuItem("Fourth");
-        textView = application.query("textView index:1").first();
+        textView = application.query("textView id:'textView'").first();
         assertEquals("Fourth menu item was selected", textView.getText());
 
     }
@@ -177,7 +200,7 @@ public class AllActionsIT {
 
         application.query("imageView id:'longPressImage'").first().longPress();
         UIElement resultTextViewAfter = application.query("textView id:'textView'").first();
-        assertEquals("long press image   was long pressed", resultTextViewAfter.getText());
+        assertEquals("long press image was long pressed", resultTextViewAfter.getText());
     }
 
     @Test
@@ -196,10 +219,6 @@ public class AllActionsIT {
 
         assertEquals(Double.parseDouble(latitudeText.getText()), 37.792626, .05);
         assertEquals(Double.parseDouble(longitudeText.getText()), -122.402698, .05);
-
-
-
-
     }
 
     @Test
@@ -210,6 +229,6 @@ public class AllActionsIT {
         assertEquals("my string", preferences.get("a string"));
         assertEquals("1.5", preferences.get("a float"));
         assertEquals("123", preferences.get("an int"));
-
     }
+
 }

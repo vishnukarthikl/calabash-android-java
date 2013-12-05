@@ -36,5 +36,6 @@ public class ConditionalWaiter {
                 return;
             }
         } while ((System.currentTimeMillis() - startTime) < timeoutInMillis);
+        throw new CalabashException(String.format("Wait condition timed out after %s ms", timeoutInMillis));
     }
 }

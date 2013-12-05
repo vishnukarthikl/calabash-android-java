@@ -91,7 +91,7 @@ public class AndroidRunnerIT {
     public void shouldInstallApplicationIfSerialIsProvided() throws CalabashException {
         //note: emulator should be launched with serial 'emulator-5554
         String serial = "emulator-5554";
-        uninstall(packageName);
+        uninstall(packageName, serial);
         AndroidConfiguration configuration = new AndroidConfiguration();
         configuration.setSerial(serial);
         AndroidRunner androidRunner = new AndroidRunner(tempAndroidApkPath.getAbsolutePath(), configuration);
@@ -108,7 +108,7 @@ public class AndroidRunnerIT {
         //note: emulator with name 'device' should be launched with serial 'emulator-5554'
         String device = "device";
         String serial = "emulator-5554";
-        uninstall(packageName);
+        uninstall(packageName, serial);
         AndroidConfiguration configuration = new AndroidConfiguration();
         configuration.setDeviceName(device);
         AndroidRunner androidRunner = new AndroidRunner(tempAndroidApkPath.getAbsolutePath(), configuration);
