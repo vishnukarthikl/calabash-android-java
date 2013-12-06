@@ -24,7 +24,7 @@
 	</target>
 
 	<target name="doc">
-		<javadoc packagenames="calabash.java.*" sourcepath="src" defaultexcludes="yes" destdir="${doc.dir}" author="true" version="true" use="true" windowtitle="Calabash-android-java" classpathref="classpath">
+		<javadoc packagenames="com.thoughtworks.twist.calabash.android.*" sourcepath="src" defaultexcludes="yes" destdir="${doc.dir}" author="true" version="true" use="true" windowtitle="Calabash-android-java" classpathref="classpath">
 			<link href="http://developer.java.sun.com/developer/products/xml/docs/api/" />
 		</javadoc>
 	</target>
@@ -51,8 +51,15 @@
 		</jar>
 
 		<jar destfile="${doc.jar}" basedir="${doc.dir}" />
-
 	</target>
+
+    <target name="copy-lib-jar">
+        <copy toDir="${distro.dir}">
+            <fileset dir="${lib.dir}">
+                <include name="*.jar" />
+            </fileset>
+        </copy>
+    </target>
 
 	<target name="-ensure-gems-zip-is-present">
 		<fail message="Path to gems.zip is required. Provide it like 'ant -Dgems.zip.path=PATH'" unless="gems.zip.path" />
@@ -65,7 +72,8 @@
 		<copy file="LICENSE.txt" todir="${distro.dir}" />
 		<copy file="README.md" todir="${distro.dir}" />
 		<copy file="CONTRIBUTORS.txt" todir="${distro.dir}" />
-		<zip basedir="${distro.dir}" includes="**" destfile="${distro.file}" />
+        <antcall target="copy-lib-jar" />
+        <zip basedir="${distro.dir}" includes="**" destfile="${distro.file}" />
 	</target>
 
 </project>
