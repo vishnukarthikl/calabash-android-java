@@ -56,7 +56,9 @@ public class AndroidBridge {
             unlockKeyguard(newSerial);
             return newSerial;
         }
-        //deviceserial is null!!
+        if (deviceSerial == null) {
+            throw new CalabashException("Could not get the device serial, set the serial or devicename in the AndroidConfiguration");
+        }
         return deviceSerial;
     }
 
