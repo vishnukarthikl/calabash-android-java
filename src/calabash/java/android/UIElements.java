@@ -43,9 +43,9 @@ public final class UIElements extends ArrayList<UIElement> implements AndroidEle
     }
 
     /**
-     * Gets the first element
+     * Gets the first element in the list
      *
-     * @return
+     * @return first element
      * @throws CalabashException
      */
     public UIElement first() throws CalabashException {

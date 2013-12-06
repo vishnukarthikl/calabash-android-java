@@ -154,18 +154,13 @@ public class AndroidRunner {
 
     private String getCurrentVersion() {
         try {
-            Enumeration<URL> resources = getClass().getClassLoader()
-                    .getResources("META-INF/MANIFEST.MF");
+            Enumeration<URL> resources = getClass().getClassLoader().getResources("META-INF/MANIFEST.MF");
             while (resources.hasMoreElements()) {
                 try {
-                    Manifest manifest = new Manifest(resources.nextElement()
-                            .openStream());
+                    Manifest manifest = new Manifest(resources.nextElement().openStream());
                     Attributes mainAttributes = manifest.getMainAttributes();
-                    if (mainAttributes != null
-                            && "calabash-android-java".equals(mainAttributes
-                            .getValue("Project-Name"))) {
-                        String value = mainAttributes
-                                .getValue("Implementation-Version");
+                    if (mainAttributes != null && "calabash-android-java".equals(mainAttributes.getValue("Project-Name"))) {
+                        String value = mainAttributes.getValue("Implementation-Version");
                         if (value != null)
                             return value;
                     }

@@ -28,7 +28,7 @@ public class UIElement implements AndroidElementAction {
     /**
      * Get element's class
      *
-     * @return
+     * @return the class property
      */
     public String getElementClass() {
         return getStringFromHash(data, "class");
