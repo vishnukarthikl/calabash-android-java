@@ -72,7 +72,7 @@ public class AndroidCalabashWrapper {
     public void start(String serial) throws CalabashException {
         try {
             addRequiresAndIncludes("Calabash::Android::Operations");
-            container.runScriptlet(format("Dir.chdir '%s'", apk.getParent()));
+            container.runScriptlet(format("Dir.chdir '%s'", apk.getParentFile().getAbsolutePath()));
             addContainerEnv(ADB_DEVICE_ARG, serial);
             addContainerEnv(APP_PATH, apk.getAbsolutePath());
             String testServerPath = container.runScriptlet("test_server_path(ENV['APP_PATH'])").toString();
@@ -90,7 +90,7 @@ public class AndroidCalabashWrapper {
             container.runScriptlet("start_test_server_in_background");
             info("Started the app");
         } catch (Exception e) {
-            throw new CalabashException("Error starting the app", e);
+            throw new CalabashException("Error starting the app:" + e.getMessage(), e);
         }
     }
 
@@ -450,7 +450,7 @@ public class AndroidCalabashWrapper {
             info("Setting GPS location to : %s", location);
             container.clear();
             container.runScriptlet(String.format("set_gps_coordinates_from_location('%s')", location));
-        }  catch (Exception e) {
+        } catch (Exception e) {
             String message = "Failed to set gps location to : " + location;
             error(message, e);
             throw new CalabashException(message, e);
