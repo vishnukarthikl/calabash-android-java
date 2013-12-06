@@ -101,6 +101,13 @@ public class AndroidApplication {
         calabashWrapper.takeScreenShot(dir, fileName);
     }
 
+    /**
+     * Read the preferences inside the shared preference denoted by <code>preferenceName</code>
+     *
+     * @param preferenceName name of the shared preference
+     * @return a map of preferences in the shared preference
+     * @throws CalabashException
+     */
     public Map<String, String> getSharedPreferences(String preferenceName) throws CalabashException {
         if (preferenceName == null || preferenceName.isEmpty()) {
             throw new CalabashException("Invalid preference name");
@@ -116,17 +123,29 @@ public class AndroidApplication {
     /**
      * Gets the name of the current activity on the application.
      *
-     * @return
+     * @return the name of the activity on the screen
      */
     public String getCurrentActivity() throws CalabashException {
         return calabashWrapper.getCurrentActivity();
     }
 
+    /**
+     * simulates the press of 'back' button
+     *
+     * @throws CalabashException
+     */
     public void goBack() throws CalabashException {
         calabashWrapper.performGoBack();
 
     }
 
+    /**
+     * Wait for an activity to come on the screen
+     *
+     * @param activityName  the activity name which you want to wait for
+     * @param timeoutMillis times out with <code>CalabashException</code>
+     * @throws CalabashException
+     */
     public void waitForActivity(final String activityName, int timeoutMillis) throws CalabashException {
         waitFor(new ICondition() {
             @Override
@@ -161,19 +180,41 @@ public class AndroidApplication {
         calabashWrapper.selectMenuItem(menuItem);
     }
 
+    /**
+     * Performs a swipe action on the screen
+     *
+     * @param direction the direction to swipe
+     * @throws CalabashException
+     */
     public void swipe(Direction direction) throws CalabashException {
         switch (direction) {
-            case LEFT:calabashWrapper.drag(1, 99, 50, 50, 5);
-                 break;
-            case RIGHT:calabashWrapper.drag(99, 1, 50, 50, 5);
-                 break;
+            case LEFT:
+                calabashWrapper.drag(1, 99, 50, 50, 5);
+                break;
+            case RIGHT:
+                calabashWrapper.drag(99, 1, 50, 50, 5);
+                break;
         }
     }
 
+    /**
+     * Modify the gps co-ordinates of your emulator
+     *
+     * @param latitude
+     * @param longitude
+     * @throws CalabashException
+     */
     public void setGPSCoordinates(double latitude, double longitude) throws CalabashException {
         calabashWrapper.setGPSCoordinates(latitude, longitude);
     }
 
+    /**
+     * Modify the gps co-ordinates of your emulator.
+     * You can specify the location like 'Bangalore, India' and set the co-ordinates with the best match using <a href="http://www.rubygeocoder.com"/>GeoCoder</a>
+     *
+     * @param location
+     * @throws CalabashException
+     */
     public void setGPSLocation(String location) throws CalabashException {
         calabashWrapper.setGPSLocation(location);
     }

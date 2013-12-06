@@ -121,16 +121,16 @@ public class AllActionsIT {
         goToActivity(application, ACTIVITY_NESTED_VIEWS);
 
         UIElement checkBox = application.query("checkBox").first();
-        boolean isChecked = checkBox.isChecked();
-        assertEquals(isChecked, false);
+        String isChecked = checkBox.getProperty("checked").toString();
+        assertEquals(false, Boolean.parseBoolean(isChecked));
 
         checkBox.setChecked(true);
-        isChecked = checkBox.isChecked();
-        assertEquals(isChecked, true);
+        isChecked = checkBox.getProperty("checked").toString();
+        assertEquals(true, Boolean.parseBoolean(isChecked));
 
         checkBox.setChecked(false);
-        isChecked = checkBox.isChecked();
-        assertEquals(isChecked, false);
+        isChecked = checkBox.getProperty("checked").toString();
+        assertEquals(false, Boolean.parseBoolean(isChecked));
     }
 
     @Test
@@ -148,7 +148,6 @@ public class AllActionsIT {
 
         application.scrollUp();
         assertEquals(1, application.query(queryForFirstPageElement).size());
-
     }
 
     @Test

@@ -18,7 +18,7 @@ public class TestUtils {
     public static final String ACTIVITY_SWIPE_PAGE = "Swipe Page";
     public static final String ACTIVITY_SIMPLE_ELEMENTS = "Simple Elements";
 
-    private static HashMap<String, String> activityMap = new HashMap<String, String>(){{
+    private static HashMap<String, String> activityMap = new HashMap<String, String>() {{
         put(ACTIVITY_SIMPLE_ELEMENTS, "SimpleElementsActivity");
         put(ACTIVITY_SWIPE_PAGE, "SwipePageActivity");
         put(ACTIVITY_SCROLL_LIST, "ScrollListActivity");
@@ -69,7 +69,7 @@ public class TestUtils {
         try {
             runCommand(command);
         } catch (CalabashException e) {
-            fail();
+            fail(e.getMessage());
         }
 
     }

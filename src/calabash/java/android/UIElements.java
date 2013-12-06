@@ -14,7 +14,7 @@ import java.util.regex.Pattern;
  *
  *
  */
-public final class UIElements extends ArrayList<UIElement> {
+public final class UIElements extends ArrayList<UIElement> implements AndroidElementAction {
 
     private static final long serialVersionUID = 3506802535880079938L;
 
@@ -68,8 +68,10 @@ public final class UIElements extends ArrayList<UIElement> {
         get(0).touch();
     }
 
-    public void setText(String text) throws CalabashException {
+    public void longPress() throws CalabashException {
         ensureCollectionIsNotEmpty();
-        get(0).setText(text);
+        get(0).longPress();
     }
+
+
 }

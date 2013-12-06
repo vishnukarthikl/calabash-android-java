@@ -12,7 +12,7 @@ import static calabash.java.android.Utils.getStringFromHash;
 /**
  * Represents an UI element.
  */
-public class UIElement {
+public class UIElement implements AndroidElementAction {
 
     private final RubyHash data;
     private final String query;
@@ -37,7 +37,7 @@ public class UIElement {
     /**
      * Gets the element id
      *
-     * @return
+     * @return the id property
      */
     public String getId() {
         return getStringFromHash(data, "id");
@@ -46,12 +46,18 @@ public class UIElement {
     /**
      * Gets the label
      *
-     * @return
+     * @return the text property
      */
     public String getText() {
         return getStringFromHash(data, "text");
     }
 
+    /**
+     * Set the text property of the element
+     *
+     * @param text
+     * @throws CalabashException
+     */
     public void setText(String text) throws CalabashException {
         calabashWrapper.enterText(text, this.getQuery());
 
@@ -60,7 +66,7 @@ public class UIElement {
     /**
      * Get description about this element
      *
-     * @return
+     * @return the description property
      */
     public String getDescription() {
         return getStringFromHash(data, "description");
@@ -69,7 +75,7 @@ public class UIElement {
     /**
      * is the element enabled
      *
-     * @return
+     * @return the isEnabled property
      */
     public String isEnabled() {
         return getStringFromHash(data, "enabled");
@@ -78,7 +84,7 @@ public class UIElement {
     /**
      * Get the content description of this element
      *
-     * @return
+     * @return the contentDescription property
      */
     public String getContentDescription() {
         return getStringFromHash(data, "contentDescription");
@@ -87,7 +93,7 @@ public class UIElement {
     /**
      * Gets the underlying query used to locate this element
      *
-     * @return Query
+     * @return query
      */
     public String getQuery() {
         return this.query;
@@ -96,7 +102,7 @@ public class UIElement {
     /**
      * Gets the rectangle
      *
-     * @return
+     * @return the rectangle
      */
     public Rect getRect() {
         RubyHash rect;
@@ -110,11 +116,6 @@ public class UIElement {
 
         return new Rect(getIntFromHash(rect, "x"), getIntFromHash(rect, "y"), getIntFromHash(rect, "width"), getIntFromHash(rect, "height"),
                 getIntFromHash(rect, "center_x"), getIntFromHash(rect, "center_y"));
-    }
-
-    public String toString() {
-        return String.format("id: %s, class: %s, text: %s, description: %s, content description: %s, enabled: %s, rect: %s",
-                getId(), getElementClass(), getText(), getDescription(), getContentDescription(), isEnabled(), getRect());
     }
 
     /**
@@ -141,12 +142,41 @@ public class UIElement {
     }
 
     /**
-     * performs touch operation on the particular element
+     * set the checked property of the element. It is advisable to do it only on a check box
      *
+     * @param checked
      * @throws CalabashException
      */
+    public void setChecked(boolean checked) throws CalabashException {
+        calabashWrapper.setChecked(this.getQuery(), checked);
+    }
+
+    /**
+     * get the <code>selector</code> property of the element
+     *
+     * @param selector the property of the element
+     * @return the value of the selector property
+     * @throws CalabashException
+     */
+    public Object getProperty(String selector) throws CalabashException {
+        RubyArray rubyArray = calabashWrapper.query(this.getQuery(), selector);
+        return Utils.toJavaObject(rubyArray.get(0));
+    }
+
     public void touch() throws CalabashException {
         calabashWrapper.touch(query);
+    }
+
+    public void longPress() throws CalabashException {
+        String elementId = getId();
+        String text = getText();
+        if (elementId != null)
+            calabashWrapper.longPress(PropertyType.id, elementId);
+        else if (text != null && !text.isEmpty()) {
+            calabashWrapper.longPress(PropertyType.text, text);
+        } else {
+            throw new CalabashException("Failed to long press - The element doesn't have an id or text property");
+        }
     }
 
     public boolean equals(Object obj) {
@@ -172,28 +202,8 @@ public class UIElement {
         return super.equals(obj);
     }
 
-    public boolean isChecked() throws CalabashException {
-        return calabashWrapper.isChecked(this.getQuery());
-    }
-
-    public void setChecked(boolean checked) throws CalabashException {
-        calabashWrapper.setChecked(this.getQuery(), checked);
-    }
-
-    public Object getProperty(String selector) throws CalabashException {
-        RubyArray rubyArray = calabashWrapper.query(this.getQuery(), selector);
-        return Utils.toJavaObject(rubyArray.get(0));
-    }
-
-    public void longPress() throws CalabashException {
-        String elementId = getId();
-        String text = getText();
-        if (elementId != null)
-            calabashWrapper.longPress(PropertyType.id, elementId);
-        else if (text != null && !text.isEmpty()) {
-            calabashWrapper.longPress(PropertyType.text, text);
-        } else {
-            throw new CalabashException("Failed to long press - The element doesn't have an id or text property");
-        }
+    public String toString() {
+        return String.format("id: %s, class: %s, text: %s, description: %s, content description: %s, enabled: %s, rect: %s",
+                getId(), getElementClass(), getText(), getDescription(), getContentDescription(), isEnabled(), getRect());
     }
 }
