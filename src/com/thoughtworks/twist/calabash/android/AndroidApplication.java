@@ -116,14 +116,14 @@ public class AndroidApplication {
     }
 
     /**
-     * wait for ICondition's
-     * @param condition
-     * @param timeout
+     * waits for specified condition for the given timeoutInSec
+     * @param condition Condition to wait for
+     * @param timeoutInSec timeout in seconds
      * @throws CalabashException
      * @throws OperationTimedoutException
      */
-    public void waitFor(ICondition condition, int timeout) throws CalabashException, OperationTimedoutException {
-        calabashWrapper.waitFor(condition, new WaitOptions(timeout));
+    public void waitFor(ICondition condition, int timeoutInSec) throws CalabashException, OperationTimedoutException {
+        calabashWrapper.waitFor(condition, new WaitOptions(timeoutInSec));
     }
 
     /**
@@ -175,7 +175,6 @@ public class AndroidApplication {
                 return getCurrentActivity().contains(activityName);
             }
         }, timeout);
-
     }
 
     /**
