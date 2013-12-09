@@ -33,7 +33,7 @@ public class Main {
 Writing tests
 ==============
 
-Finding an element and touching it
+Finding an element and touching it. In the below example, we query for a button and then touch the first one.
 
 ```java
 import calabash.java.IOSApplication;
@@ -41,19 +41,20 @@ import calabash.java.CalabashException;
 import calabash.java.CalabashRunner;
 import calabash.java.UIElement;
 
-public class Program {
+public class Main {
     public static void main(String[] args) throws CalabashException {
-        CalabashRunner runner = new CalabashRunner("/path/to/your/ios/project");
-        runner.setupCalabash();
+        AndroidConfiguration androidConfiguration = new AndroidConfiguration();
+        androidConfiguration.setSerial("emulator-5554");
+        AndroidRunner androidRunner = new AndroidRunner("res/AndroidTestApplication.apk", androidConfiguration);
+        AndroidApplication application = androidRunner.start();
 
-        IOSApplication application = runner.start();
-        UIElement element = application.query("button").get(0);
-        element.touch();
+        UIElements button = application.query("button");
+        button.touch();
     }
 }
 ```
 
-For the query syntax, please take a look at [Calabash Wiki](https://github.com/calabash/calabash-ios/wiki/05-Query-syntax). You can use Junit asserts to perform assertions. For more information, visit [Calabash](https://github.com/calabash/calabash-ios) page.
+For the query syntax, please take a look at [Calabash Wiki](http://blog.lesspainful.com/2012/12/18/Android-Query/). You can use Junit asserts to perform assertions. For more information, visit [Calabash](https://github.com/calabash/calabash-android) page.
 
 Inspecting elements
 ===================
@@ -88,8 +89,7 @@ Screenshots
 `takeScreenshot()` function can be used to take the screenshot. You can also listen to screenshot events which will be called whenever a screenshot is taken. Calabash ruby client takes screenshots when there is a failure. Hooking on to this event handler will let you know when screenshots are taken.
 
 ```java
-
-public class Program {
+public class Main {
     public static void main(String[] args) throws CalabashException, OperationTimedoutException {
             AndroidConfiguration androidConfiguration = new AndroidConfiguration();
             androidConfiguration.setSerial("emulator-5554");
