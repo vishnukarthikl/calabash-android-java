@@ -12,18 +12,19 @@ import static org.junit.Assert.fail;
 
 public class TestUtils {
 
+    public static final String ACTIVITY_MAIN = "Main Activity";
     public static final String ACTIVITY_CURRENT_LOCATION = "Current Location";
     public static final String ACTIVITY_SCROLL_LIST = "Scroll List";
     public static final String ACTIVITY_NESTED_VIEWS = "Nested Views";
     public static final String ACTIVITY_SWIPE_PAGE = "Swipe Page";
     public static final String ACTIVITY_SIMPLE_ELEMENTS = "Simple Elements";
-
-    private static HashMap<String, String> activityMap = new HashMap<String, String>() {{
+    public static HashMap<String, String> activityMap = new HashMap<String, String>() {{
         put(ACTIVITY_SIMPLE_ELEMENTS, "SimpleElementsActivity");
         put(ACTIVITY_SWIPE_PAGE, "SwipePageActivity");
         put(ACTIVITY_SCROLL_LIST, "ScrollListActivity");
         put(ACTIVITY_NESTED_VIEWS, "NestedViewsActivity");
         put(ACTIVITY_CURRENT_LOCATION, "CurrentLocationActivity");
+        put(ACTIVITY_MAIN, "MyActivity");
     }};
 
     public static File createTempDir(String directoryName) throws IOException {
@@ -46,21 +47,25 @@ public class TestUtils {
         return tempAndroidPath;
     }
 
-    public static void goToActivity(AndroidApplication application, final String activityName) throws CalabashException {
+    public static void goToActivity(AndroidApplication application, final String activityName) throws CalabashException, OperationTimedoutException {
         application.query("* marked:'" + activityName + "'").touch();
-        application.waitForActivity(activityMap.get(activityName), 5000);
+        application.waitForActivity(activityMap.get(activityName), 5);
     }
 
     public static AndroidApplication installAppOnEmulator(String serial, String packageName, File androidApkPath) throws CalabashException {
-        uninstall(packageName, serial);
         AndroidConfiguration configuration = new AndroidConfiguration();
         configuration.setSerial(serial);
         configuration.setLogsDirectory(new File("logs"));
+        return installAppOnEmulator(serial, packageName, androidApkPath, configuration);
+    }
+
+    public static AndroidApplication installAppOnEmulator(String serial, String packageName, File androidApkPath, AndroidConfiguration configuration) throws CalabashException {
+        uninstall(packageName, serial);
         AndroidRunner androidRunner = new AndroidRunner(androidApkPath.getAbsolutePath(), configuration);
         androidRunner.setup();
         AndroidApplication application = androidRunner.start();
         assertTrue(isAppInstalled(packageName, serial));
-        assertTrue(isMainActivity(application, "MyActivity"));
+        assertTrue(isMainActivity(application, activityMap.get(ACTIVITY_MAIN)));
         return application;
     }
 

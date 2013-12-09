@@ -115,9 +115,31 @@ public class AndroidApplication {
         return calabashWrapper.getPreferences(preferenceName);
     }
 
-    public void waitFor(ICondition condition, int timeout) throws CalabashException {
-        ConditionalWaiter conditionalWaiter = new ConditionalWaiter(condition);
-        conditionalWaiter.run(timeout);
+    /**
+     * wait for ICondition's
+     * @param condition
+     * @param timeout
+     * @throws CalabashException
+     * @throws OperationTimedoutException
+     */
+    public void waitFor(ICondition condition, int timeout) throws CalabashException, OperationTimedoutException {
+        calabashWrapper.waitFor(condition, new WaitOptions(timeout));
+    }
+
+    /**
+     * Waits for the specified condition with the options specified
+     *
+     * @param condition
+     *            Condition to wait for
+     * @param options
+     *            Wait options
+     * @throws CalabashException
+     *             When any calabash operations fails
+     * @throws OperationTimedoutException
+     *             When the operation elapsed the timeout period
+     */
+    public void waitFor(ICondition condition, WaitOptions options) throws CalabashException, OperationTimedoutException {
+        calabashWrapper.waitFor(condition, options);
     }
 
     /**
@@ -143,16 +165,16 @@ public class AndroidApplication {
      * Wait for an activity to come on the screen
      *
      * @param activityName  the activity name which you want to wait for
-     * @param timeoutMillis times out with <code>CalabashException</code>
+     * @param timeout in seconds to timeout when condition fails resulting <code>CalabashException</code>
      * @throws CalabashException
      */
-    public void waitForActivity(final String activityName, int timeoutMillis) throws CalabashException {
+    public void waitForActivity(final String activityName, int timeout) throws CalabashException, OperationTimedoutException {
         waitFor(new ICondition() {
             @Override
             public boolean test() throws CalabashException {
                 return getCurrentActivity().contains(activityName);
             }
-        }, timeoutMillis);
+        }, timeout);
 
     }
 

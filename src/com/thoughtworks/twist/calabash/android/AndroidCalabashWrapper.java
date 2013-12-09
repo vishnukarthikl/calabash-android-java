@@ -57,14 +57,14 @@ public class AndroidCalabashWrapper {
             String calabashAndroid = new File(getCalabashGemDirectory(), "calabash-android").getAbsolutePath();
             container.runScriptlet(PathType.ABSOLUTE, calabashAndroid);
 
-            CalabashLogger.info("Done signing the app");
+            info("Done signing the app");
             container.put("ARGV", new String[]{"build", apk.getAbsolutePath()});
             container.runScriptlet(PathType.ABSOLUTE, calabashAndroid);
 
-            CalabashLogger.info("App build complete");
+            info("App build complete");
 
         } catch (Exception e) {
-            CalabashLogger.error("Failed to setup calabash for project: %s", e, apk.getAbsolutePath());
+            error("Failed to setup calabash for project: %s", e, apk.getAbsolutePath());
             throw new CalabashException(format("Failed to setup calabash. %s", e.getMessage()));
         }
     }
@@ -80,15 +80,15 @@ public class AndroidCalabashWrapper {
 
             String packageName = container.runScriptlet("package_name(ENV['APP_PATH'])").toString();
             if (configuration.shouldReinstallApp() || !androidBridge.isAppInstalled(packageName, serial)) {
-                CalabashLogger.info("Reinstalling app %s and test server on %s", packageName, serial);
+                info("Reinstalling app %s and test server on %s", packageName, serial);
                 container.runScriptlet("reinstall_apps");
             } else {
-                CalabashLogger.info("Reinstalling test server on %s", serial);
+                info("Reinstalling test server on %s", serial);
                 container.runScriptlet("reinstall_test_server");
             }
 
             container.runScriptlet("start_test_server_in_background");
-            CalabashLogger.info("Started the app");
+            info("Started the app");
         } catch (Exception e) {
             throw new CalabashException("Error starting the app:" + e.getMessage(), e);
         }
@@ -123,10 +123,10 @@ public class AndroidCalabashWrapper {
         List<File> keystoreLocation = getKeystoreLocation();
         for (File file : keystoreLocation) {
             if (file.exists()) {
-                CalabashLogger.info("Debug Keystore found at %s", file.getAbsolutePath());
+                info("Debug Keystore found at %s", file.getAbsolutePath());
                 return;
             }
-            CalabashLogger.info("Could not find debug keystore at %s", file.getAbsolutePath());
+            info("Could not find debug keystore at %s", file.getAbsolutePath());
         }
         generateDefaultAndroidKeyStore();
     }
@@ -134,7 +134,7 @@ public class AndroidCalabashWrapper {
     private void generateDefaultAndroidKeyStore() throws CalabashException {
         File destinationKeystoreLocation = new File(apk.getParentFile(), "debug.keystore");
         String[] keygenCommand = getKeygenCommand(destinationKeystoreLocation.getAbsolutePath());
-        CalabashLogger.info("Generating keystore at %s", destinationKeystoreLocation.getAbsolutePath());
+        info("Generating keystore at %s", destinationKeystoreLocation.getAbsolutePath());
         Utils.runCommand(keygenCommand, "could not generate debug.keystore");
     }
 
@@ -164,11 +164,11 @@ public class AndroidCalabashWrapper {
         URL[] urls = classLoader.getURLs();
         for (URL url : urls) {
             if (url.toString().contains(resource)) {
-                CalabashLogger.info("Found %s in classpath at : %s", resource, url.getFile());
+                info("Found %s in classpath at : %s", resource, url.getFile());
                 return url.getFile();
             }
         }
-        CalabashLogger.error("Could not find %s in classpath", resource);
+        error("Could not find %s in classpath", resource);
         return null;
     }
 
@@ -221,7 +221,7 @@ public class AndroidCalabashWrapper {
     public RubyArray query(String query, String... args) throws CalabashException {
         ensureNotDisposed();
         try {
-            CalabashLogger.info("Executing query - %s", query);
+            info("Executing query - %s", query);
             container.clear();
             container.put("cajQueryString", query);
             container.put("cajQueryArgs", args);
@@ -234,19 +234,19 @@ public class AndroidCalabashWrapper {
 
             return queryResults;
         } catch (Exception e) {
-            CalabashLogger.error("Execution of query: %s, failed", e, query);
+            error("Execution of query: %s, failed", e, query);
             throw new CalabashException(String.format("Failed to execute '%s'. %s", query, e.getMessage()));
         }
     }
 
     public void touch(String query) throws CalabashException {
         try {
-            CalabashLogger.info("Touching - %s", query);
+            info("Touching - %s", query);
             container.clear();
             container.put("cajQueryString", query);
             container.runScriptlet("touch(cajQueryString)");
         } catch (Exception e) {
-            CalabashLogger.error("Failed to touch on: %s", e, query);
+            error("Failed to touch on: %s", e, query);
             throw new CalabashException(String.format("Failed to touch on: %s. %s", query, e.getMessage()));
         }
 
@@ -254,13 +254,13 @@ public class AndroidCalabashWrapper {
 
     public void enterText(String text, String query) throws CalabashException {
         try {
-            CalabashLogger.info("Entering text %s into %s", text, query);
+            info("Entering text %s into %s", text, query);
             container.clear();
             container.put("cajQueryString", query);
             String setText = String.format("{:setText => '%s'}", text);
             container.runScriptlet(String.format("query(cajQueryString, %s)", setText));
         } catch (Exception e) {
-            CalabashLogger.error("Failed to enter text %s into %s", e, text, query);
+            error("Failed to enter text %s into %s", e, text, query);
             throw new CalabashException(String.format("Failed to enter text %s into %s :%s", text, query, e.getMessage()));
         }
     }
@@ -277,54 +277,54 @@ public class AndroidCalabashWrapper {
             container.terminate();
             disposed = true;
         } catch (Throwable e) {
-            CalabashLogger.error("Failed to dispose container. ", e);
+            error("Failed to dispose container. ", e);
             throw new CalabashException("Failed to dispose container. " + e.getMessage());
         }
     }
 
     public void takeScreenShot(File dir, String fileName) throws CalabashException {
         try {
-            CalabashLogger.info("Taking screenshot");
+            info("Taking screenshot");
             container.clear();
             container.put("cajPrefix", dir.getAbsolutePath() + "/");
             container.put("cajFileName", fileName);
             container.runScriptlet("screenshot(options={:prefix => cajPrefix, :name => cajFileName})");
         } catch (Exception e) {
-            CalabashLogger.error("Failed to take screenshot.", e);
+            error("Failed to take screenshot.", e);
             throw new CalabashException(String.format("Failed to take screenshot. %s", e.getMessage()));
         }
     }
 
     public Map<String, String> getPreferences(String preferenceName) throws CalabashException {
         try {
-            CalabashLogger.info("Finding preferences: %s", preferenceName);
+            info("Finding preferences: %s", preferenceName);
             container.clear();
             container.put("cajPreferenceName", preferenceName);
             RubyHash preferenceHash = (RubyHash) container.runScriptlet("get_preferences(cajPreferenceName)");
             return (Map<String, String>) Utils.toJavaHash(preferenceHash);
 
         } catch (Exception e) {
-            CalabashLogger.error("Failed to get preferences: %s", preferenceName);
+            error("Failed to get preferences: %s", preferenceName);
             throw new CalabashException(String.format("Failed to find preferences: %s", preferenceName));
         }
     }
 
     public String getCurrentActivity() throws CalabashException {
         try {
-            CalabashLogger.info("Getting current activity");
+            info("Getting current activity");
             container.clear();
             RubyHash activityInfoMap = (RubyHash) container.runScriptlet("performAction('get_activity_name')");
             return (String) Utils.toJavaHash(activityInfoMap).get("message");
         } catch (Exception e) {
             String message = "Failed to get Current Activity";
-            CalabashLogger.error(message, e);
+            error(message, e);
             throw new CalabashException(message, e);
         }
     }
 
     public boolean isChecked(String query) throws CalabashException {
         try {
-            CalabashLogger.info("Getting isChecked property");
+            info("Getting isChecked property");
             container.clear();
             container.put("cajQueryString", query);
             RubyArray rubyArray = (RubyArray) container.runScriptlet("query(cajQueryString, :isChecked)");
@@ -332,32 +332,32 @@ public class AndroidCalabashWrapper {
             return Boolean.parseBoolean(javaArray[0].toString());
         } catch (Exception e) {
             String message = "Failed to get isChecked property";
-            CalabashLogger.error(message, e);
+            error(message, e);
             throw new CalabashException(message, e);
         }
     }
 
     public void setChecked(String query, boolean checked) throws CalabashException {
         try {
-            CalabashLogger.info("Setting checked to : %s", checked);
+            info("Setting checked to : %s", checked);
             container.clear();
             container.put("cajQueryString", query);
             container.runScriptlet(String.format("query(cajQueryString, {:method_name => :setChecked, :arguments => [%s] })", checked));
         } catch (Exception e) {
             String message = String.format("Failed to set checked property to: %s", checked);
-            CalabashLogger.error(message, e);
+            error(message, e);
             throw new CalabashException(message, e);
         }
     }
 
     public void performGoBack() throws CalabashException {
         try {
-            CalabashLogger.info("Pressing back button");
+            info("Pressing back button");
             container.clear();
             container.runScriptlet("performAction('go_back')");
         } catch (Exception e) {
             String message = "Failed to go back";
-            CalabashLogger.error(message, e);
+            error(message, e);
             throw new CalabashException(message, e);
         }
 
@@ -365,49 +365,49 @@ public class AndroidCalabashWrapper {
 
     public void scrollDown() throws CalabashException {
         try {
-            CalabashLogger.info("Scrolling down");
+            info("Scrolling down");
             container.clear();
             container.runScriptlet("performAction('scroll_down')");
         } catch (Exception e) {
             String message = "Failed to scroll down";
-            CalabashLogger.error(message, e);
+            error(message, e);
             throw new CalabashException(message, e);
         }
     }
 
     public void scrollUp() throws CalabashException {
         try {
-            CalabashLogger.info("Scrolling up");
+            info("Scrolling up");
             container.clear();
             container.runScriptlet("performAction('scroll_up')");
         } catch (Exception e) {
             String message = "Failed to scroll up";
-            CalabashLogger.error(message, e);
+            error(message, e);
             throw new CalabashException(message, e);
         }
     }
 
     public void selectMenuItem(String menuItem) throws CalabashException {
         try {
-            CalabashLogger.info("Selecting menu item %s", menuItem);
+            info("Selecting menu item %s", menuItem);
             container.clear();
             container.put("cajMenuItem", menuItem);
             container.runScriptlet("performAction('select_from_menu', cajMenuItem)");
         } catch (Exception e) {
             String message = "Failed to Select menu item" + menuItem;
-            CalabashLogger.error(message, e);
+            error(message, e);
             throw new CalabashException(message, e);
         }
     }
 
     public void drag(Integer fromX, Integer toX, Integer fromY, Integer toY, Integer steps) throws CalabashException {
         try {
-            CalabashLogger.info("Performing drag from: (%s,%s) to: (%s,%s) in %s steps", fromX, toX, fromY, toY, steps);
+            info("Performing drag from: (%s,%s) to: (%s,%s) in %s steps", fromX, toX, fromY, toY, steps);
             container.clear();
             container.runScriptlet(String.format("performAction('drag', '%d', '%d', '%d', '%d', '%d')", fromX, toX, fromY, toY, steps));
         } catch (Exception e) {
             String message = "Error performing drag";
-            CalabashLogger.error(message, e);
+            error(message, e);
             throw new CalabashException(message, e);
         }
     }
@@ -426,20 +426,20 @@ public class AndroidCalabashWrapper {
             container.runScriptlet(String.format("performAction('%s', '%s')", actionName, property));
         } catch (Exception e) {
             String message = "Failed to long press";
-            CalabashLogger.error(message, e);
+            error(message, e);
             throw new CalabashException(message, e);
         }
     }
 
     public void setGPSCoordinates(double latitude, double longitude) throws CalabashException {
         try {
-            CalabashLogger.info("Setting gps coordinates %f : %f", latitude, longitude);
+            info("Setting gps coordinates %f : %f", latitude, longitude);
             container.clear();
             container.runScriptlet(String.format("set_gps_coordinates(%f, %f)", latitude, longitude));
 
         } catch (Exception e) {
             String message = String.format("Failed to set coordinates %f : %f", latitude, longitude);
-            CalabashLogger.error(message, e);
+            error(message, e);
             throw new CalabashException(message, e);
         }
 
@@ -447,13 +447,63 @@ public class AndroidCalabashWrapper {
 
     public void setGPSLocation(String location) throws CalabashException {
         try {
-            CalabashLogger.info("Setting GPS location to : %s", location);
+            info("Setting GPS location to : %s", location);
             container.clear();
             container.runScriptlet(String.format("set_gps_coordinates_from_location('%s')", location));
         } catch (Exception e) {
             String message = "Failed to set gps location to : " + location;
-            CalabashLogger.error(message, e);
+            error(message, e);
             throw new CalabashException(message, e);
         }
     }
+
+    public void waitFor(ICondition condition, WaitOptions options) throws CalabashException, OperationTimedoutException {
+        try {
+            info("Waiting for condition");
+            container.clear();
+            addRequiresAndIncludes("Calabash::Android::WaitHelpers");
+            container.put("cajWaitCondition", condition);
+            String waitOptionsHash = getWaitOptionsHash(options);
+            if (waitOptionsHash == null)
+                container.runScriptlet("wait_for { cajWaitCondition.test }");
+            else {
+                container.runScriptlet(String.format("wait_for(%s) { cajWaitCondition.test }", waitOptionsHash));
+            }
+        } catch (Exception e) {
+            handleWaitException(e, options);
+        }
+    }
+
+    private void handleWaitException(Exception e, WaitOptions options) throws OperationTimedoutException, CalabashException {
+        if (e.toString().contains("Calabash::Android::WaitHelpers::WaitError")) {
+            String message = null;
+            if (options != null)
+                message = options.getTimeoutMessage();
+
+            error("Timedout waiting");
+            throw new OperationTimedoutException(message == null ? "Timed out waiting..." : message);
+        } else {
+            error("Failed to wait for condition. %s", e, e.getMessage());
+            throw new CalabashException(String.format("Failed to wait for condition. %s", e.getMessage()));
+        }
+    }
+
+    private String getWaitOptionsHash(WaitOptions options) {
+        if (options == null)
+            return null;
+        else {
+            container.put("cajWaitTimeout", options.getTimeoutInSec());
+            container.put("cajWaitRetryFreq", options.getRetryFreqInSec());
+            container.put("cajWaitPostTimeout", options.getPostTimeoutInSec());
+            container.put("cajWaitTimeoutMessage", options.getTimeoutMessage());
+            container.put("cajWaitShouldTakeScreenshot",
+                    options.shouldScreenshotOnError());
+            return "{:timeout => cajWaitTimeout, " +
+                    ":retry_frequency => cajWaitRetryFreq, " +
+                    ":post_timeout => cajWaitPostTimeout, " +
+                    ":timeout_message => cajWaitTimeoutMessage, " +
+                    ":screenshot_on_error => cajWaitShouldTakeScreenshot}";
+        }
+    }
+
 }

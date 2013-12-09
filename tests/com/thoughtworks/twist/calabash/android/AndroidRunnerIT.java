@@ -1,9 +1,5 @@
 package com.thoughtworks.twist.calabash.android;
 
-import com.thoughtworks.twist.calabash.android.AndroidApplication;
-import com.thoughtworks.twist.calabash.android.AndroidConfiguration;
-import com.thoughtworks.twist.calabash.android.AndroidRunner;
-import com.thoughtworks.twist.calabash.android.CalabashException;
 import org.apache.commons.io.FileUtils;
 import org.junit.After;
 import org.junit.Before;
@@ -15,7 +11,6 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
 
-import static com.thoughtworks.twist.calabash.android.TestUtils.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -74,7 +69,6 @@ public class AndroidRunnerIT {
         AndroidRunner androidRunner = new AndroidRunner(tempAndroidApkPath.getAbsolutePath(), configuration);
         androidRunner.setup();
         androidRunner.start();
-
     }
 
     @Test
@@ -121,17 +115,42 @@ public class AndroidRunnerIT {
         AndroidApplication application = androidRunner.start();
 
         assertTrue(TestUtils.isAppInstalled(packageName, serial));
-        assertTrue(TestUtils.isMainActivity(application, "MyActivity"));
+        assertTrue(TestUtils.isMainActivity(application, TestUtils.activityMap.get(TestUtils.ACTIVITY_MAIN)));
     }
 
     @Test
-    public void shouldTestGoBack() throws CalabashException {
+    public void shouldTestGoBack() throws CalabashException, OperationTimedoutException {
         final AndroidApplication application = TestUtils.installAppOnEmulator("emulator-5554", packageName, tempAndroidApkPath);
 
         TestUtils.goToActivity(application, "Nested Views");
         application.goBack();
 
-        application.waitForActivity("MyActivity", 2000);
+        application.waitForActivity("MyActivity", 2);
         assertEquals("MyActivity", application.getCurrentActivity());
+    }
+
+    @Test
+    public void shouldTakeScreenshotOnFailure() throws CalabashException {
+        final StringBuffer screenshotPath = new StringBuffer();
+        AndroidConfiguration androidConfiguration = new AndroidConfiguration();
+        androidConfiguration.setSerial("emulator-5554");
+        androidConfiguration.setScreenshotListener(new ScreenshotListener() {
+            public void screenshotTaken(String path, String imageType, String fileName) {
+                screenshotPath.append(path);
+            }
+        });
+        final AndroidApplication application;
+        try {
+            application = TestUtils.installAppOnEmulator("emulator-5554", packageName, tempAndroidApkPath, androidConfiguration);
+            application.waitFor(new ICondition() {
+                @Override
+                public boolean test() throws CalabashException {
+                    return false;
+                }
+            }, 1);
+        } catch (OperationTimedoutException e) {
+        }
+
+        assertTrue(new File(tempDir, screenshotPath.toString()).exists());
     }
 }

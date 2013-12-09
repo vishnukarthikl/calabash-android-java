@@ -1,8 +1,5 @@
 package com.thoughtworks.twist.calabash.android;
 
-import com.thoughtworks.twist.calabash.android.CalabashException;
-import com.thoughtworks.twist.calabash.android.ConditionalWaiter;
-import com.thoughtworks.twist.calabash.android.ICondition;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;

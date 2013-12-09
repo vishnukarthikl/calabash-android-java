@@ -31,13 +31,13 @@ public class AllActionsIT {
     }
 
     @After
-    public void goToMainActivity() throws CalabashException {
+    public void goToMainActivity() throws CalabashException, OperationTimedoutException {
         application.goBack();
-        application.waitForActivity("MyActivity", 5000);
+        application.waitForActivity("MyActivity", 5);
     }
 
     @Test
-    public void shouldQueryForElements() throws CalabashException {
+    public void shouldQueryForElements() throws CalabashException, OperationTimedoutException {
         TestUtils.goToActivity(application, TestUtils.ACTIVITY_SIMPLE_ELEMENTS);
 
         UIElements elements = application.query("textview marked:'Hello world!'");
@@ -48,7 +48,7 @@ public class AllActionsIT {
 
     @Test
     @Ignore("Need to speed up inspect..taking too long")
-    public void shouldInspectApplicationElements() throws CalabashException {
+    public void shouldInspectApplicationElements() throws Exception {
         TestUtils.goToActivity(application, TestUtils.ACTIVITY_SIMPLE_ELEMENTS);
         String expectedElementCollection = "Element : com.android.internal.policy.impl.PhoneWindow$DecorView , Nesting : 0\n" +
                 "Element : com.android.internal.widget.ActionBarOverlayLayout , Nesting : 1\n" +
@@ -85,7 +85,7 @@ public class AllActionsIT {
     }
 
     @Test
-    public void shouldTouchElements() throws CalabashException {
+    public void shouldTouchElements() throws Exception {
         TestUtils.goToActivity(application, TestUtils.ACTIVITY_SIMPLE_ELEMENTS);
         UIElement button = application.query("button marked:'Normal Button'").first();
         UIElement radioButton = application.query("radioButton").first();
@@ -105,7 +105,7 @@ public class AllActionsIT {
     }
 
     @Test
-    public void shouldSetText() throws CalabashException {
+    public void shouldSetText() throws Exception {
         TestUtils.goToActivity(application, TestUtils.ACTIVITY_SIMPLE_ELEMENTS);
         UIElement editText = application.query("editText").first();
 
@@ -116,7 +116,7 @@ public class AllActionsIT {
     }
 
     @Test
-    public void shouldPerformCheckboxActions() throws CalabashException {
+    public void shouldPerformCheckboxActions() throws Exception {
         TestUtils.goToActivity(application, TestUtils.ACTIVITY_NESTED_VIEWS);
 
         UIElement checkBox = application.query("checkBox").first();
@@ -133,7 +133,7 @@ public class AllActionsIT {
     }
 
     @Test
-    public void shouldPerformScrollActions() throws CalabashException {
+    public void shouldPerformScrollActions() throws Exception {
         TestUtils.goToActivity(application, TestUtils.ACTIVITY_SCROLL_LIST);
 
         String queryForSecondPageElement = "textView marked:'The House of Mirth'";
@@ -150,7 +150,7 @@ public class AllActionsIT {
     }
 
     @Test
-    public void shouldTakeScreenshot() throws CalabashException {
+    public void shouldTakeScreenshot() throws Exception {
         TestUtils.goToActivity(application, TestUtils.ACTIVITY_NESTED_VIEWS);
         File screenshotsDir = new File(tempDir, "screenshots");
         screenshotsDir.mkdirs();
@@ -162,7 +162,7 @@ public class AllActionsIT {
     }
 
     @Test
-    public void shouldSelectMenuOptions() throws CalabashException {
+    public void shouldSelectMenuOptions() throws Exception {
         TestUtils.goToActivity(application, TestUtils.ACTIVITY_SIMPLE_ELEMENTS);
 
         application.selectMenuItem("Third");
@@ -176,7 +176,7 @@ public class AllActionsIT {
     }
 
     @Test
-    public void shouldPerformSwipeActions() throws CalabashException {
+    public void shouldPerformSwipeActions() throws Exception {
         TestUtils.goToActivity(application, TestUtils.ACTIVITY_SWIPE_PAGE);
 
         application.swipe(Direction.RIGHT);
@@ -189,7 +189,7 @@ public class AllActionsIT {
     }
 
     @Test
-    public void shouldPerformLongPress() throws CalabashException {
+    public void shouldPerformLongPress() throws Exception {
         TestUtils.goToActivity(application, TestUtils.ACTIVITY_SIMPLE_ELEMENTS);
 
         application.query("textView marked:'Long press text'").first().longPress();
@@ -202,7 +202,7 @@ public class AllActionsIT {
     }
 
     @Test
-    public void shouldSetGPSCoordinates() throws CalabashException {
+    public void shouldSetGPSCoordinates() throws Exception {
         TestUtils.goToActivity(application, TestUtils.ACTIVITY_CURRENT_LOCATION);
 
         application.setGPSCoordinates(12.928909, 77.628906);
@@ -220,7 +220,7 @@ public class AllActionsIT {
     }
 
     @Test
-    public void shouldGetSharedPreferences() throws CalabashException {
+    public void shouldGetSharedPreferences() throws Exception {
         Map<String, String> preferences = application.getSharedPreferences("my_preferences");
 
         assertEquals("true", preferences.get("a boolean"));
@@ -228,5 +228,4 @@ public class AllActionsIT {
         assertEquals("1.5", preferences.get("a float"));
         assertEquals("123", preferences.get("an int"));
     }
-
 }
