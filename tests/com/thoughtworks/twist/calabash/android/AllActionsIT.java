@@ -22,7 +22,7 @@ public class AllActionsIT {
         packageName = "com.example.AndroidTestApplication";
         tempDir = TestUtils.createTempDir("TestAndroidApps");
         apkPath = TestUtils.createTempDirWithProj("AndroidTestApplication.apk", tempDir);
-        application = TestUtils.installAppOnEmulator("emulator-5554", packageName, apkPath);
+        application = TestUtils.installAppOnEmulator("192.168.56.101:5555", packageName, apkPath);
     }
 
     @AfterClass
@@ -47,7 +47,6 @@ public class AllActionsIT {
     }
 
     @Test
-    @Ignore("Need to speed up inspect..taking too long")
     public void shouldInspectApplicationElements() throws Exception {
         TestUtils.goToActivity(application, TestUtils.ACTIVITY_SIMPLE_ELEMENTS);
         String expectedElementCollection = "Element : com.android.internal.policy.impl.PhoneWindow$DecorView , Nesting : 0\n" +

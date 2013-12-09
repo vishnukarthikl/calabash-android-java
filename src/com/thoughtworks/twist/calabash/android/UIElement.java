@@ -6,8 +6,7 @@ package com.thoughtworks.twist.calabash.android;
 import org.jruby.RubyArray;
 import org.jruby.RubyHash;
 
-import static com.thoughtworks.twist.calabash.android.Utils.getIntFromHash;
-import static com.thoughtworks.twist.calabash.android.Utils.getStringFromHash;
+import java.util.List;
 
 /**
  * Represents an UI element.
@@ -138,7 +137,9 @@ public class UIElement implements AndroidElementAction {
      * @throws CalabashException
      */
     public void inspect(InspectCallback callback) throws CalabashException {
-        Utils.inspectElement(this, 0, callback);
+        TreeBuilder treeBuilder = new TreeBuilder(calabashWrapper);
+        List<TreeNode> tree = treeBuilder.createTree(getQuery());
+        Utils.inspectElement(tree.get(0), 0, callback);
     }
 
     /**

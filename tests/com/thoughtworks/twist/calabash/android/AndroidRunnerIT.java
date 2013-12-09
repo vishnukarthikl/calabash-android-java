@@ -81,7 +81,7 @@ public class AndroidRunnerIT {
         androidRunner.setup();
         AndroidApplication application = androidRunner.start();
 
-        assertTrue(TestUtils.isAppInstalled(packageName, application.getInstalledOn()));
+        assertTrue(TestUtils.isAppInstalled(packageName, application.getInstalledOnSerial()));
         assertTrue(TestUtils.isMainActivity(application, "MyActivity"));
     }
 

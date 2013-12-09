@@ -3,6 +3,7 @@ package com.thoughtworks.twist.calabash.android;
 import org.jruby.RubyArray;
 
 import java.io.File;
+import java.util.List;
 import java.util.Map;
 
 public class AndroidApplication {
@@ -14,7 +15,7 @@ public class AndroidApplication {
         this.installedOn = serial;
     }
 
-    public String getInstalledOn() {
+    public String getInstalledOnSerial() {
         return installedOn;
     }
 
@@ -35,13 +36,17 @@ public class AndroidApplication {
      * @throws CalabashException
      */
     public void inspect(InspectCallback callback) throws CalabashException {
-        UIElements rootElements = getRootElements();
-        if (rootElements == null)
-            return;
+        List<TreeNode> tree = createTreeFromRoot();
+        if (tree.isEmpty()) return;
 
-        for (UIElement root : rootElements) {
-            Utils.inspectElement(root, 0, callback);
+        for (TreeNode treeNode : tree) {
+            Utils.inspectElement(treeNode, 0, callback);
         }
+    }
+
+    private List<TreeNode> createTreeFromRoot() throws CalabashException {
+        return new TreeBuilder(calabashWrapper).createTree("*");
+
     }
 
     /**
@@ -117,7 +122,8 @@ public class AndroidApplication {
 
     /**
      * waits for specified condition for the given timeoutInSec
-     * @param condition Condition to wait for
+     *
+     * @param condition    Condition to wait for
      * @param timeoutInSec timeout in seconds
      * @throws CalabashException
      * @throws OperationTimedoutException
@@ -129,14 +135,10 @@ public class AndroidApplication {
     /**
      * Waits for the specified condition with the options specified
      *
-     * @param condition
-     *            Condition to wait for
-     * @param options
-     *            Wait options
-     * @throws CalabashException
-     *             When any calabash operations fails
-     * @throws OperationTimedoutException
-     *             When the operation elapsed the timeout period
+     * @param condition Condition to wait for
+     * @param options   Wait options
+     * @throws CalabashException          When any calabash operations fails
+     * @throws OperationTimedoutException When the operation elapsed the timeout period
      */
     public void waitFor(ICondition condition, WaitOptions options) throws CalabashException, OperationTimedoutException {
         calabashWrapper.waitFor(condition, options);
@@ -164,8 +166,8 @@ public class AndroidApplication {
     /**
      * Wait for an activity to come on the screen
      *
-     * @param activityName  the activity name which you want to wait for
-     * @param timeout in seconds to timeout when condition fails resulting <code>CalabashException</code>
+     * @param activityName the activity name which you want to wait for
+     * @param timeout      in seconds to timeout when condition fails resulting <code>CalabashException</code>
      * @throws CalabashException
      */
     public void waitForActivity(final String activityName, int timeout) throws CalabashException, OperationTimedoutException {
@@ -224,6 +226,7 @@ public class AndroidApplication {
      * Note: * you have to turn on 'Allow mock location' on the emulator
      *       * manifest should have android.permission.ACCESS_MOCK_LOCATION permission to change the location
      * </pre>
+     *
      * @param latitude
      * @param longitude
      * @throws CalabashException
@@ -239,6 +242,7 @@ public class AndroidApplication {
      * Note: * you have to turn on 'Allow mock location' on the emulator
      *       * manifest should have android.permission.ACCESS_MOCK_LOCATION permission to change the location
      * </pre>
+     *
      * @param location
      * @throws CalabashException
      */

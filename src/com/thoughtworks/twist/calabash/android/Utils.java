@@ -76,12 +76,11 @@ final class Utils {
         return map;
     }
 
-    public static void inspectElement(UIElement element, int nestingLevel,
-                                      InspectCallback callback) throws CalabashException {
-        callback.onEachElement(element, nestingLevel);
-        UIElements children = element.children();
-        for (UIElement child : children) {
-            inspectElement(child, nestingLevel + 1, callback);
+
+    public static void inspectElement(TreeNode node, int nestingLevel, InspectCallback callback) {
+        callback.onEachElement(node.getData(), nestingLevel);
+        for (TreeNode childNode : node.getChildren()) {
+            inspectElement(childNode, nestingLevel + 1, callback);
         }
     }
 
