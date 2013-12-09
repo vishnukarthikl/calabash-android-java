@@ -14,6 +14,8 @@ Getting started
 * Calabash-android-java depends on Jruby,log4j and Zip4j. You need to add those jars also into the classpath. Download the JAR file and add all the JAR files to the class path.
 * If you have an existing apk, point to it in the AndroidRunner, see example below on how to write tests.
 
+Note: AndroidRunner starts the emulator if the device name is specified in the configuration, but it is not very stable. So it is advised that the emulator is manually started and serial(e.g emulator-5554) is set in the configuration.
+
 ```java
 import com.thoughtworks.twist.calabash.android.AndroidConfiguration;
 import com.thoughtworks.twist.calabash.android.AndroidRunner;
