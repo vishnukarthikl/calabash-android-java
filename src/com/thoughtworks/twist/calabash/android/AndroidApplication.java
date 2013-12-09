@@ -220,7 +220,10 @@ public class AndroidApplication {
 
     /**
      * Modify the gps co-ordinates of your emulator
-     *
+     * <pre>
+     * Note: * you have to turn on 'Allow mock location' on the emulator
+     *       * manifest should have android.permission.ACCESS_MOCK_LOCATION permission to change the location
+     * </pre>
      * @param latitude
      * @param longitude
      * @throws CalabashException
@@ -232,7 +235,10 @@ public class AndroidApplication {
     /**
      * Modify the gps co-ordinates of your emulator.
      * You can specify the location like 'Bangalore, India' and set the co-ordinates with the best match using <a href="http://www.rubygeocoder.com"/>GeoCoder</a>
-     *
+     * <pre>
+     * Note: * you have to turn on 'Allow mock location' on the emulator
+     *       * manifest should have android.permission.ACCESS_MOCK_LOCATION permission to change the location
+     * </pre>
      * @param location
      * @throws CalabashException
      */
