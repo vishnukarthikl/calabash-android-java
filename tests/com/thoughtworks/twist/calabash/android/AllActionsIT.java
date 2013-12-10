@@ -22,7 +22,7 @@ public class AllActionsIT {
         packageName = "com.example.AndroidTestApplication";
         tempDir = TestUtils.createTempDir("TestAndroidApps");
         apkPath = TestUtils.createTempDirWithProj("AndroidTestApplication.apk", tempDir);
-        application = TestUtils.installAppOnEmulator("192.168.56.101:5555", packageName, apkPath);
+        application = TestUtils.installAppOnEmulator("emulator-5554", packageName, apkPath);
     }
 
     @AfterClass
@@ -48,30 +48,36 @@ public class AllActionsIT {
 
     @Test
     public void shouldInspectApplicationElements() throws Exception {
-        TestUtils.goToActivity(application, TestUtils.ACTIVITY_SIMPLE_ELEMENTS);
+        TestUtils.goToActivity(application, TestUtils.ACTIVITY_NESTED_VIEWS);
         String expectedElementCollection = "Element : com.android.internal.policy.impl.PhoneWindow$DecorView , Nesting : 0\n" +
-                "Element : com.android.internal.widget.ActionBarOverlayLayout , Nesting : 1\n" +
+                "Element : android.widget.LinearLayout , Nesting : 1\n" +
                 "Element : android.widget.FrameLayout , Nesting : 2\n" +
                 "Element : android.widget.LinearLayout , Nesting : 3\n" +
-                "Element : android.widget.TextView , Nesting : 4\n" +
-                "Element : android.widget.EditText , Nesting : 4\n" +
-                "Element : android.widget.Button , Nesting : 4\n" +
-                "Element : android.widget.RadioButton , Nesting : 4\n" +
-                "Element : android.widget.ImageButton , Nesting : 4\n" +
-                "Element : android.widget.TextView , Nesting : 4\n" +
-                "Element : android.widget.ImageView , Nesting : 4\n" +
-                "Element : android.widget.LinearLayout , Nesting : 2\n" +
-                "Element : com.android.internal.widget.ActionBarContainer , Nesting : 3\n" +
-                "Element : com.android.internal.widget.ActionBarView , Nesting : 4\n" +
-                "Element : android.widget.LinearLayout , Nesting : 5\n" +
-                "Element : com.android.internal.widget.ActionBarView$HomeView , Nesting : 6\n" +
-                "Element : android.widget.ImageView , Nesting : 7\n" +
+                "Element : android.widget.TableLayout , Nesting : 4\n" +
+                "Element : android.widget.TableRow , Nesting : 5\n" +
+                "Element : android.widget.RelativeLayout , Nesting : 6\n" +
+                "Element : android.widget.TextView , Nesting : 7\n" +
+                "Element : android.widget.TextView , Nesting : 7\n" +
+                "Element : android.widget.FrameLayout , Nesting : 6\n" +
+                "Element : android.widget.RelativeLayout , Nesting : 7\n" +
+                "Element : android.widget.ProgressBar , Nesting : 7\n" +
+                "Element : android.widget.TableRow , Nesting : 5\n" +
                 "Element : android.widget.LinearLayout , Nesting : 6\n" +
-                "Element : android.widget.LinearLayout , Nesting : 7\n" +
-                "Element : android.widget.TextView , Nesting : 8\n" +
-                "Element : com.android.internal.view.menu.ActionMenuView , Nesting : 5\n" +
-                "Element : com.android.internal.view.menu.ActionMenuItemView , Nesting : 6\n" +
-                "Element : com.android.internal.view.menu.ActionMenuPresenter$OverflowMenuButton , Nesting : 6\n";
+                "Element : android.widget.CheckBox , Nesting : 7\n" +
+                "Element : android.widget.ToggleButton , Nesting : 7\n" +
+                "Element : android.widget.TableRow , Nesting : 6\n" +
+                "Element : android.widget.RadioButton , Nesting : 7\n" +
+                "Element : android.widget.Button , Nesting : 7\n" +
+                "Element : android.widget.TableRow , Nesting : 5\n" +
+                "Element : android.widget.Button , Nesting : 6\n" +
+                "Element : android.widget.Button , Nesting : 6\n" +
+                "Element : com.android.internal.widget.ActionBarContainer , Nesting : 2\n" +
+                "Element : com.android.internal.widget.ActionBarView , Nesting : 3\n" +
+                "Element : com.android.internal.widget.ActionBarView$HomeView , Nesting : 4\n" +
+                "Element : android.widget.ImageView , Nesting : 5\n" +
+                "Element : android.widget.LinearLayout , Nesting : 4\n" +
+                "Element : android.widget.LinearLayout , Nesting : 5\n" +
+                "Element : android.widget.TextView , Nesting : 6\n";
         final StringBuilder actualElementCollection = new StringBuilder();
 
         application.inspect(new InspectCallback() {

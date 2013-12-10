@@ -6,6 +6,7 @@ package com.thoughtworks.twist.calabash.android;
 import org.jruby.RubyArray;
 import org.jruby.RubyHash;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -138,8 +139,8 @@ public class UIElement implements AndroidElementAction {
      */
     public void inspect(InspectCallback callback) throws CalabashException {
         TreeBuilder treeBuilder = new TreeBuilder(calabashWrapper);
-        List<TreeNode> tree = treeBuilder.createTree(getQuery());
-        Utils.inspectElement(tree.get(0), 0, callback);
+        TreeNode tree = treeBuilder.createTreeFrom(this);
+        Utils.inspectElement(tree, 0, callback);
     }
 
     /**
@@ -201,6 +202,20 @@ public class UIElement implements AndroidElementAction {
         }
 
         return super.equals(obj);
+    }
+
+    @Override
+    public int hashCode() {
+        List<Object> objects = new ArrayList<Object>();
+        objects.add(getRect());
+        objects.add(getText());
+        objects.add(getElementClass());
+        objects.add(getId());
+        int result = 0;
+        for (Object object : objects) {
+            result = 31 * result + (object != null ? object.hashCode() : 0);
+        }
+        return result;
     }
 
     public String toString() {

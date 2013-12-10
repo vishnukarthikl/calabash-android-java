@@ -87,4 +87,15 @@ public final class Rect {
 
 		return super.equals(obj);
 	}
+
+    @Override
+    public int hashCode() {
+        int result = x != null ? x.hashCode() : 0;
+        result = 31 * result + (y != null ? y.hashCode() : 0);
+        result = 31 * result + (width != null ? width.hashCode() : 0);
+        result = 31 * result + (height != null ? height.hashCode() : 0);
+        result = 31 * result + (center_x != null ? center_x.hashCode() : 0);
+        result = 31 * result + (center_y != null ? center_y.hashCode() : 0);
+        return result;
+    }
 }

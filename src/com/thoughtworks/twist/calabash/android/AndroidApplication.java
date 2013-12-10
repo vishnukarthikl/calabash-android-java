@@ -36,55 +36,12 @@ public class AndroidApplication {
      * @throws CalabashException
      */
     public void inspect(InspectCallback callback) throws CalabashException {
-        List<TreeNode> tree = createTreeFromRoot();
+        List<TreeNode> tree = new TreeBuilder(calabashWrapper).createTreeFromRoot();
         if (tree.isEmpty()) return;
 
         for (TreeNode treeNode : tree) {
             Utils.inspectElement(treeNode, 0, callback);
         }
-    }
-
-    private List<TreeNode> createTreeFromRoot() throws CalabashException {
-        return new TreeBuilder(calabashWrapper).createTree("*");
-
-    }
-
-    /**
-     * Gets all the root elements available This can be used to make a tree view
-     * of all the elements available in the view currently
-     *
-     * @return list of root elements if available, null otherwise
-     * @throws CalabashException
-     */
-    public UIElements getRootElements() throws CalabashException {
-        RubyArray allElements = calabashWrapper.query("*");
-        if (allElements.size() == 0)
-            return null;
-
-        UIElements rootElements = new UIElements();
-        for (int i = 0; i < allElements.size(); i++) {
-            String query = String.format("* index:%d", i);
-            UIElement rootElement = getRootElement(query);
-            if (rootElement != null && !rootElements.contains(rootElement))
-                rootElements.add(rootElement);
-        }
-
-        return rootElements;
-    }
-
-    private UIElement getRootElement(String query) throws CalabashException {
-        UIElement rootElement = null;
-        RubyArray result = calabashWrapper.query(query);
-        if (result.size() == 0)
-            return null;
-        else {
-            rootElement = new UIElements(result, query, calabashWrapper).get(0);
-            UIElement element = getRootElement(query + " parent * index:0");
-            if (element != null)
-                rootElement = element;
-        }
-
-        return rootElement;
     }
 
     /**
