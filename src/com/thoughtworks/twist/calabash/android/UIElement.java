@@ -3,6 +3,7 @@
  */
 package com.thoughtworks.twist.calabash.android;
 
+import org.joda.time.DateTime;
 import org.jruby.RubyArray;
 import org.jruby.RubyHash;
 
@@ -23,6 +24,11 @@ public class UIElement implements AndroidElementAction {
         this.data = data;
         this.query = query;
         this.calabashWrapper = calabashWrapper;
+    }
+
+
+    protected  AndroidCalabashWrapper getCalabashWrapper() {
+        return this.calabashWrapper;
     }
 
     /**
@@ -152,6 +158,7 @@ public class UIElement implements AndroidElementAction {
     public void setChecked(boolean checked) throws CalabashException {
         calabashWrapper.setChecked(this.getQuery(), checked);
     }
+
 
     /**
      * get the <code>selector</code> property of the element

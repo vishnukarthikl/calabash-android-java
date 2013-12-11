@@ -1,5 +1,6 @@
 package com.thoughtworks.twist.calabash.android;
 
+import org.joda.time.DateTime;
 import org.jruby.RubyArray;
 import org.jruby.RubyHash;
 import org.jruby.embed.LocalContextScope;
@@ -328,6 +329,26 @@ public class AndroidCalabashWrapper {
         }
     }
 
+    public DateTime getDate(String query) throws CalabashException {
+        try {
+            info("Getting date");
+            container.put(QUERY_STRING, query);
+            RubyArray rubyArray = (RubyArray) container.runScriptlet(String.format("query(%s, :getYear)", QUERY_STRING));
+            int year = Utils.getFirstIntValue(rubyArray);
+
+            rubyArray = (RubyArray) container.runScriptlet(String.format("query(%s, :getMonth)", QUERY_STRING));
+            int month = Utils.getFirstIntValue(rubyArray);
+
+            rubyArray = (RubyArray) container.runScriptlet(String.format("query(%s, :getDayOfMonth)", QUERY_STRING));
+            int day = Utils.getFirstIntValue(rubyArray);
+
+            return new DateTime(year, month + 1, day, 0, 0);
+        } catch (Exception e) {
+            String message = "Error getting date";
+            throw new CalabashException(message, e);
+        }
+    }
+
     public boolean isChecked(String query) throws CalabashException {
         try {
             info("Getting isChecked property");
@@ -459,6 +480,21 @@ public class AndroidCalabashWrapper {
         }
     }
 
+    public void setDate(String query, int year, int month, int day) throws CalabashException {
+        try {
+            info("Setting date: %d-%d-%d - format yyyy-mm-dd", year, month, day);
+            container.put(QUERY_STRING, query);
+            container.runScriptlet(String.format("query(%s, {:method_name => :updateDate, :arguments => [%d,%d,%d]})", QUERY_STRING, year, month, day));
+        } catch (Exception e) {
+            String message = String.format("Failed to set date : %d-%d-%d", year, month, day);
+            error(message, e);
+            throw new CalabashException(message, e);
+        }  finally {
+            clearContainerVars(QUERY_STRING);
+        }
+
+    }
+
     public void waitFor(ICondition condition, WaitOptions options) throws CalabashException, OperationTimedoutException {
         try {
             info("Waiting for condition");
@@ -531,5 +567,4 @@ public class AndroidCalabashWrapper {
         container.put(cajEnv, envValue);
         container.runScriptlet(format("ENV['%s'] = %s", envName, cajEnv));
     }
-
 }

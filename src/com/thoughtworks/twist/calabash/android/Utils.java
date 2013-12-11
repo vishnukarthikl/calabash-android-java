@@ -15,6 +15,8 @@ import java.util.*;
 
 final class Utils {
 
+    public static final String DATEPICKER = "DatePicker";
+
     public static String getStringFromHash(RubyHash target, String key) {
         try {
             Object value = target.get(key);
@@ -159,5 +161,19 @@ final class Utils {
 
     public static boolean isWindows() {
         return System.getProperty("os.name").toLowerCase().contains("win");
+    }
+
+    public static int getFirstIntValue(RubyArray rubyArray) {
+        Object[] javaArray = Utils.toJavaArray(rubyArray);
+        return Integer.parseInt(javaArray[0].toString() );
+    }
+
+    public static UIElement createUIElement(RubyHash data, String query, AndroidCalabashWrapper wrapper) {
+        String className = getStringFromHash(data, "class");
+        if(className.contains(DATEPICKER)) {
+            return new DatePicker(data, query, wrapper);
+        }
+
+        return new UIElement(data, query, wrapper);
     }
 }

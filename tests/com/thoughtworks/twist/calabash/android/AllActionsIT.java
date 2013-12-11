@@ -1,9 +1,12 @@
 package com.thoughtworks.twist.calabash.android;
 
 
+import org.joda.time.DateTime;
 import org.junit.*;
 
 import java.io.File;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
@@ -248,7 +251,26 @@ public class AllActionsIT {
         assertEquals(Double.parseDouble(longitudeText.getText()), -122.402698, .05);
     }
 
+
     @Test
+    public void shouldSetDateOnDatePicker() throws Exception {
+        TestUtils.goToActivity(application, TestUtils.ACTIVITY_DATE_TIME_ELEMENTS);
+
+        DatePicker datePicker = (DatePicker) application.query("datePicker").first();
+        datePicker.setDate(new DateTime(2011, 12, 22, 0, 0));
+
+        datePicker = (DatePicker) application.query("datePicker").first();
+
+        DateTime actualDate = datePicker.getDate();
+
+        assertEquals(2011, actualDate.getYear());
+        assertEquals(12, actualDate.getMonthOfYear());
+        assertEquals(22, actualDate.getDayOfMonth());
+
+    }
+
+
+        @Test
     public void shouldGetSharedPreferences() throws Exception {
         Map<String, String> preferences = application.getSharedPreferences("my_preferences");
 

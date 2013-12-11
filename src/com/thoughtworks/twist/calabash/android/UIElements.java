@@ -34,7 +34,7 @@ public final class UIElements extends ArrayList<UIElement> implements AndroidEle
                 String q = query;
                 if (!indexedQuery)
                     q += " index:" + i;
-                this.add(new UIElement(object, q, wrapper));
+                this.add(Utils.createUIElement(object, q, wrapper));
             } catch (Exception e) {
                 throw new CalabashException("Unsupported result format.\n"
                         + elements.toString(), e);
