@@ -90,6 +90,30 @@ public class AllActionsIT {
     }
 
     @Test
+    public void shouldInspectAllElementsBelowElement() throws Exception {
+        TestUtils.goToActivity(application, TestUtils.ACTIVITY_NESTED_VIEWS);
+        UIElement uiElement = application.query("tableRow index:1").first();
+
+        String expectedElementsCollection = "Element : android.widget.TableRow , Nesting : 0\n" +
+                "Element : android.widget.LinearLayout , Nesting : 1\n" +
+                "Element : android.widget.CheckBox , Nesting : 2\n" +
+                "Element : android.widget.ToggleButton , Nesting : 2\n" +
+                "Element : android.widget.TableRow , Nesting : 1\n" +
+                "Element : android.widget.RadioButton , Nesting : 2\n" +
+                "Element : android.widget.Button , Nesting : 2\n";
+
+        final StringBuilder actualElementsCollection = new StringBuilder();
+        uiElement.inspect(new InspectCallback() {
+            public void onEachElement(UIElement element, int nestingLevel) {
+                actualElementsCollection.append(String.format("Element : %s , Nesting : %d\n", element.getElementClass(), nestingLevel));
+            }
+        });
+
+        assertEquals(expectedElementsCollection, actualElementsCollection.toString());
+
+    }
+
+    @Test
     public void shouldTouchElements() throws Exception {
         TestUtils.goToActivity(application, TestUtils.ACTIVITY_SIMPLE_ELEMENTS);
         UIElement button = application.query("button marked:'Normal Button'").first();
