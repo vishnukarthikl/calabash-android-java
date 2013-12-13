@@ -3,19 +3,16 @@ package com.thoughtworks.twist.calabash.android;
 import org.jruby.RubyArray;
 import org.jruby.RubyHash;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class TreeBuilder {
 
     public static final String QUERY_ALL = "*";
-    private final AndroidCalabashWrapper calabashWrapper;
+    private final CalabashWrapper calabashWrapper;
     private List<TreeNode> roots = new ArrayList<TreeNode>();
     private Set<UIElement> inspectedElements = new HashSet<UIElement>();
 
-    public TreeBuilder(AndroidCalabashWrapper calabashWrapper) {
+    public TreeBuilder(CalabashWrapper calabashWrapper) {
         this.calabashWrapper = calabashWrapper;
     }
 
@@ -87,7 +84,7 @@ public class TreeBuilder {
     }
 
     public void merge(List<UIElement> elements) {
-        sort(elements);
+        Collections.reverse(elements);
         if (isEmpty()) {
             TreeNode root = createBranch(elements);
             roots.add(root);
@@ -97,7 +94,7 @@ public class TreeBuilder {
                     return;
             }
             TreeNode newRoot = createBranch(elements);
-            roots.add(newRoot);
+            roots.add(0, newRoot);
 
         }
     }
@@ -123,7 +120,7 @@ public class TreeBuilder {
     }
 
     private TreeNode createBranch(List<UIElement> elements) {
-        TreeNode startNode = new TreeNode(null);
+        TreeNode startNode = new TreeNode();
         TreeNode current = startNode;
         for (int i = 0; i < elements.size(); i++) {
             current.setData(elements.get(i));
@@ -147,17 +144,6 @@ public class TreeBuilder {
 
     private boolean isEmpty() {
         return roots.size() == 0;
-    }
-
-    private void sort(List<UIElement> elements) {
-        int length = elements.size();
-        for (int i = 0; i < length / 2; i++) {
-            int reverseIndex = length - (i + 1);
-            UIElement ith = elements.get(i);
-            UIElement ithFromReverse = elements.get(reverseIndex);
-            elements.set(i, ithFromReverse);
-            elements.set(reverseIndex, ith);
-        }
     }
 
     public List<TreeNode> getRoots() {

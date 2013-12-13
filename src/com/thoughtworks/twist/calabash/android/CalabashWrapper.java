@@ -23,7 +23,7 @@ import static com.thoughtworks.twist.calabash.android.CalabashLogger.info;
 import static java.io.File.separator;
 import static java.lang.String.format;
 
-public class AndroidCalabashWrapper {
+public class CalabashWrapper {
     public static final String QUERY_STRING = "cajQueryString";
     public static final String QUERY_ARGS = "cajQueryArgs";
     public static final String SCREENSHOT_PREFIX = "cajPrefix";
@@ -48,7 +48,7 @@ public class AndroidCalabashWrapper {
     private AndroidBridge androidBridge;
     private boolean disposed = false;
 
-    public AndroidCalabashWrapper(File rbScriptsPath, File apk, AndroidConfiguration configuration, Environment environment) throws CalabashException {
+    public CalabashWrapper(File rbScriptsPath, File apk, AndroidConfiguration configuration, Environment environment) throws CalabashException {
         this.rbScriptsPath = rbScriptsPath;
         this.gemsDir = new File(rbScriptsPath, "gems");
         this.apk = apk;
@@ -344,24 +344,9 @@ public class AndroidCalabashWrapper {
 
             return new DateTime(year, month + 1, day, 0, 0);
         } catch (Exception e) {
+            clearContainerVars(QUERY_STRING);
             String message = "Error getting date";
             throw new CalabashException(message, e);
-        }
-    }
-
-    public boolean isChecked(String query) throws CalabashException {
-        try {
-            info("Getting isChecked property");
-            container.put(QUERY_STRING, query);
-            RubyArray rubyArray = (RubyArray) container.runScriptlet(String.format("query(%s, :isChecked)", QUERY_STRING));
-            Object[] javaArray = Utils.toJavaArray(rubyArray);
-            return Boolean.parseBoolean(javaArray[0].toString());
-        } catch (Exception e) {
-            String message = "Failed to get isChecked property";
-            error(message, e);
-            throw new CalabashException(message, e);
-        } finally {
-            clearContainerVars(QUERY_STRING);
         }
     }
 
@@ -484,12 +469,12 @@ public class AndroidCalabashWrapper {
         try {
             info("Setting date: %d-%d-%d - format yyyy-mm-dd", year, month, day);
             container.put(QUERY_STRING, query);
-            container.runScriptlet(String.format("query(%s, {:method_name => :updateDate, :arguments => [%d,%d,%d]})", QUERY_STRING, year, month, day));
+            container.runScriptlet(String.format("query(%s, {:method_name => :updateDate, :arguments => [%d,%d,%d]})", QUERY_STRING, year, month - 1, day));
         } catch (Exception e) {
             String message = String.format("Failed to set date : %d-%d-%d", year, month, day);
             error(message, e);
             throw new CalabashException(message, e);
-        }  finally {
+        } finally {
             clearContainerVars(QUERY_STRING);
         }
 
@@ -557,7 +542,7 @@ public class AndroidCalabashWrapper {
 
     private void clearContainerVars(String... vars) {
         for (String var : vars) {
-             Object containerVar = Utils.toJavaObject(container.getVarMap().get(var));
+            Object containerVar = Utils.toJavaObject(container.getVarMap().get(var));
             container.getVarMap().remove(containerVar);
         }
     }

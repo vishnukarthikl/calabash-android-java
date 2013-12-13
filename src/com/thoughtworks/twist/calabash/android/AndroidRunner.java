@@ -9,15 +9,13 @@ import java.util.Enumeration;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 
-import static com.thoughtworks.twist.calabash.android.Utils.isWindows;
-
 public class AndroidRunner {
 
     public static final String TEST_SERVERS = "test_servers";
     private final AndroidConfiguration configuration;
     private final File apk;
     private Environment environment;
-    private AndroidCalabashWrapper calabashWrapper;
+    private CalabashWrapper calabashWrapper;
 
     /**
      * @param apkPath       path of the .apk file
@@ -55,7 +53,7 @@ public class AndroidRunner {
         try {
             environment = EnvironmentInitializer.initialize(configuration);
             File gemPath = extractGemsFromBundle();
-            calabashWrapper = new AndroidCalabashWrapper(gemPath, apk, configuration, environment);
+            calabashWrapper = new CalabashWrapper(gemPath, apk, configuration, environment);
             calabashWrapper.setup();
 
         } catch (Exception e) {

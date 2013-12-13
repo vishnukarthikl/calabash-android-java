@@ -21,7 +21,7 @@ public final class UIElements extends ArrayList<UIElement> implements AndroidEle
     public UIElements() {
     }
 
-    public UIElements(RubyArray elements, String query, AndroidCalabashWrapper wrapper)
+    public UIElements(RubyArray elements, String query, CalabashWrapper wrapper)
             throws CalabashException {
         query = query.trim();
         Pattern pattern = Pattern.compile("^.+index:[0-9]+$");
@@ -34,7 +34,7 @@ public final class UIElements extends ArrayList<UIElement> implements AndroidEle
                 String q = query;
                 if (!indexedQuery)
                     q += " index:" + i;
-                this.add(Utils.createUIElement(object, q, wrapper));
+                this.add(new UIElement(object, q, wrapper));
             } catch (Exception e) {
                 throw new CalabashException("Unsupported result format.\n"
                         + elements.toString(), e);

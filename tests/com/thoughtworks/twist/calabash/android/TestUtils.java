@@ -52,7 +52,7 @@ public class TestUtils {
 
     public static void goToActivity(AndroidApplication application, final String activityName) throws CalabashException, OperationTimedoutException {
         application.query("* marked:'" + activityName + "'").touch();
-        application.waitForActivity(activityMap.get(activityName), 5);
+        application.waitForActivity(activityMap.get(activityName), 10);
     }
 
     public static AndroidApplication installAppOnEmulator(String serial, String packageName, File androidApkPath) throws CalabashException {

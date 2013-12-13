@@ -8,9 +8,9 @@ import java.util.Map;
 
 public class AndroidApplication {
     private String installedOn;
-    private AndroidCalabashWrapper calabashWrapper;
+    private CalabashWrapper calabashWrapper;
 
-    public AndroidApplication(AndroidCalabashWrapper calabashWrapper, String serial) {
+    public AndroidApplication(CalabashWrapper calabashWrapper, String serial) {
         this.calabashWrapper = calabashWrapper;
         this.installedOn = serial;
     }

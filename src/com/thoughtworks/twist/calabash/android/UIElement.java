@@ -17,18 +17,12 @@ public class UIElement implements AndroidElementAction {
 
     private final RubyHash data;
     private final String query;
-    private final AndroidCalabashWrapper calabashWrapper;
+    private final CalabashWrapper calabashWrapper;
 
-    public UIElement(RubyHash data, String query,
-                     AndroidCalabashWrapper calabashWrapper) {
+    public UIElement(RubyHash data, String query, CalabashWrapper calabashWrapper) {
         this.data = data;
         this.query = query;
         this.calabashWrapper = calabashWrapper;
-    }
-
-
-    protected  AndroidCalabashWrapper getCalabashWrapper() {
-        return this.calabashWrapper;
     }
 
     /**
@@ -159,7 +153,6 @@ public class UIElement implements AndroidElementAction {
         calabashWrapper.setChecked(this.getQuery(), checked);
     }
 
-
     /**
      * get the <code>selector</code> property of the element
      *
@@ -188,36 +181,48 @@ public class UIElement implements AndroidElementAction {
         }
     }
 
-    public boolean equals(Object obj) {
-        if (obj instanceof UIElement) {
-            UIElement that = (UIElement) obj;
-            boolean equal = false;
+    /**
+     * set the date if it is a date picker
+     *
+     * @param date date to be set
+     * @throws CalabashException
+     */
+    public void setDate(DateTime date) throws CalabashException {
+        calabashWrapper.setDate(getQuery(), date.getYear(), date.getMonthOfYear(), date.getDayOfMonth());
+    }
 
-            if (this.getRect() != null && that.getRect() != null)
-                equal = this.getRect().equals(that.getRect());
+    /**
+     *
+     * @return the date value represented by the UI element if it is a date picker
+     * @throws CalabashException
+     */
+    public DateTime getDate() throws CalabashException {
+        return calabashWrapper.getDate(getQuery());
+    }
 
-            if (equal && this.getId() != null && that.getId() != null)
-                equal = this.getId().equals(that.getId());
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
 
-            if (equal && this.getText() != null && that.getText() != null)
-                equal = this.getText().equals(that.getText());
+        UIElement uiElement = (UIElement) o;
 
-            if (equal && this.getElementClass() != null && that.getElementClass() != null)
-                equal = this.getElementClass().equals(that.getElementClass());
+        if (getId() != null ? !getId().equals(uiElement.getId()) : uiElement.getId() != null)return false;
+        if (getElementClass() != null ? !getElementClass().equals(uiElement.getElementClass()) : uiElement.getElementClass() != null) return false;
+        if (getRect() != null ? !getRect().equals(uiElement.getRect()) : uiElement.getRect() != null) return false;
+        if (getText() != null ? !getText().equals(uiElement.getText()) : uiElement.getText() != null) return false;
+        if (getContentDescription() != null ? !getContentDescription().equals(uiElement.getContentDescription()) : uiElement.getContentDescription() != null) return false;
 
-            return equal;
-        }
-
-        return super.equals(obj);
+        return true;
     }
 
     @Override
     public int hashCode() {
         List<Object> objects = new ArrayList<Object>();
+        objects.add(getId());
+        objects.add(getElementClass());
         objects.add(getRect());
         objects.add(getText());
-        objects.add(getElementClass());
-        objects.add(getId());
         int result = 0;
         for (Object object : objects) {
             result = 31 * result + (object != null ? object.hashCode() : 0);
@@ -229,4 +234,5 @@ public class UIElement implements AndroidElementAction {
         return String.format("id: %s, class: %s, text: %s, description: %s, content description: %s, enabled: %s, rect: %s",
                 getId(), getElementClass(), getText(), getDescription(), getContentDescription(), isEnabled(), getRect());
     }
+
 }

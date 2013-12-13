@@ -12,12 +12,16 @@ public class TreeNode {
         this.children = new ArrayList<TreeNode>();
     }
 
+    public TreeNode() {
+        this(null);
+    }
+
     public List<TreeNode> getChildren() {
         return children;
     }
 
     public void addChild(TreeNode child) {
-        children.add(child);
+        children.add(0, child);
     }
 
     public UIElement getData() {

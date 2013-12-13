@@ -2,11 +2,12 @@ package com.thoughtworks.twist.calabash.android;
 
 
 import org.joda.time.DateTime;
-import org.junit.*;
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 import java.io.File;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
@@ -36,7 +37,7 @@ public class AllActionsIT {
     @After
     public void goToMainActivity() throws CalabashException, OperationTimedoutException {
         application.goBack();
-        application.waitForActivity("MyActivity", 5);
+        application.waitForActivity("MyActivity", 10);
     }
 
     @Test
@@ -54,33 +55,33 @@ public class AllActionsIT {
         TestUtils.goToActivity(application, TestUtils.ACTIVITY_NESTED_VIEWS);
         String expectedElementCollection = "Element : com.android.internal.policy.impl.PhoneWindow$DecorView , Nesting : 0\n" +
                 "Element : android.widget.LinearLayout , Nesting : 1\n" +
+                "Element : com.android.internal.widget.ActionBarContainer , Nesting : 2\n" +
+                "Element : com.android.internal.widget.ActionBarView , Nesting : 3\n" +
+                "Element : android.widget.LinearLayout , Nesting : 4\n" +
+                "Element : android.widget.LinearLayout , Nesting : 5\n" +
+                "Element : android.widget.TextView , Nesting : 6\n" +
+                "Element : com.android.internal.widget.ActionBarView$HomeView , Nesting : 4\n" +
+                "Element : android.widget.ImageView , Nesting : 5\n" +
                 "Element : android.widget.FrameLayout , Nesting : 2\n" +
                 "Element : android.widget.LinearLayout , Nesting : 3\n" +
                 "Element : android.widget.TableLayout , Nesting : 4\n" +
                 "Element : android.widget.TableRow , Nesting : 5\n" +
+                "Element : android.widget.Button , Nesting : 6\n" +
+                "Element : android.widget.Button , Nesting : 6\n" +
+                "Element : android.widget.TableRow , Nesting : 5\n" +
+                "Element : android.widget.TableRow , Nesting : 6\n" +
+                "Element : android.widget.Button , Nesting : 7\n" +
+                "Element : android.widget.RadioButton , Nesting : 7\n" +
+                "Element : android.widget.LinearLayout , Nesting : 6\n" +
+                "Element : android.widget.ToggleButton , Nesting : 7\n" +
+                "Element : android.widget.CheckBox , Nesting : 7\n" +
+                "Element : android.widget.TableRow , Nesting : 5\n" +
+                "Element : android.widget.FrameLayout , Nesting : 6\n" +
+                "Element : android.widget.ProgressBar , Nesting : 7\n" +
+                "Element : android.widget.RelativeLayout , Nesting : 7\n" +
                 "Element : android.widget.RelativeLayout , Nesting : 6\n" +
                 "Element : android.widget.TextView , Nesting : 7\n" +
-                "Element : android.widget.TextView , Nesting : 7\n" +
-                "Element : android.widget.FrameLayout , Nesting : 6\n" +
-                "Element : android.widget.RelativeLayout , Nesting : 7\n" +
-                "Element : android.widget.ProgressBar , Nesting : 7\n" +
-                "Element : android.widget.TableRow , Nesting : 5\n" +
-                "Element : android.widget.LinearLayout , Nesting : 6\n" +
-                "Element : android.widget.CheckBox , Nesting : 7\n" +
-                "Element : android.widget.ToggleButton , Nesting : 7\n" +
-                "Element : android.widget.TableRow , Nesting : 6\n" +
-                "Element : android.widget.RadioButton , Nesting : 7\n" +
-                "Element : android.widget.Button , Nesting : 7\n" +
-                "Element : android.widget.TableRow , Nesting : 5\n" +
-                "Element : android.widget.Button , Nesting : 6\n" +
-                "Element : android.widget.Button , Nesting : 6\n" +
-                "Element : com.android.internal.widget.ActionBarContainer , Nesting : 2\n" +
-                "Element : com.android.internal.widget.ActionBarView , Nesting : 3\n" +
-                "Element : com.android.internal.widget.ActionBarView$HomeView , Nesting : 4\n" +
-                "Element : android.widget.ImageView , Nesting : 5\n" +
-                "Element : android.widget.LinearLayout , Nesting : 4\n" +
-                "Element : android.widget.LinearLayout , Nesting : 5\n" +
-                "Element : android.widget.TextView , Nesting : 6\n";
+                "Element : android.widget.TextView , Nesting : 7\n";
         final StringBuilder actualElementCollection = new StringBuilder();
 
         application.inspect(new InspectCallback() {
@@ -98,12 +99,12 @@ public class AllActionsIT {
         UIElement uiElement = application.query("tableRow index:1").first();
 
         String expectedElementsCollection = "Element : android.widget.TableRow , Nesting : 0\n" +
-                "Element : android.widget.LinearLayout , Nesting : 1\n" +
-                "Element : android.widget.CheckBox , Nesting : 2\n" +
-                "Element : android.widget.ToggleButton , Nesting : 2\n" +
                 "Element : android.widget.TableRow , Nesting : 1\n" +
+                "Element : android.widget.Button , Nesting : 2\n" +
                 "Element : android.widget.RadioButton , Nesting : 2\n" +
-                "Element : android.widget.Button , Nesting : 2\n";
+                "Element : android.widget.LinearLayout , Nesting : 1\n" +
+                "Element : android.widget.ToggleButton , Nesting : 2\n" +
+                "Element : android.widget.CheckBox , Nesting : 2\n";
 
         final StringBuilder actualElementsCollection = new StringBuilder();
         uiElement.inspect(new InspectCallback() {
@@ -251,26 +252,24 @@ public class AllActionsIT {
         assertEquals(Double.parseDouble(longitudeText.getText()), -122.402698, .05);
     }
 
-
     @Test
     public void shouldSetDateOnDatePicker() throws Exception {
         TestUtils.goToActivity(application, TestUtils.ACTIVITY_DATE_TIME_ELEMENTS);
 
-        DatePicker datePicker = (DatePicker) application.query("datePicker").first();
-        datePicker.setDate(new DateTime(2011, 12, 22, 0, 0));
+        UIElement datePicker =  application.query("datePicker").first();
+        datePicker.setDate(new DateTime(2011, 1, 25, 0, 0));
 
-        datePicker = (DatePicker) application.query("datePicker").first();
+        datePicker = application.query("datePicker").first();
 
         DateTime actualDate = datePicker.getDate();
 
         assertEquals(2011, actualDate.getYear());
-        assertEquals(12, actualDate.getMonthOfYear());
-        assertEquals(22, actualDate.getDayOfMonth());
+        assertEquals(1, actualDate.getMonthOfYear());
+        assertEquals(25, actualDate.getDayOfMonth());
 
     }
 
-
-        @Test
+    @Test
     public void shouldGetSharedPreferences() throws Exception {
         Map<String, String> preferences = application.getSharedPreferences("my_preferences");
 
