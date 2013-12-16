@@ -36,6 +36,8 @@ public class CalabashWrapper {
     public static final String WAIT_POST_TIMEOUT = "cajWaitPostTimeout";
     public static final String WAIT_TIMEOUT_MESSAGE = "cajWaitTimeoutMessage";
     public static final String WAIT_SHOULD_TAKE_SCREENSHOT = "cajWaitShouldTakeScreenshot";
+    public static final String ENVIRONMENT_VAR_PLACEHOLDER = "cajEnv";
+    public static final String ARGV = "ARGV";
     private static final String ADB_DEVICE_ARG = "ADB_DEVICE_ARG";
     private static final String APP_PATH = "APP_PATH";
     private static final String TEST_SERVER_PATH = "TEST_APP_PATH";
@@ -93,26 +95,23 @@ public class CalabashWrapper {
     public void setup() throws CalabashException {
         try {
             createDebugCertificateIfMissing();
-
-            //Todo: check if it works on eclipse
             String jrubyClasspath = getClasspathFor("jruby");
             addContainerEnv("CLASSPATH", jrubyClasspath);
             container.runScriptlet(format("Dir.chdir '%s'", apk.getParent()));
-            container.put("ARGV", new String[]{"resign", apk.getAbsolutePath()});
+
+            container.put(ARGV, new String[]{"resign", apk.getAbsolutePath()});
             String calabashAndroid = new File(getCalabashGemDirectory(), "calabash-android").getAbsolutePath();
             container.runScriptlet(PathType.ABSOLUTE, calabashAndroid);
-
             info("Done signing the app");
-            container.put("ARGV", new String[]{"build", apk.getAbsolutePath()});
+
+            container.put(ARGV, new String[]{"build", apk.getAbsolutePath()});
             container.runScriptlet(PathType.ABSOLUTE, calabashAndroid);
-
             info("App build complete");
-
         } catch (Exception e) {
             error("Failed to setup calabash for project: %s", e, apk.getAbsolutePath());
             throw new CalabashException(format("Failed to setup calabash. %s", e.getMessage()));
         } finally {
-            clearContainerVars("ARGV");
+            clearContainerVars(ARGV, ENVIRONMENT_VAR_PLACEHOLDER);
         }
     }
 
@@ -138,6 +137,8 @@ public class CalabashWrapper {
             info("Started the app");
         } catch (Exception e) {
             throw new CalabashException("Error starting the app:" + e.getMessage(), e);
+        } finally {
+            clearContainerVars(ENVIRONMENT_VAR_PLACEHOLDER);
         }
     }
 
@@ -200,9 +201,19 @@ public class CalabashWrapper {
         }};
     }
 
-    private String getClasspathFor(String resource) {
-        URLClassLoader classLoader = (URLClassLoader) container.getClassLoader();
-        URL[] urls = classLoader.getURLs();
+    private String getClasspathFor(String resource) throws CalabashException {
+        if (environment.getJrubyHome() != null) {
+            return environment.getJrubyHome();
+        }
+
+        ClassLoader classLoader = container.getClassLoader();
+        if (!(classLoader instanceof URLClassLoader)) {
+            //eclipse doesn't give URLClassLoader
+            error("Could not get %s path", resource);
+            throw new CalabashException(String.format("Could not get %s path", resource));
+        }
+        URLClassLoader urlClassLoader = (URLClassLoader) classLoader;
+        URL[] urls = urlClassLoader.getURLs();
         for (URL url : urls) {
             if (url.toString().contains(resource)) {
                 info("Found %s in classpath at : %s", resource, url.getFile());
@@ -210,7 +221,7 @@ public class CalabashWrapper {
             }
         }
         error("Could not find %s in classpath", resource);
-        return null;
+        throw new CalabashException(String.format("Could not find %s in classpath", resource));
     }
 
     private File getCalabashGemDirectory() throws CalabashException {
@@ -542,13 +553,12 @@ public class CalabashWrapper {
 
     private void clearContainerVars(String... vars) {
         for (String var : vars) {
-            Object containerVar = Utils.toJavaObject(container.getVarMap().get(var));
-            container.getVarMap().remove(containerVar);
+            container.getVarMap().remove(var);
         }
     }
 
     private void addContainerEnv(String envName, String envValue) {
-        String cajEnv = "cajEnv";
+        String cajEnv = ENVIRONMENT_VAR_PLACEHOLDER;
         container.put(cajEnv, envValue);
         container.runScriptlet(format("ENV['%s'] = %s", envName, cajEnv));
     }

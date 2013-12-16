@@ -32,6 +32,7 @@ public class AndroidRunner {
             throw new CalabashException("invalid path to apk file");
         }
         this.configuration = configuration;
+        this.environment = EnvironmentInitializer.initialize(configuration);
         CalabashLogger.initialize(this.configuration);
 
     }
@@ -51,7 +52,6 @@ public class AndroidRunner {
      */
     public void setup() throws CalabashException {
         try {
-            environment = EnvironmentInitializer.initialize(configuration);
             File gemPath = extractGemsFromBundle();
             calabashWrapper = new CalabashWrapper(gemPath, apk, configuration, environment);
             calabashWrapper.setup();
@@ -78,6 +78,10 @@ public class AndroidRunner {
         calabashWrapper.start(serial);
 
         return new AndroidApplication(calabashWrapper,serial);
+    }
+
+    public void setJrubyJarFile(File jrubyJarFile) {
+        environment.setJrubyHome(jrubyJarFile.getAbsolutePath());
     }
 
     private boolean alreadySetup() {
