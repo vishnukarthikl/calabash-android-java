@@ -34,7 +34,8 @@ public class AndroidRunner {
         this.configuration = configuration;
         this.environment = EnvironmentInitializer.initialize(configuration);
         CalabashLogger.initialize(this.configuration);
-
+        File gemPath = extractGemsFromBundle();
+        calabashWrapper = new CalabashWrapper(gemPath, apk, configuration, environment);
     }
 
 
@@ -47,15 +48,22 @@ public class AndroidRunner {
     }
 
     /**
+     * Gets the underlying wrapper
+     *
+     * @return the calabashWrapper
+     */
+    protected CalabashWrapper getCalabashWrapper() {
+        return calabashWrapper;
+    }
+
+    /**
      * generate the instrumentation test server apk, resign the application with debug keystore
+     *
      * @throws CalabashException
      */
     public void setup() throws CalabashException {
         try {
-            File gemPath = extractGemsFromBundle();
-            calabashWrapper = new CalabashWrapper(gemPath, apk, configuration, environment);
             calabashWrapper.setup();
-
         } catch (Exception e) {
             String errorMessage = "calabash android setup failed: " + e.getMessage();
             CalabashLogger.error(errorMessage, e);
@@ -65,6 +73,7 @@ public class AndroidRunner {
 
     /**
      * install the signed apk and test server apk
+     *
      * @return handle to the android application
      * @throws CalabashException
      */
@@ -77,7 +86,7 @@ public class AndroidRunner {
         String serial = androidBridge.launchEmulator(configuration);
         calabashWrapper.start(serial);
 
-        return new AndroidApplication(calabashWrapper,serial);
+        return new AndroidApplication(calabashWrapper, serial);
     }
 
     public void setJrubyJarFile(File jrubyJarFile) {
