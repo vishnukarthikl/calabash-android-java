@@ -20,8 +20,8 @@
 
 	<target name="compile">
 		<mkdir dir="${classes.dir}" />
-		<javac srcdir="src" destdir="${classes.dir}" classpathref="classpath" />
-	</target>
+    <javac srcdir="src" destdir="${classes.dir}" classpathref="classpath" debug="true" debuglevel="lines,vars,source"/>
+  </target>
 
 	<target name="doc">
 		<javadoc packagenames="com.thoughtworks.twist.calabash.android.*" sourcepath="src" defaultexcludes="yes" destdir="${doc.dir}" author="true" version="true" use="true" windowtitle="Calabash-android-java" classpathref="classpath">
