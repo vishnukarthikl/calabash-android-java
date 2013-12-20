@@ -9,6 +9,8 @@ import java.util.Enumeration;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 
+import static com.thoughtworks.twist.calabash.android.CalabashLogger.info;
+
 public class AndroidRunner {
 
     public static final String TEST_SERVERS = "test_servers";
@@ -79,11 +81,12 @@ public class AndroidRunner {
      */
     public AndroidApplication start() throws CalabashException {
         if (!alreadySetup()) {
-            CalabashLogger.info("Application not setup. Performing setup...");
+            info("Application not setup. Performing setup...");
             setup();
         }
         AndroidBridge androidBridge = new AndroidBridge(environment);
         String serial = androidBridge.launchEmulator(configuration);
+        info("Using the serial: %s", serial);
         calabashWrapper.start(serial);
 
         return new AndroidApplication(calabashWrapper, serial);
@@ -116,10 +119,10 @@ public class AndroidRunner {
         File extractedDir = getExtractionDir();
         File extracted = new File(extractedDir, "extracted");
         if (extracted.exists()) {
-            CalabashLogger.info("Gems already present in temp dir");
+            info("Gems already present in temp dir");
             return extractedDir;
         }
-        CalabashLogger.info("Extracting gems to temp dir");
+        info("Extracting gems to temp dir");
         copyFileFromBundleTo("scripts", "gems.zip", extractedDir);
         try {
             File gemszip = new File(extractedDir, "gems.zip");

@@ -6,7 +6,6 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 
-import static com.thoughtworks.twist.calabash.android.Utils.runCommand;
 import static java.lang.String.format;
 
 public class AndroidBridge {
@@ -14,6 +13,7 @@ public class AndroidBridge {
     public static final String BOOT_ANIM_STOPPED = "stopped";
     public static final String EMULATOR_PREFIX = "emulator-";
     private final Environment environment;
+    private DeviceList deviceList;
 
     public AndroidBridge(Environment environment) {
         this.environment = environment;
@@ -26,6 +26,7 @@ public class AndroidBridge {
     }
 
     public String launchEmulator(AndroidConfiguration configuration) throws CalabashException {
+        deviceList = getDeviceList();
         String deviceSerial = configuration.getSerial();
         if (deviceSerial != null) {
             checkDeviceIsRunning(deviceSerial);
@@ -56,15 +57,14 @@ public class AndroidBridge {
             unlockKeyguard(newSerial);
             return newSerial;
         }
-        if (deviceSerial == null) {
-            throw new CalabashException("Could not get the device serial, set the serial or devicename in the AndroidConfiguration");
+        if (deviceList.size() == 1) {
+            return deviceList.get(0).getSerial();
         }
-        return deviceSerial;
+        throw new CalabashException("Could not get the device serial, set the serial or devicename in the AndroidConfiguration");
     }
 
     private String launchEmulatorWithName(String deviceName) throws CalabashException {
         String[] launchCommand = getLaunchCommand(deviceName);
-        final DeviceList deviceList = getDeviceList();
         String launchedDeviceSerial = getSerialIfDeviceAlreadyLaunched(deviceList, deviceName);
         if (launchedDeviceSerial != null) {
             return launchedDeviceSerial;
