@@ -73,5 +73,8 @@ public final class UIElements extends ArrayList<UIElement> implements AndroidEle
         get(0).longPress();
     }
 
-
+    public void setText(String text) throws CalabashException {
+        ensureCollectionIsNotEmpty();
+        get(0).setText(text);
+    }
 }

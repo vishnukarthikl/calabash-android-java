@@ -415,7 +415,7 @@ public class CalabashWrapper {
             container.put(MENU_ITEM, menuItem);
             container.runScriptlet(String.format("performAction('select_from_menu', %s)", MENU_ITEM));
         } catch (Exception e) {
-            String message = "Failed to Select menu item" + menuItem;
+            String message = "Failed to Select menu item " + menuItem;
             error(message, e);
             throw new CalabashException(message, e);
         } finally {

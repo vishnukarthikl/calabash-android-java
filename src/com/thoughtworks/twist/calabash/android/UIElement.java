@@ -162,7 +162,11 @@ public class UIElement implements AndroidElementAction {
      */
     public Object getProperty(String selector) throws CalabashException {
         RubyArray rubyArray = calabashWrapper.query(this.getQuery(), selector);
-        return Utils.toJavaObject(rubyArray.get(0));
+        Object value = Utils.toJavaObject(rubyArray.get(0));
+        if (value != null && value.toString().toLowerCase().contains("no accessor")) {
+            return null;
+        }
+        return value;
     }
 
     public void touch() throws CalabashException {
@@ -182,6 +186,14 @@ public class UIElement implements AndroidElementAction {
     }
 
     /**
+     * @return the date value represented by the UI element if it is a date picker
+     * @throws CalabashException
+     */
+    public DateTime getDate() throws CalabashException {
+        return calabashWrapper.getDate(getQuery());
+    }
+
+    /**
      * set the date if it is a date picker
      *
      * @param date date to be set
@@ -192,12 +204,13 @@ public class UIElement implements AndroidElementAction {
     }
 
     /**
+     * get the tree with the current element as the root
      *
-     * @return the date value represented by the UI element if it is a date picker
+     * @return treeNode
      * @throws CalabashException
      */
-    public DateTime getDate() throws CalabashException {
-        return calabashWrapper.getDate(getQuery());
+    public TreeNode getTree() throws CalabashException {
+        return new TreeBuilder(calabashWrapper).createTreeFrom(this);
     }
 
     @Override
@@ -207,11 +220,13 @@ public class UIElement implements AndroidElementAction {
 
         UIElement uiElement = (UIElement) o;
 
-        if (getId() != null ? !getId().equals(uiElement.getId()) : uiElement.getId() != null)return false;
-        if (getElementClass() != null ? !getElementClass().equals(uiElement.getElementClass()) : uiElement.getElementClass() != null) return false;
+        if (getId() != null ? !getId().equals(uiElement.getId()) : uiElement.getId() != null) return false;
+        if (getElementClass() != null ? !getElementClass().equals(uiElement.getElementClass()) : uiElement.getElementClass() != null)
+            return false;
         if (getRect() != null ? !getRect().equals(uiElement.getRect()) : uiElement.getRect() != null) return false;
         if (getText() != null ? !getText().equals(uiElement.getText()) : uiElement.getText() != null) return false;
-        if (getContentDescription() != null ? !getContentDescription().equals(uiElement.getContentDescription()) : uiElement.getContentDescription() != null) return false;
+        if (getContentDescription() != null ? !getContentDescription().equals(uiElement.getContentDescription()) : uiElement.getContentDescription() != null)
+            return false;
 
         return true;
     }

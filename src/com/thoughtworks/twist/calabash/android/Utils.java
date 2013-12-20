@@ -52,7 +52,7 @@ final class Utils {
 
     public static Object toJavaObject(Object rubyObject) {
         if (rubyObject == null)
-            return rubyObject;
+            return null;
 
         if (rubyObject instanceof RubyArray)
             return toJavaArray((RubyArray) rubyObject);

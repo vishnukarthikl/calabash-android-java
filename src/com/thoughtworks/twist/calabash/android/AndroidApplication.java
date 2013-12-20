@@ -19,10 +19,6 @@ public class AndroidApplication {
         return installedOn;
     }
 
-    public void setInstalledOn(String installedOn) {
-        this.installedOn = installedOn;
-    }
-
     public UIElements query(String query) throws CalabashException {
         RubyArray array = calabashWrapper.query(query);
         return new UIElements(array, query, calabashWrapper);
@@ -205,5 +201,16 @@ public class AndroidApplication {
      */
     public void setGPSLocation(String location) throws CalabashException {
         calabashWrapper.setGPSLocation(location);
+    }
+
+    /**
+     * Gets all the root elements available This can be used to make a tree view
+     * of all the elements available in the view currently
+     *
+     * @return list of root elements if available, null otherwise
+     * @throws CalabashException
+     */
+    public List<TreeNode> getRootElements() throws CalabashException {
+        return new TreeBuilder(calabashWrapper).createTreeFromRoot();
     }
 }

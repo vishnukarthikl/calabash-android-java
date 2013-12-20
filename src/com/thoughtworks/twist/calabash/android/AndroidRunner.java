@@ -212,4 +212,14 @@ public class AndroidRunner {
             throw new CalabashException(message, e);
         }
     }
+
+    /**
+     * Releases resources associated with this runner
+     *
+     * @throws CalabashException
+     */
+    public void dispose() throws CalabashException {
+        calabashWrapper.dispose();
+    }
+
 }
