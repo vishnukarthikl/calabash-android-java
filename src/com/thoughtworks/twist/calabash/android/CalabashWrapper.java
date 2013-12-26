@@ -49,6 +49,7 @@ public class CalabashWrapper {
     private File gemsDir;
     private AndroidBridge androidBridge;
     private boolean disposed = false;
+    private long pauseTimeInMilliSec = 500;
 
     public CalabashWrapper(File rbScriptsPath, File apk, AndroidConfiguration configuration, Environment environment) throws CalabashException {
         this.rbScriptsPath = rbScriptsPath;
@@ -58,6 +59,9 @@ public class CalabashWrapper {
         this.environment = environment;
         this.androidBridge = new AndroidBridge(environment);
         this.initializeScriptingContainer();
+        if (configuration != null && configuration.getPauseTimeInMs() >= 0)
+            pauseTimeInMilliSec = configuration.getPauseTimeInMs();
+
     }
 
     private void initializeScriptingContainer() throws CalabashException {
@@ -265,6 +269,7 @@ public class CalabashWrapper {
             info("Touching - %s", query);
             container.put(QUERY_STRING, query);
             container.runScriptlet(String.format("touch(%s)", QUERY_STRING));
+            pause();
         } catch (Exception e) {
             error("Failed to touch on: %s", e, query);
             throw new CalabashException(String.format("Failed to touch on: %s. %s", query, e.getMessage()));
@@ -280,6 +285,7 @@ public class CalabashWrapper {
             container.put(QUERY_STRING, query);
             String setText = String.format("{:setText => '%s'}", text);
             container.runScriptlet(String.format("query(%s, %s)", QUERY_STRING, setText));
+            pause();
         } catch (Exception e) {
             error("Failed to enter text %s into %s", e, text, query);
             throw new CalabashException(String.format("Failed to enter text %s into %s :%s", text, query, e.getMessage()));
@@ -379,6 +385,7 @@ public class CalabashWrapper {
         try {
             info("Pressing back button");
             container.runScriptlet("performAction('go_back')");
+            pause();
         } catch (Exception e) {
             String message = "Failed to go back";
             error(message, e);
@@ -414,6 +421,7 @@ public class CalabashWrapper {
             info("Selecting menu item %s", menuItem);
             container.put(MENU_ITEM, menuItem);
             container.runScriptlet(String.format("performAction('select_from_menu', %s)", MENU_ITEM));
+            pause();
         } catch (Exception e) {
             String message = "Failed to Select menu item " + menuItem;
             error(message, e);
@@ -445,6 +453,7 @@ public class CalabashWrapper {
                     actionName = "press_long_on_text";
             }
             container.runScriptlet(String.format("performAction('%s', '%s')", actionName, property));
+            pause();
         } catch (Exception e) {
             String message = "Failed to long press";
             error(message, e);
@@ -548,6 +557,13 @@ public class CalabashWrapper {
                     WAIT_POST_TIMEOUT,
                     WAIT_TIMEOUT_MESSAGE,
                     WAIT_SHOULD_TAKE_SCREENSHOT);
+        }
+    }
+
+    private void pause() {
+        try {
+            Thread.sleep(pauseTimeInMilliSec);
+        } catch (InterruptedException e) {
         }
     }
 

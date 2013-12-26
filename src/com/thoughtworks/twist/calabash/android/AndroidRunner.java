@@ -125,9 +125,9 @@ public class AndroidRunner {
         info("Extracting gems to temp dir");
         copyFileFromBundleTo("scripts", "gems.zip", extractedDir);
         try {
-            File gemszip = new File(extractedDir, "gems.zip");
-            unzipWithPermission(extractedDir, gemszip);
-            gemszip.delete();
+            File gemsZip = new File(extractedDir, "gems.zip");
+            unzipWithPermission(extractedDir, gemsZip);
+            gemsZip.delete();
             extracted.createNewFile();
         } catch (Exception e) {
             throw new CalabashException("Failed to unzip gems", e);

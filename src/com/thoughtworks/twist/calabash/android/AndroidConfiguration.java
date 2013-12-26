@@ -10,6 +10,7 @@ public class AndroidConfiguration {
     private boolean shouldReinstallApp;
     private String deviceName;
     private ScreenshotListener screenshotListener;
+    private long pauseTimeInMs = -1;
 
     public boolean isLoggingEnabled() {
         return getLogsDirectory() != null;
@@ -78,7 +79,18 @@ public class AndroidConfiguration {
         return screenshotListener;
     }
 
+
     public void setScreenshotListener(ScreenshotListener screenshotListener) {
         this.screenshotListener = screenshotListener;
+    }
+
+
+    public void setPauseTime(long pauseTimeInMs) {
+        this.pauseTimeInMs = pauseTimeInMs;
+    }
+
+
+    public long getPauseTimeInMs() {
+        return pauseTimeInMs;
     }
 }
