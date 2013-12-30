@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 
+import static com.thoughtworks.twist.calabash.android.CalabashLogger.info;
 import static java.lang.String.format;
 
 public class AndroidBridge {
@@ -14,6 +15,7 @@ public class AndroidBridge {
     public static final String EMULATOR_PREFIX = "emulator-";
     private final Environment environment;
     private DeviceList deviceList;
+    private DeviceList newDeviceList;
 
     public AndroidBridge(Environment environment) {
         this.environment = environment;
@@ -58,6 +60,7 @@ public class AndroidBridge {
             return newSerial;
         }
         if (deviceList.size() == 1) {
+            info("Only one emualtor/device is connected");
             return deviceList.get(0).getSerial();
         }
         throw new CalabashException("Could not get the device serial, set the serial or devicename in the AndroidConfiguration");
@@ -72,23 +75,22 @@ public class AndroidBridge {
         Process process = Utils.runCommandInBackGround(launchCommand, format("failed to launch the emulator %s", deviceName));
         ConditionalWaiter conditionalWaiter = new ConditionalWaiter(new ICondition(String.format("Unable to launch emulator: %s", deviceName)) {
             public boolean test() throws CalabashException {
-                DeviceList newDeviceList = getDeviceList();
+                newDeviceList = getDeviceList();
                 return deviceList.size() < newDeviceList.size();
             }
         });
         conditionalWaiter.run(5, 5);
 
-        DeviceList newDeviceList = getDeviceList();
         return getNewSerial(deviceList, newDeviceList);
     }
 
     private String getSerialIfDeviceAlreadyLaunched(DeviceList deviceList, String deviceName) throws CalabashException {
-        CalabashLogger.info("Checking if %s is already launched", deviceName);
+        info("Checking if %s is already launched", deviceName);
         for (Device device : deviceList.devices) {
             String serial = device.getSerial();
             try {
                 if (isDeviceRunningWithSerial(deviceName, serial)) {
-                    CalabashLogger.info("%s is running with serial %s", deviceName, serial);
+                    info("%s is running with serial %s", deviceName, serial);
                     return serial;
                 }
             } catch (IOException e) {

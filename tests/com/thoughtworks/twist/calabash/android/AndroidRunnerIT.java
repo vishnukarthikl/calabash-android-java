@@ -59,6 +59,16 @@ public class AndroidRunnerIT {
     }
 
     @Test
+    public void shouldThrowExceptionIfSerialOrDeviceNotProvided() throws CalabashException {
+        expectedException.expect(CalabashException.class);
+        expectedException.expectMessage("Could not get the device serial, set the serial or devicename in the AndroidConfiguration");
+
+        AndroidRunner androidRunner = new AndroidRunner(tempAndroidApkPath.getAbsolutePath());
+        androidRunner.setup();
+        androidRunner.start();
+    }
+
+    @Test
     public void shouldThrowExceptionIfSerialIsGivenWhenNotStarted() throws CalabashException {
         String serial = "emulator-x";
         expectedException.expect(CalabashException.class);
@@ -153,4 +163,6 @@ public class AndroidRunnerIT {
 
         assertTrue(new File(tempDir, screenshotPath.toString()).exists());
     }
+
+
 }
