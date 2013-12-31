@@ -20,7 +20,7 @@
 
 	<target name="compile">
 		<mkdir dir="${classes.dir}" />
-    <javac srcdir="src" destdir="${classes.dir}" classpathref="classpath" debug="true" debuglevel="lines,vars,source"/>
+    <javac source="1.5" target="1.5" srcdir="src" destdir="${classes.dir}" classpathref="classpath" debug="true" debuglevel="lines,vars,source"/>
   </target>
 
 	<target name="doc">
