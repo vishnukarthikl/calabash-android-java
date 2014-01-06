@@ -394,6 +394,18 @@ public class CalabashWrapper {
 
     }
 
+    public void pressEnterKey() throws CalabashException {
+        try {
+            info("Pressing enter key");
+            container.runScriptlet("performAction('send_key_enter')");
+            pause();
+        } catch (Exception e) {
+            String message = "Failed to press enter key";
+            error(message, e);
+            throw new CalabashException(message, e);
+        }
+    }
+
     public void scrollDown() throws CalabashException {
         try {
             info("Scrolling down");

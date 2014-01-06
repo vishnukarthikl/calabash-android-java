@@ -113,7 +113,15 @@ public class AndroidApplication {
      */
     public void goBack() throws CalabashException {
         calabashWrapper.performGoBack();
+    }
 
+    /**
+     * press the 'enter' key on the keypad
+     *
+     * @throws CalabashException
+     */
+    public void pressEnterKey() throws CalabashException {
+        calabashWrapper.pressEnterKey();
     }
 
     /**
