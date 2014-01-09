@@ -164,5 +164,36 @@ public class AndroidRunnerIT {
         assertTrue(new File(tempDir, screenshotPath.toString()).exists());
     }
 
+    @Test
+    public void shouldWaitForActivity() throws Exception {
+        final AndroidApplication application = TestUtils.installAppOnEmulator("emulator-5554", packageName, tempAndroidApkPath);
 
+        application.waitFor(new ICondition() {
+            @Override
+            public boolean test() throws CalabashException {
+                return application.getCurrentActivity().equals("foo");
+            }
+        },4);
+
+        application.waitForElementWithId("button", 5);
+    }
+
+    @Test
+    public void shouldWaitForAnElementWithId() throws Exception {
+        final AndroidApplication application = TestUtils.installAppOnEmulator("emulator-5554", packageName, tempAndroidApkPath);
+
+        TestUtils.goToActivity(application, TestUtils.ACTIVITY_SIMPLE_ELEMENTS);
+
+        application.waitForElementWithId("button", 5);
+    }
+
+    @Test
+    public void shouldFailForAnElementWithIdNotFound() throws Exception {
+        expectedException.expect(OperationTimedoutException.class);
+        final AndroidApplication application = TestUtils.installAppOnEmulator("emulator-5554", packageName, tempAndroidApkPath);
+
+        TestUtils.goToActivity(application, TestUtils.ACTIVITY_SIMPLE_ELEMENTS);
+
+        application.waitForElementWithId("foobarid", 5);
+    }
 }

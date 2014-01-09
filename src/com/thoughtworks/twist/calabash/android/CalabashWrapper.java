@@ -114,8 +114,6 @@ public class CalabashWrapper {
         } catch (Exception e) {
             error("Failed to setup calabash for project: %s", e, apk.getAbsolutePath());
             throw new CalabashException(format("Failed to setup calabash. %s", e.getMessage()));
-        } finally {
-            clearContainerVars(ARGV, ENVIRONMENT_VAR_PLACEHOLDER);
         }
     }
 
@@ -141,8 +139,6 @@ public class CalabashWrapper {
             info("Started the app");
         } catch (Exception e) {
             throw new CalabashException("Error starting the app:" + e.getMessage(), e);
-        } finally {
-            clearContainerVars(ENVIRONMENT_VAR_PLACEHOLDER);
         }
     }
 
@@ -259,8 +255,6 @@ public class CalabashWrapper {
         } catch (Exception e) {
             error("Execution of query: %s, failed", e, query);
             throw new CalabashException(String.format("Failed to execute '%s'. %s", query, e.getMessage()));
-        } finally {
-            clearContainerVars(QUERY_STRING, QUERY_ARGS);
         }
     }
 
@@ -273,8 +267,6 @@ public class CalabashWrapper {
         } catch (Exception e) {
             error("Failed to touch on: %s", e, query);
             throw new CalabashException(String.format("Failed to touch on: %s. %s", query, e.getMessage()));
-        } finally {
-            clearContainerVars(QUERY_STRING);
         }
 
     }
@@ -289,8 +281,6 @@ public class CalabashWrapper {
         } catch (Exception e) {
             error("Failed to enter text %s into %s", e, text, query);
             throw new CalabashException(String.format("Failed to enter text %s into %s :%s", text, query, e.getMessage()));
-        } finally {
-            clearContainerVars(QUERY_STRING);
         }
     }
 
@@ -315,8 +305,6 @@ public class CalabashWrapper {
         } catch (Exception e) {
             error("Failed to take screenshot.", e);
             throw new CalabashException(String.format("Failed to take screenshot. %s", e.getMessage()));
-        } finally {
-            clearContainerVars(SCREENSHOT_PREFIX, SCREENSHOT_FILENAME);
         }
     }
 
@@ -329,8 +317,6 @@ public class CalabashWrapper {
         } catch (Exception e) {
             error("Failed to get preferences: %s", preferenceName);
             throw new CalabashException(String.format("Failed to find preferences: %s", preferenceName));
-        } finally {
-            clearContainerVars(PREFERENCE_NAME);
         }
     }
 
@@ -338,7 +324,9 @@ public class CalabashWrapper {
         try {
             info("Getting current activity");
             RubyHash activityInfoMap = (RubyHash) container.runScriptlet("performAction('get_activity_name')");
-            return (String) Utils.toJavaHash(activityInfoMap).get("message");
+            String activityName = (String) Utils.toJavaHash(activityInfoMap).get("message");
+            info("Current activity: %s", activityName);
+            return activityName;
         } catch (Exception e) {
             String message = "Failed to get Current Activity";
             error(message, e);
@@ -361,7 +349,6 @@ public class CalabashWrapper {
 
             return new DateTime(year, month + 1, day, 0, 0);
         } catch (Exception e) {
-            clearContainerVars(QUERY_STRING);
             String message = "Error getting date";
             throw new CalabashException(message, e);
         }
@@ -376,8 +363,6 @@ public class CalabashWrapper {
             String message = String.format("Failed to set checked property to: %s", checked);
             error(message, e);
             throw new CalabashException(message, e);
-        } finally {
-            clearContainerVars(QUERY_STRING);
         }
     }
 
@@ -438,8 +423,6 @@ public class CalabashWrapper {
             String message = "Failed to Select menu item " + menuItem;
             error(message, e);
             throw new CalabashException(message, e);
-        } finally {
-            clearContainerVars(MENU_ITEM);
         }
     }
 
@@ -506,8 +489,6 @@ public class CalabashWrapper {
             String message = String.format("Failed to set date : %d-%d-%d", year, month, day);
             error(message, e);
             throw new CalabashException(message, e);
-        } finally {
-            clearContainerVars(QUERY_STRING);
         }
 
     }
@@ -525,8 +506,6 @@ public class CalabashWrapper {
             }
         } catch (Exception e) {
             handleWaitException(e, options);
-        } finally {
-            clearContainerVars(WAIT_CONDITION, WAIT_TIMEOUT, WAIT_RETRY_FREQ, WAIT_POST_TIMEOUT, WAIT_TIMEOUT_MESSAGE, WAIT_SHOULD_TAKE_SCREENSHOT);
         }
     }
 
@@ -536,12 +515,12 @@ public class CalabashWrapper {
     }
 
     private void handleWaitException(Exception e, WaitOptions options) throws OperationTimedoutException, CalabashException {
-        if (e.toString().contains("Calabash::Android::WaitHelpers::WaitError")) {
+        if (e.getMessage().contains("WaitError")) {
             String message = null;
             if (options != null)
                 message = options.getTimeoutMessage();
 
-            error("Timedout waiting");
+            error("Wait Timed-out");
             throw new OperationTimedoutException(message == null ? "Timed out waiting..." : message);
         } else {
             error("Failed to wait for condition. %s", e, e.getMessage());
@@ -575,13 +554,7 @@ public class CalabashWrapper {
     private void pause() {
         try {
             Thread.sleep(pauseTimeInMilliSec);
-        } catch (InterruptedException e) {
-        }
-    }
-
-    private void clearContainerVars(String... vars) {
-        for (String var : vars) {
-            container.getVarMap().remove(var);
+        } catch (InterruptedException ignored) {
         }
     }
 

@@ -6,6 +6,8 @@ import java.io.File;
 import java.util.List;
 import java.util.Map;
 
+import static java.lang.String.format;
+
 public class AndroidApplication {
     private String installedOn;
     private CalabashWrapper calabashWrapper;
@@ -138,6 +140,22 @@ public class AndroidApplication {
                 return getCurrentActivity().contains(activityName);
             }
         }, timeout);
+    }
+
+    /**
+     * Wait till an element with id appears
+     * @param id id of the element
+     * @param timeoutInSec wait time in seconds
+     * @throws OperationTimedoutException
+     * @throws CalabashException
+     */
+    public void waitForElementWithId(final String id, int timeoutInSec) throws OperationTimedoutException, CalabashException {
+        waitFor(new ICondition() {
+            @Override
+            public boolean test() throws CalabashException {
+                return calabashWrapper.query(format("* id:'%s'", id)).size() > 0;
+            }
+        }, timeoutInSec);
     }
 
     /**

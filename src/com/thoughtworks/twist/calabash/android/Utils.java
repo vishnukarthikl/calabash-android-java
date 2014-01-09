@@ -117,7 +117,7 @@ final class Utils {
             CalabashLogger.error(error);
             return output;
         } catch (Exception e) {
-            throw new CalabashException(String.format("Failed to execute command %s", getCommandString(command)), e);
+            throw new CalabashException(String.format("Failed to execute command %s, %s", getCommandString(command),e.getMessage()), e);
         }
     }
 

@@ -256,7 +256,7 @@ public class AllActionsIT {
     public void shouldSetDateOnDatePicker() throws Exception {
         TestUtils.goToActivity(application, TestUtils.ACTIVITY_DATE_TIME_ELEMENTS);
 
-        UIElement datePicker =  application.query("datePicker").first();
+        UIElement datePicker = application.query("datePicker").first();
         datePicker.setDate(new DateTime(2011, 1, 25, 0, 0));
 
         datePicker = application.query("datePicker").first();
