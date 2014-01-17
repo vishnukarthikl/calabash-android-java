@@ -37,7 +37,12 @@ public class AllActionsIT {
     @After
     public void goToMainActivity() throws CalabashException, OperationTimedoutException {
         application.goBack();
-        application.waitForActivity("MyActivity", 10);
+        try {
+            application.waitForActivity("MyActivity", 6);
+        } catch (CalabashException e) {
+            application.goBack();
+            application.waitForActivity("MyActivity", 6);
+        }
     }
 
     @Test
@@ -54,14 +59,7 @@ public class AllActionsIT {
     public void shouldInspectApplicationElements() throws Exception {
         TestUtils.goToActivity(application, TestUtils.ACTIVITY_NESTED_VIEWS);
         String expectedElementCollection = "Element : com.android.internal.policy.impl.PhoneWindow$DecorView , Nesting : 0\n" +
-                "Element : android.widget.LinearLayout , Nesting : 1\n" +
-                "Element : com.android.internal.widget.ActionBarContainer , Nesting : 2\n" +
-                "Element : com.android.internal.widget.ActionBarView , Nesting : 3\n" +
-                "Element : android.widget.LinearLayout , Nesting : 4\n" +
-                "Element : android.widget.LinearLayout , Nesting : 5\n" +
-                "Element : android.widget.TextView , Nesting : 6\n" +
-                "Element : com.android.internal.widget.ActionBarView$HomeView , Nesting : 4\n" +
-                "Element : android.widget.ImageView , Nesting : 5\n" +
+                "Element : com.android.internal.widget.ActionBarOverlayLayout , Nesting : 1\n" +
                 "Element : android.widget.FrameLayout , Nesting : 2\n" +
                 "Element : android.widget.LinearLayout , Nesting : 3\n" +
                 "Element : android.widget.TableLayout , Nesting : 4\n" +
@@ -81,7 +79,14 @@ public class AllActionsIT {
                 "Element : android.widget.RelativeLayout , Nesting : 7\n" +
                 "Element : android.widget.RelativeLayout , Nesting : 6\n" +
                 "Element : android.widget.TextView , Nesting : 7\n" +
-                "Element : android.widget.TextView , Nesting : 7\n";
+                "Element : android.widget.TextView , Nesting : 7\n" +
+                "Element : com.android.internal.widget.ActionBarContainer , Nesting : 2\n" +
+                "Element : com.android.internal.widget.ActionBarView , Nesting : 3\n" +
+                "Element : android.widget.LinearLayout , Nesting : 4\n" +
+                "Element : com.android.internal.widget.ActionBarView$HomeView , Nesting : 5\n" +
+                "Element : android.widget.ImageView , Nesting : 6\n" +
+                "Element : android.widget.LinearLayout , Nesting : 5\n" +
+                "Element : android.widget.TextView , Nesting : 6\n";
         final StringBuilder actualElementCollection = new StringBuilder();
 
         application.inspect(new InspectCallback() {
@@ -169,7 +174,7 @@ public class AllActionsIT {
     public void shouldPerformScrollActions() throws Exception {
         TestUtils.goToActivity(application, TestUtils.ACTIVITY_SCROLL_LIST);
 
-        String queryForSecondPageElement = "textView marked:'The House of Mirth'";
+        String queryForSecondPageElement = "textView marked:'No Highway'";
         assertEquals(0, application.query(queryForSecondPageElement).size());
 
         application.scrollDown();

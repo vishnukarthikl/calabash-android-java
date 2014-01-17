@@ -5,7 +5,9 @@
 
 	<property name="version" value="1.1.0" />
 	<property name="build.dir" value="build" />
+    <property name="default.target.dir" value="${basedir}/target" />
 	<property name="classes.dir" value="${build.dir}/classes" />
+	<property name="test.classes.dir" value="${build.dir}/test-classes" />
 	<property name="jar.dir" value="${build.dir}/jar" />
 	<property name="jar.file" value="${jar.dir}/${ant.project.name}-${version}.jar" />
 	<property name="doc.dir" value="${build.dir}/javadoc" />
@@ -13,17 +15,26 @@
 	<property name="distro.dir" value="${build.dir}/${ant.project.name}-${version}" />
 	<property name="distro.file" value="${build.dir}/${ant.project.name}-${version}.zip" />
 	<property name="lib.dir" value="lib" />
+	<property name="test.lib.dir" value="tests/lib" />
+    <property name="test.report.dir" value="test-reports" />
 
 	<target name="clean">
 		<delete dir="${build.dir}" />
+        <delete dir="${test.report.dir}" />
 	</target>
 
-	<target name="compile">
-		<mkdir dir="${classes.dir}" />
+  <target name="compile">
+	<mkdir dir="${classes.dir}" />
     <javac srcdir="src" destdir="${classes.dir}" classpathref="classpath" debug="true" debuglevel="lines,vars,source"/>
   </target>
 
-	<target name="doc">
+    <target name="test.compile" depends="clean,compile">
+        <mkdir dir="${test.classes.dir}" />
+        <javac srcdir="tests" destdir="${test.classes.dir}" classpathref="test.classpath" />
+    </target>
+
+
+    <target name="doc">
 		<javadoc packagenames="com.thoughtworks.twist.calabash.android.*" sourcepath="src" defaultexcludes="yes" destdir="${doc.dir}" author="true" version="true" use="true" windowtitle="Calabash-android-java" classpathref="classpath">
 			<link href="http://developer.java.sun.com/developer/products/xml/docs/api/" />
 		</javadoc>
@@ -32,6 +43,14 @@
 	<path id="classpath">
 		<fileset dir="${lib.dir}" includes="**/*.jar" />
 	</path>
+
+    <path id="test.classpath">
+       <pathelement path="${classes.dir}"/>
+        <pathelement path="${test.classes.dir}"/>
+        <fileset dir="${lib.dir}" includes="**/*.jar" />
+        <fileset dir="${test.lib.dir}" includes="**/*.jar"/>
+        <pathelement path="." />
+    </path>
 
 	<target name="jar" depends="-ensure-gems-zip-is-present, compile, doc">
 		<property name="scripts.dir" value="${classes.dir}/scripts" />
@@ -75,5 +94,30 @@
         <antcall target="copy-lib-jar" />
         <zip basedir="${distro.dir}" includes="**" destfile="${distro.file}" />
 	</target>
+
+    <target name="test" depends="test.compile" >
+        <mkdir dir="${test.report.dir}" />
+        <junit fork="true" printSummary="true" showOutput="true" failureProperty="test.failure">
+            <classpath refid="test.classpath" />
+            <batchtest fork="true" todir="${test.report.dir}" >
+                <formatter type="xml" />
+                <fileset dir="${test.classes.dir}">
+                    <include name="**/*Test.*" />
+                    <include name="**/*IT.*" />
+                </fileset>
+            </batchtest>
+        </junit>
+
+        <junitreport todir="${test.report.dir}">
+            <fileset dir="${test.report.dir}">
+                <include name="TEST-*.xml" />
+            </fileset>
+            <report todir="${test.report.dir}/html" />
+        </junitreport>
+
+        <fail message="test failed" if="test.failure" />
+    </target>
+
+
 
 </project>
