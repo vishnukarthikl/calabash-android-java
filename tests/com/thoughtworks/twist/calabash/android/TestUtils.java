@@ -58,7 +58,6 @@ public class TestUtils {
     public static AndroidApplication installAppOnEmulator(String serial, String packageName, File androidApkPath) throws CalabashException {
         AndroidConfiguration configuration = new AndroidConfiguration();
         configuration.setSerial(serial);
-        configuration.setLogsDirectory(new File("logs"));
         return installAppOnEmulator(serial, packageName, androidApkPath, configuration);
     }
 
