@@ -1,6 +1,7 @@
 package com.thoughtworks.twist.calabash.android;
 
 
+import org.apache.commons.io.FileUtils;
 import org.joda.time.DateTime;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -16,6 +17,7 @@ import static org.junit.Assert.assertTrue;
 public class AllActionsIT {
 
 
+    public static final String EMULATOR = "emulator-5554";
     private static String packageName;
     private static File tempDir;
     private static File apkPath;
@@ -26,12 +28,12 @@ public class AllActionsIT {
         packageName = "com.example.AndroidTestApplication";
         tempDir = TestUtils.createTempDir("TestAndroidApps");
         apkPath = TestUtils.createTempDirWithProj("AndroidTestApplication.apk", tempDir);
-        application = TestUtils.installAppOnEmulator("emulator-5554", packageName, apkPath);
+        application = TestUtils.installAppOnEmulator(EMULATOR, packageName, apkPath);
     }
 
     @AfterClass
-    public static void tearDown() {
-        tempDir.delete();
+    public static void tearDown() throws Exception {
+        FileUtils.deleteDirectory(tempDir);
     }
 
     @After

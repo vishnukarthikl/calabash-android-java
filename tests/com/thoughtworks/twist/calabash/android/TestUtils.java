@@ -37,11 +37,6 @@ public class TestUtils {
         return tempDir;
     }
 
-    public static void clearAppDir() throws IOException {
-        File tempDir = createTempDir("TestIOSApps");
-        FileUtils.deleteDirectory(tempDir);
-    }
-
     public static File createTempDirWithProj(String androidApp, File dir) throws IOException {
         File androidAppPath = new File("tests/resources/" + androidApp);
         File tempAndroidPath = new File(dir, androidApp);
