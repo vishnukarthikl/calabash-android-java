@@ -1,6 +1,8 @@
 package com.thoughtworks.twist.calabash.android;
 
 import org.apache.commons.io.FileUtils;
+import org.hamcrest.BaseMatcher;
+import org.hamcrest.Description;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -10,6 +12,8 @@ import org.junit.rules.ExpectedException;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -17,6 +21,7 @@ import static org.junit.Assert.assertTrue;
 //Just run all the test. Can't help with emulator state dependency.
 public class AndroidRunnerIT {
 
+    public static final String EMULATOR = "emulator-5554";
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
     private File tempDir;
@@ -97,8 +102,8 @@ public class AndroidRunnerIT {
 
     @Test
     public void shouldInstallApplicationIfSerialIsProvided() throws CalabashException {
-        //note: emulator should be launched with serial 'emulator-5554
-        String serial = "emulator-5554";
+        //note: emulator should be launched with serial 'EMULATOR
+        String serial = EMULATOR;
         TestUtils.uninstall(packageName, serial);
         AndroidConfiguration configuration = new AndroidConfiguration();
         configuration.setSerial(serial);
@@ -113,9 +118,9 @@ public class AndroidRunnerIT {
 
     @Test
     public void shouldInstallApplicationAlreadyRunningDevice() throws CalabashException {
-        //note: emulator with name 'device' should be launched with serial 'emulator-5554'
+        //note: emulator with name 'device' should be launched with serial 'EMULATOR'
         String device = "device";
-        String serial = "emulator-5554";
+        String serial = EMULATOR;
         TestUtils.uninstall(packageName, serial);
         AndroidConfiguration configuration = new AndroidConfiguration();
         configuration.setDeviceName(device);
@@ -130,9 +135,9 @@ public class AndroidRunnerIT {
 
     @Test
     public void shouldTestGoBack() throws CalabashException, OperationTimedoutException {
-        final AndroidApplication application = TestUtils.installAppOnEmulator("emulator-5554", packageName, tempAndroidApkPath);
+        final AndroidApplication application = TestUtils.installAppOnEmulator(EMULATOR, packageName, tempAndroidApkPath);
 
-        TestUtils.goToActivity(application, "Nested Views");
+        TestUtils.goToActivity(application, TestUtils.ACTIVITY_NESTED_VIEWS);
         application.goBack();
 
         application.waitForActivity("MyActivity", 2);
@@ -143,7 +148,7 @@ public class AndroidRunnerIT {
     public void shouldTakeScreenshotOnFailure() throws CalabashException {
         final StringBuffer screenshotPath = new StringBuffer();
         AndroidConfiguration androidConfiguration = new AndroidConfiguration();
-        androidConfiguration.setSerial("emulator-5554");
+        androidConfiguration.setSerial(EMULATOR);
         androidConfiguration.setScreenshotListener(new ScreenshotListener() {
             public void screenshotTaken(String path, String imageType, String fileName) {
                 screenshotPath.append(path);
@@ -151,7 +156,7 @@ public class AndroidRunnerIT {
         });
         final AndroidApplication application;
         try {
-            application = TestUtils.installAppOnEmulator("emulator-5554", packageName, tempAndroidApkPath, androidConfiguration);
+            application = TestUtils.installAppOnEmulator(EMULATOR, packageName, tempAndroidApkPath, androidConfiguration);
             application.waitFor(new ICondition() {
                 @Override
                 public boolean test() throws CalabashException {
@@ -165,22 +170,53 @@ public class AndroidRunnerIT {
     }
 
     @Test
-    public void shouldWaitForActivity() throws Exception {
-        final AndroidApplication application = TestUtils.installAppOnEmulator("emulator-5554", packageName, tempAndroidApkPath);
+    public void shouldFailWaitingForActivity() throws Exception {
+        expectedException.expect(OperationTimedoutException.class);
+        expectedException.expectMessage("Timed out");
+        final AndroidApplication application = TestUtils.installAppOnEmulator(EMULATOR, packageName, tempAndroidApkPath);
 
         application.waitFor(new ICondition() {
             @Override
             public boolean test() throws CalabashException {
-                return application.getCurrentActivity().equals("foo");
+                return application.getCurrentActivity().contains("foo");
             }
-        },4);
+        }, 5);
 
-        application.waitForElementWithId("button", 5);
+    }
+
+    @Test
+    public void shouldRetryTimesSpecified() throws Exception {
+        final List<Integer> times = new ArrayList<Integer>();
+        final String timeoutMessage = "custom timeout message";
+        int retryFreqInSec = 5;
+        int timeoutInSec = 20;
+        expectedException.expect(OperationTimedoutException.class);
+        expectedException.expectMessage(new BaseMatcher<String>() {
+
+            public boolean matches(Object o) {
+                return o.toString().contains(timeoutMessage);
+            }
+
+            public void describeTo(Description description) {
+
+            }
+        });
+
+        final AndroidApplication application = TestUtils.installAppOnEmulator(EMULATOR, packageName, tempAndroidApkPath);
+        application.waitFor(new ICondition() {
+            @Override
+            public boolean test() throws CalabashException {
+                times.add(1);
+                return application.query("button marked:'some foo element'").size() == 1;
+            }
+        }, new WaitOptions(timeoutInSec, retryFreqInSec, 0, timeoutMessage, false));
+
+        assertEquals(timeoutInSec / retryFreqInSec, times.size());
     }
 
     @Test
     public void shouldWaitForAnElementWithId() throws Exception {
-        final AndroidApplication application = TestUtils.installAppOnEmulator("emulator-5554", packageName, tempAndroidApkPath);
+        final AndroidApplication application = TestUtils.installAppOnEmulator(EMULATOR, packageName, tempAndroidApkPath);
 
         TestUtils.goToActivity(application, TestUtils.ACTIVITY_SIMPLE_ELEMENTS);
 
@@ -190,7 +226,7 @@ public class AndroidRunnerIT {
     @Test
     public void shouldFailForAnElementWithIdNotFound() throws Exception {
         expectedException.expect(OperationTimedoutException.class);
-        final AndroidApplication application = TestUtils.installAppOnEmulator("emulator-5554", packageName, tempAndroidApkPath);
+        final AndroidApplication application = TestUtils.installAppOnEmulator(EMULATOR, packageName, tempAndroidApkPath);
 
         TestUtils.goToActivity(application, TestUtils.ACTIVITY_SIMPLE_ELEMENTS);
 

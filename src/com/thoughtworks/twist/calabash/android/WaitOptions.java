@@ -27,8 +27,8 @@ public final class WaitOptions {
 
     public WaitOptions(int timeout) {
         this.timeoutInSec = timeout;
-        this.retryFreqInSec = 0;
-        this.postTimeoutInSec = 1;
+        this.retryFreqInSec = 1;
+        this.postTimeoutInSec = 0;
         this.timeoutMessage = "Timed out";
         this.screenshotOnError = true;
     }
