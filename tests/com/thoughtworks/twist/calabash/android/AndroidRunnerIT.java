@@ -77,7 +77,7 @@ public class AndroidRunnerIT {
     public void shouldThrowExceptionIfSerialIsGivenWhenNotStarted() throws CalabashException {
         String serial = "emulator-x";
         expectedException.expect(CalabashException.class);
-        expectedException.expectMessage(String.format("%s is not running. Cannot install app", serial));
+        expectedException.expectMessage(String.format("%s not found in the device list, installation failed", serial));
 
         AndroidConfiguration configuration = new AndroidConfiguration();
         configuration.setSerial(serial);
