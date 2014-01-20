@@ -85,8 +85,8 @@ public class TestUtils {
         return EnvironmentInitializer.initialize(new AndroidConfiguration()).getAdb();
     }
 
-    public static boolean isAppInstalled(String appPackageName, final String serialNo) {
-        String[] cmd = new String[]{"adb", "-s", serialNo, "shell", "pm", "path", appPackageName};
+    public static boolean isAppInstalled(String appPackageName, final String serialNo) throws CalabashException {
+        String[] cmd = new String[]{TestUtils.getAdbPath(), "-s", serialNo, "shell", "pm", "path", appPackageName};
         try {
             String output = runCommand(cmd, "failed");
             return output.contains(appPackageName);
