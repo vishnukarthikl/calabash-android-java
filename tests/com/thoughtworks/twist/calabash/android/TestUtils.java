@@ -19,7 +19,6 @@ public class TestUtils {
     public static final String ACTIVITY_SWIPE_PAGE = "Swipe Page";
     public static final String ACTIVITY_SIMPLE_ELEMENTS = "Simple Elements";
     public static final String ACTIVITY_DATE_TIME_ELEMENTS = "DateTime Elements";
-
     public static HashMap<String, String> activityMap = new HashMap<String, String>() {{
         put(ACTIVITY_SIMPLE_ELEMENTS, "SimpleElementsActivity");
         put(ACTIVITY_SWIPE_PAGE, "SwipePageActivity");
@@ -71,14 +70,19 @@ public class TestUtils {
         return application;
     }
 
-    public static void uninstall(String packageName, String serial) {
-        String[] command = {"adb", "-s", serial, "uninstall", packageName};
+    public static void uninstall(String packageName, String serial) throws CalabashException {
+
+        String[] command = {TestUtils.getAdbPath(), "-s", serial, "uninstall", packageName};
         try {
             runCommand(command);
         } catch (CalabashException e) {
             fail(e.getMessage());
         }
 
+    }
+
+    private static String getAdbPath() throws CalabashException {
+        return EnvironmentInitializer.initialize(new AndroidConfiguration()).getAdb();
     }
 
     public static boolean isAppInstalled(String appPackageName, final String serialNo) {
