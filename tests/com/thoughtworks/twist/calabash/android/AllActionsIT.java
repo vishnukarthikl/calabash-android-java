@@ -3,10 +3,8 @@ package com.thoughtworks.twist.calabash.android;
 
 import org.apache.commons.io.FileUtils;
 import org.joda.time.DateTime;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.*;
+import org.junit.rules.ExpectedException;
 
 import java.io.File;
 import java.util.Map;
@@ -18,10 +16,13 @@ public class AllActionsIT {
 
 
     public static final String EMULATOR = "emulator-5554";
+    public static final String MAIN_ACTIVITY = "MyActivity";
     private static String packageName;
     private static File tempDir;
     private static File apkPath;
     private static AndroidApplication application;
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
 
     @BeforeClass
     public static void installApp() throws Exception {
@@ -38,12 +39,14 @@ public class AllActionsIT {
 
     @After
     public void goToMainActivity() throws CalabashException, OperationTimedoutException {
-        application.goBack();
-        try {
-            application.waitForActivity("MyActivity", 6);
-        } catch (CalabashException e) {
+        if (!application.getCurrentActivity().equals(MAIN_ACTIVITY)) {
             application.goBack();
-            application.waitForActivity("MyActivity", 6);
+            try {
+                application.waitForActivity(MAIN_ACTIVITY, 6);
+            } catch (CalabashException e) {
+                application.goBack();
+                application.waitForActivity(MAIN_ACTIVITY, 6);
+            }
         }
     }
 
@@ -285,4 +288,54 @@ public class AllActionsIT {
         assertEquals("1.5", preferences.get("a float"));
         assertEquals("123", preferences.get("an int"));
     }
+
+    @Test
+    public void shouldTestGoBack() throws CalabashException, OperationTimedoutException {
+        TestUtils.goToActivity(application, TestUtils.ACTIVITY_NESTED_VIEWS);
+        application.goBack();
+
+        application.waitForActivity(MAIN_ACTIVITY, 2);
+        assertEquals(MAIN_ACTIVITY, application.getCurrentActivity());
+    }
+
+    @Test
+    public void shouldTakeScreenshotOnFailure() throws CalabashException {
+        final StringBuffer screenshotPath = new StringBuffer();
+        AndroidConfiguration androidConfiguration = new AndroidConfiguration();
+        androidConfiguration.setSerial(EMULATOR);
+        androidConfiguration.setScreenshotListener(new ScreenshotListener() {
+            public void screenshotTaken(String path, String imageType, String fileName) {
+                screenshotPath.append(path);
+            }
+        });
+        try {
+            application.waitFor(new ICondition() {
+                @Override
+                public boolean test() throws CalabashException {
+                    return false;
+                }
+            }, 1);
+        } catch (OperationTimedoutException e) {
+        }
+
+        assertTrue(new File(tempDir, screenshotPath.toString()).exists());
+    }
+
+    @Test
+    public void shouldWaitForAnElementWithId() throws Exception {
+        TestUtils.goToActivity(application, TestUtils.ACTIVITY_SIMPLE_ELEMENTS);
+
+        application.waitForElementWithId("button", 5);
+    }
+
+    @Test
+    public void shouldFailForAnElementWithIdNotFound() throws Exception {
+        expectedException.expect(OperationTimedoutException.class);
+        expectedException.expectMessage("Timed out");
+
+        TestUtils.goToActivity(application, TestUtils.ACTIVITY_SIMPLE_ELEMENTS);
+
+        application.waitForElementWithId("foobarid", 5);
+    }
+
 }

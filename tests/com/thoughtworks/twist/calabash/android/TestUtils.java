@@ -46,7 +46,7 @@ public class TestUtils {
 
     public static void goToActivity(AndroidApplication application, final String activityName) throws CalabashException, OperationTimedoutException {
         application.query("* marked:'" + activityName + "'").touch();
-        application.waitForActivity(activityMap.get(activityName), 10);
+        application.waitForActivity(activityMap.get(activityName), 6);
     }
 
     public static AndroidApplication installAppOnEmulator(String serial, String packageName, File androidApkPath) throws CalabashException {
@@ -57,6 +57,7 @@ public class TestUtils {
 
     public static AndroidApplication installAppOnEmulator(String serial, String packageName, File androidApkPath, AndroidConfiguration configuration) throws CalabashException {
         uninstall(packageName, serial);
+        configuration.setPauseTime(4000);
         AndroidRunner androidRunner = new AndroidRunner(androidApkPath.getAbsolutePath(), configuration);
         androidRunner.setup();
         AndroidApplication application = androidRunner.start();
