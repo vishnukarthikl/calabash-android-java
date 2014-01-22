@@ -41,6 +41,8 @@ public class CalabashWrapper {
     private static final String ADB_DEVICE_ARG = "ADB_DEVICE_ARG";
     private static final String APP_PATH = "APP_PATH";
     private static final String TEST_SERVER_PATH = "TEST_APP_PATH";
+    private static final String ACTION = "cajAction";
+    private static final String ACTION_ARGS = "cajActionArgs";
     private final ScriptingContainer container = new ScriptingContainer(LocalContextScope.SINGLETHREAD, LocalVariableBehavior.PERSISTENT);
     private final File rbScriptsPath;
     private final File apk;
@@ -491,6 +493,19 @@ public class CalabashWrapper {
             throw new CalabashException(message, e);
         }
 
+    }
+
+    public void performAction(String action, String[] args) throws CalabashException {
+        try {
+            info("performing action %s with args %s", action, Utils.getStringFromArray(args));
+            container.put(ACTION, action);
+            container.put(ACTION_ARGS, args);
+            container.runScriptlet(String.format("performAction(%s,*%s)", ACTION, ACTION_ARGS));
+        } catch (Exception e) {
+            String message = String.format("Failed to perform action %s with args %s", action, Utils.getStringFromArray(args));
+            error(message, e);
+            throw new CalabashException(message, e);
+        }
     }
 
     public void waitFor(ICondition condition, WaitOptions options) throws CalabashException, OperationTimedoutException {

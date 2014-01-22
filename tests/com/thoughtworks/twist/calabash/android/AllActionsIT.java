@@ -290,12 +290,23 @@ public class AllActionsIT {
     }
 
     @Test
-    public void shouldTestGoBack() throws CalabashException, OperationTimedoutException {
+    public void shouldTestGoBack() throws Exception {
         TestUtils.goToActivity(application, TestUtils.ACTIVITY_NESTED_VIEWS);
         application.goBack();
 
         application.waitForActivity(MAIN_ACTIVITY, 2);
         assertEquals(MAIN_ACTIVITY, application.getCurrentActivity());
+    }
+
+    @Test
+    public void shouldTestPerformCalabashAction() throws Exception {
+        final String enteredText = "text";
+        TestUtils.goToActivity(application, TestUtils.ACTIVITY_SIMPLE_ELEMENTS);
+
+        application.performCalabashAction("enter_text_into_numbered_field", enteredText, "1");
+
+        final String actualText = application.query("editText index:0").get(0).getText();
+        assertEquals(actualText, enteredText);
     }
 
     @Test

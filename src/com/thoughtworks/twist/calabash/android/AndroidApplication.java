@@ -239,4 +239,17 @@ public class AndroidApplication {
     public List<TreeNode> getRootElements() throws CalabashException {
         return new TreeBuilder(calabashWrapper).createTreeFromRoot();
     }
+
+    /**
+     * call calabash's performAction function with action and its corresponding args
+     * eg:
+     * performCalabashAction("enter_text_into_numbered_field","text to be entered","1");
+     *
+     * @param action action to be performed
+     * @param args   list of arguments for the action
+     * @throws CalabashException
+     */
+    public void performCalabashAction(String action, String... args) throws CalabashException {
+        calabashWrapper.performAction(action, args);
+    }
 }
