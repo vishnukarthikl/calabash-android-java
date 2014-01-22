@@ -1,6 +1,7 @@
 package com.thoughtworks.twist.calabash.android;
 
 import org.jruby.RubyArray;
+import org.jruby.RubyHash;
 
 import java.io.File;
 import java.util.List;
@@ -144,7 +145,7 @@ public class AndroidApplication {
 
     /**
      * Wait till an element with id appears
-     * @param id id of the element
+     * @param id           id of the element
      * @param timeoutInSec wait time in seconds
      * @throws OperationTimedoutException
      * @throws CalabashException
@@ -262,7 +263,12 @@ public class AndroidApplication {
      * @param args   list of arguments for the action
      * @throws CalabashException
      */
-    public void performCalabashAction(String action, String... args) throws CalabashException {
-        calabashWrapper.performAction(action, args);
+    public ActionResult performCalabashAction(String action, String... args) throws CalabashException {
+        final RubyHash rubyResult = calabashWrapper.performAction(action, args);
+        final RubyArray bonusInformationArray = (RubyArray) rubyResult.get("bonusInformation");
+        final String message = rubyResult.get("message").toString();
+        final boolean success = Boolean.parseBoolean(rubyResult.get("success").toString());
+        final Object[] bonusInformation = Utils.toJavaArray(bonusInformationArray);
+        return new ActionResult(bonusInformation, message, success);
     }
 }

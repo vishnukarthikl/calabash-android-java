@@ -495,12 +495,12 @@ public class CalabashWrapper {
 
     }
 
-    public void performAction(String action, String[] args) throws CalabashException {
+    public RubyHash performAction(String action, String[] args) throws CalabashException {
         try {
             info("performing action %s with args %s", action, Utils.getStringFromArray(args));
             container.put(ACTION, action);
             container.put(ACTION_ARGS, args);
-            container.runScriptlet(String.format("performAction(%s,*%s)", ACTION, ACTION_ARGS));
+            return (RubyHash) container.runScriptlet(String.format("performAction(%s,*%s)", ACTION, ACTION_ARGS));
         } catch (Exception e) {
             String message = String.format("Failed to perform action %s with args %s", action, Utils.getStringFromArray(args));
             error(message, e);

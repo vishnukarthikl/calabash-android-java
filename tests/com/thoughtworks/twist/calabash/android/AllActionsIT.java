@@ -310,6 +310,17 @@ public class AllActionsIT {
     }
 
     @Test
+    public void shouldGetResultForPerformCalabashAction() throws Exception {
+        TestUtils.goToActivity(application, TestUtils.ACTIVITY_SCROLL_LIST);
+
+        ActionResult result = application.performCalabashAction("list_actions");
+
+        assertEquals(100, result.getBonusInformation().size());
+        assertEquals("Available actions", result.getMessage());
+        assertEquals(true, result.isSuccess());
+    }
+
+    @Test
     public void shouldTakeScreenshotOnFailure() throws CalabashException {
         final StringBuffer screenshotPath = new StringBuffer();
         AndroidConfiguration androidConfiguration = new AndroidConfiguration();
