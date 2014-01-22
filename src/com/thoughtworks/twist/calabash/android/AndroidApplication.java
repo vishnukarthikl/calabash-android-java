@@ -241,6 +241,19 @@ public class AndroidApplication {
     }
 
     /**
+     * click and drag from (fromX, fromY) to (toX, toY) where X and Y axis start at top left corner
+     * @param fromX source x-coordinate normalized to screen width
+     * @param toX destination x-coordinate normalized to screen width
+     * @param fromY source y-coordinate normalized to screen height
+     * @param toY destination y-coordinate normalized to screen height
+     * @param steps no.of steps that it takes between the two points
+     * @throws CalabashException
+     */
+    public void drag(int fromX, int toX, int fromY, int toY, int steps) throws CalabashException {
+        calabashWrapper.drag(fromX, toX, fromY, toY, steps);
+    }
+
+    /**
      * call calabash's performAction function with action and its corresponding args
      * eg:
      * performCalabashAction("enter_text_into_numbered_field","text to be entered","1");
