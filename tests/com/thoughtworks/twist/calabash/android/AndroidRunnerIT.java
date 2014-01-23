@@ -24,12 +24,15 @@ public class AndroidRunnerIT {
     private File tempDir;
     private File tempAndroidApkPath;
     private String packageName;
+    private AndroidConfiguration configuration;
 
     @Before
-    public void setUp() throws IOException {
+    public void setUp() throws Exception {
         packageName = "com.example.AndroidTestApplication";
         tempDir = TestUtils.createTempDir("TestAndroidApps");
         tempAndroidApkPath = createTempDirWithProj("AndroidTestApplication.apk", tempDir);
+        configuration = new AndroidConfiguration();
+        configuration.setLogsDirectory(new File("logs"));
     }
 
     private File createTempDirWithProj(String androidApp, File dir) throws IOException {
@@ -46,7 +49,7 @@ public class AndroidRunnerIT {
 
     @Test
     public void shouldCreateTestServerApk() throws CalabashException, IOException {
-        AndroidRunner androidRunner = new AndroidRunner(tempAndroidApkPath.getAbsolutePath());
+        AndroidRunner androidRunner = new AndroidRunner(tempAndroidApkPath.getAbsolutePath(), this.configuration);
         androidRunner.setup();
         File testServersDir = new File(tempDir, "test_servers");
 
@@ -66,7 +69,7 @@ public class AndroidRunnerIT {
         expectedException.expect(CalabashException.class);
         expectedException.expectMessage("Could not get the device serial, set the serial or devicename in the AndroidConfiguration");
 
-        AndroidRunner androidRunner = new AndroidRunner(tempAndroidApkPath.getAbsolutePath());
+        AndroidRunner androidRunner = new AndroidRunner(tempAndroidApkPath.getAbsolutePath(), this.configuration);
         androidRunner.setup();
         androidRunner.start();
     }
@@ -77,7 +80,6 @@ public class AndroidRunnerIT {
         expectedException.expect(CalabashException.class);
         expectedException.expectMessage(String.format("%s not found in the device list, installation failed", serial));
 
-        AndroidConfiguration configuration = new AndroidConfiguration();
         configuration.setSerial(serial);
         AndroidRunner androidRunner = new AndroidRunner(tempAndroidApkPath.getAbsolutePath(), configuration);
         androidRunner.setup();
@@ -86,7 +88,6 @@ public class AndroidRunnerIT {
 
     @Test
     public void shouldInstallAppOnDeviceWithName() throws CalabashException {
-        AndroidConfiguration configuration = new AndroidConfiguration();
         configuration.setDeviceName("device");
         configuration.setShouldReinstallApp(true);
         AndroidRunner androidRunner = new AndroidRunner(tempAndroidApkPath.getAbsolutePath(), configuration);
@@ -103,7 +104,6 @@ public class AndroidRunnerIT {
         //note: emulator should be launched with serial 'EMULATOR
         String serial = EMULATOR;
         TestUtils.uninstall(packageName, serial);
-        AndroidConfiguration configuration = new AndroidConfiguration();
         configuration.setSerial(serial);
         AndroidRunner androidRunner = new AndroidRunner(tempAndroidApkPath.getAbsolutePath(), configuration);
 
@@ -120,7 +120,6 @@ public class AndroidRunnerIT {
         String device = "device";
         String serial = EMULATOR;
         TestUtils.uninstall(packageName, serial);
-        AndroidConfiguration configuration = new AndroidConfiguration();
         configuration.setDeviceName(device);
         AndroidRunner androidRunner = new AndroidRunner(tempAndroidApkPath.getAbsolutePath(), configuration);
 

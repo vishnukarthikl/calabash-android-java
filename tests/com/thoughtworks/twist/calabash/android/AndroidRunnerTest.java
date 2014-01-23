@@ -10,13 +10,15 @@ import java.io.IOException;
 public class AndroidRunnerTest {
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
+    private AndroidConfiguration configuration;
 
     @Test
     public void shouldThrowCalabashExceptionIfApkNotFound() throws Exception {
         expectedException.expect(CalabashException.class);
         expectedException.expectMessage("invalid path to apk file");
         File tempFile = File.createTempFile("foo", "bar");
-        new AndroidRunner(tempFile.getPath());
+        configuration = new AndroidConfiguration();
+        configuration.setLogsDirectory(new File("logs"));
     }
 
     @Test
@@ -26,7 +28,7 @@ public class AndroidRunnerTest {
             expectedException.expectMessage("Could not find ANDROID_HOME");
 
             File apk = new File("tests/resources/AndroidTestApplication.apk");
-            AndroidRunner androidRunner = new AndroidRunner(apk.getAbsolutePath());
+            AndroidRunner androidRunner = new AndroidRunner(apk.getAbsolutePath(), configuration);
             androidRunner.setup();
         }
     }
@@ -38,7 +40,6 @@ public class AndroidRunnerTest {
         expectedException.expect(CalabashException.class);
         expectedException.expectMessage("Invalid ANDROID_HOME : " + androidHome);
 
-        AndroidConfiguration configuration = new AndroidConfiguration();
         configuration.setAndroidHome(androidHome);
         File apk = new File("tests/resources/AndroidTestApplication.apk");
         AndroidRunner androidRunner = new AndroidRunner(apk.getAbsolutePath(), configuration);
