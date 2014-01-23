@@ -76,7 +76,6 @@ final class Utils {
         return map;
     }
 
-
     public static void inspectElement(TreeNode node, int nestingLevel, InspectCallback callback) {
         callback.onEachElement(node.getData(), nestingLevel);
         for (TreeNode childNode : node.getChildren()) {
@@ -117,7 +116,7 @@ final class Utils {
             CalabashLogger.error(error);
             return output;
         } catch (Exception e) {
-            throw new CalabashException(String.format("Failed to execute command %s, %s", getCommandString(command),e.getMessage()), e);
+            throw new CalabashException(String.format("Failed to execute command %s, %s", getStringFromArray(command), e.getMessage()), e);
         }
     }
 
@@ -131,13 +130,13 @@ final class Utils {
     }
 
     private static Process executeCommand(String[] command) throws Exception {
-        String cmd = getCommandString(command);
+        String cmd = getStringFromArray(command);
         CalabashLogger.info("Executing command");
         CalabashLogger.info(cmd);
         return Runtime.getRuntime().exec(command);
     }
 
-    private static String getCommandString(String[] command) {
+    public static String getStringFromArray(String[] command) {
         return Arrays.toString(command).replaceAll("\\[|,|]", "");
     }
 
@@ -166,4 +165,7 @@ final class Utils {
         return Integer.parseInt(javaArray[0].toString());
     }
 
+    public static String toString(Object object) {
+        return object != null ? object.toString() : "null";
+    }
 }

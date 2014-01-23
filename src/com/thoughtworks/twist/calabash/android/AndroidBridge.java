@@ -31,7 +31,7 @@ public class AndroidBridge {
         deviceList = getDeviceList();
         String deviceSerial = configuration.getSerial();
         if (deviceSerial != null) {
-            checkDeviceIsRunning(deviceSerial);
+            checkDeviceIsRunning(deviceList, deviceSerial);
             return deviceSerial;
         }
         String deviceName = configuration.getDeviceName();
@@ -148,11 +148,16 @@ public class AndroidBridge {
         return result.equals(BOOT_ANIM_STOPPED);
     }
 
-    private void checkDeviceIsRunning(String serial) throws CalabashException {
-        String[] deviceListCmd = getDeviceListCommand();
-        String output = Utils.runCommand(deviceListCmd, "could not list all devices");
-        if (!output.contains(serial))
-            throw new CalabashException(format("%s is not running. Cannot install app", serial));
+    private void checkDeviceIsRunning(DeviceList deviceList, String serial) throws CalabashException {
+        for (Device device : deviceList.devices) {
+            if (device.getSerial().equals(serial)) {
+                if (!device.getState().equals("device")) {
+                   throw new CalabashException(format("%s's state: %s. Cannot install app", serial, device.getState()));
+                }
+                return;
+            }
+        }
+        throw new CalabashException(format("%s not found in the device list, installation failed", serial));
     }
 
     public void unlockKeyguard(String serial) throws CalabashException {

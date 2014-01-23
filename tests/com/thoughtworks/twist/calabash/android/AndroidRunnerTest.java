@@ -1,8 +1,5 @@
 package com.thoughtworks.twist.calabash.android;
 
-import com.thoughtworks.twist.calabash.android.AndroidConfiguration;
-import com.thoughtworks.twist.calabash.android.AndroidRunner;
-import com.thoughtworks.twist.calabash.android.CalabashException;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -26,7 +23,7 @@ public class AndroidRunnerTest {
     public void shouldFailIfAndroidHomeIsNotSet() throws IOException, CalabashException {
         if (System.getenv("ANDROID_HOME") == null) {
             expectedException.expect(CalabashException.class);
-            expectedException.expectMessage("ANDROID_HOME is not set");
+            expectedException.expectMessage("Could not find ANDROID_HOME");
 
             File apk = new File("tests/resources/AndroidTestApplication.apk");
             AndroidRunner androidRunner = new AndroidRunner(apk.getAbsolutePath());

@@ -19,7 +19,6 @@ public class TestUtils {
     public static final String ACTIVITY_SWIPE_PAGE = "Swipe Page";
     public static final String ACTIVITY_SIMPLE_ELEMENTS = "Simple Elements";
     public static final String ACTIVITY_DATE_TIME_ELEMENTS = "DateTime Elements";
-
     public static HashMap<String, String> activityMap = new HashMap<String, String>() {{
         put(ACTIVITY_SIMPLE_ELEMENTS, "SimpleElementsActivity");
         put(ACTIVITY_SWIPE_PAGE, "SwipePageActivity");
@@ -38,11 +37,6 @@ public class TestUtils {
         return tempDir;
     }
 
-    public static void clearAppDir() throws IOException {
-        File tempDir = createTempDir("TestIOSApps");
-        FileUtils.deleteDirectory(tempDir);
-    }
-
     public static File createTempDirWithProj(String androidApp, File dir) throws IOException {
         File androidAppPath = new File("tests/resources/" + androidApp);
         File tempAndroidPath = new File(dir, androidApp);
@@ -52,18 +46,18 @@ public class TestUtils {
 
     public static void goToActivity(AndroidApplication application, final String activityName) throws CalabashException, OperationTimedoutException {
         application.query("* marked:'" + activityName + "'").touch();
-        application.waitForActivity(activityMap.get(activityName), 10);
+        application.waitForActivity(activityMap.get(activityName), 6);
     }
 
     public static AndroidApplication installAppOnEmulator(String serial, String packageName, File androidApkPath) throws CalabashException {
         AndroidConfiguration configuration = new AndroidConfiguration();
         configuration.setSerial(serial);
-        configuration.setLogsDirectory(new File("logs"));
         return installAppOnEmulator(serial, packageName, androidApkPath, configuration);
     }
 
     public static AndroidApplication installAppOnEmulator(String serial, String packageName, File androidApkPath, AndroidConfiguration configuration) throws CalabashException {
         uninstall(packageName, serial);
+        configuration.setPauseTime(4000);
         AndroidRunner androidRunner = new AndroidRunner(androidApkPath.getAbsolutePath(), configuration);
         androidRunner.setup();
         AndroidApplication application = androidRunner.start();
@@ -72,8 +66,9 @@ public class TestUtils {
         return application;
     }
 
-    public static void uninstall(String packageName, String serial) {
-        String[] command = {"adb", "-s", serial, "uninstall", packageName};
+    public static void uninstall(String packageName, String serial) throws CalabashException {
+
+        String[] command = {TestUtils.getAdbPath(), "-s", serial, "uninstall", packageName};
         try {
             runCommand(command);
         } catch (CalabashException e) {
@@ -82,8 +77,12 @@ public class TestUtils {
 
     }
 
-    public static boolean isAppInstalled(String appPackageName, final String serialNo) {
-        String[] cmd = new String[]{"adb", "-s", serialNo, "shell", "pm", "path", appPackageName};
+    private static String getAdbPath() throws CalabashException {
+        return EnvironmentInitializer.initialize(new AndroidConfiguration()).getAdb();
+    }
+
+    public static boolean isAppInstalled(String appPackageName, final String serialNo) throws CalabashException {
+        String[] cmd = new String[]{TestUtils.getAdbPath(), "-s", serialNo, "shell", "pm", "path", appPackageName};
         try {
             String output = runCommand(cmd, "failed");
             return output.contains(appPackageName);

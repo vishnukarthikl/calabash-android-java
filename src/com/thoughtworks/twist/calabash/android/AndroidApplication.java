@@ -1,6 +1,7 @@
 package com.thoughtworks.twist.calabash.android;
 
 import org.jruby.RubyArray;
+import org.jruby.RubyHash;
 
 import java.io.File;
 import java.util.List;
@@ -144,7 +145,7 @@ public class AndroidApplication {
 
     /**
      * Wait till an element with id appears
-     * @param id id of the element
+     * @param id           id of the element
      * @param timeoutInSec wait time in seconds
      * @throws OperationTimedoutException
      * @throws CalabashException
@@ -238,5 +239,36 @@ public class AndroidApplication {
      */
     public List<TreeNode> getRootElements() throws CalabashException {
         return new TreeBuilder(calabashWrapper).createTreeFromRoot();
+    }
+
+    /**
+     * click and drag from (fromX, fromY) to (toX, toY) where X and Y axis start at top left corner
+     * @param fromX source x-coordinate normalized to screen width
+     * @param toX destination x-coordinate normalized to screen width
+     * @param fromY source y-coordinate normalized to screen height
+     * @param toY destination y-coordinate normalized to screen height
+     * @param steps no.of steps that it takes between the two points
+     * @throws CalabashException
+     */
+    public void drag(int fromX, int toX, int fromY, int toY, int steps) throws CalabashException {
+        calabashWrapper.drag(fromX, toX, fromY, toY, steps);
+    }
+
+    /**
+     * call calabash's performAction function with action and its corresponding args
+     * eg:
+     * performCalabashAction("enter_text_into_numbered_field","text to be entered","1");
+     *
+     * @param action action to be performed
+     * @param args   list of arguments for the action
+     * @throws CalabashException
+     */
+    public ActionResult performCalabashAction(String action, String... args) throws CalabashException {
+        final RubyHash rubyResult = calabashWrapper.performAction(action, args);
+        final RubyArray bonusInformationArray = (RubyArray) rubyResult.get("bonusInformation");
+        final String message = rubyResult.get("message").toString();
+        final boolean success = Boolean.parseBoolean(rubyResult.get("success").toString());
+        final Object[] bonusInformation = Utils.toJavaArray(bonusInformationArray);
+        return new ActionResult(bonusInformation, message, success);
     }
 }

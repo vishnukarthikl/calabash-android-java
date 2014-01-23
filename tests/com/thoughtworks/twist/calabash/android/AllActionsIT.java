@@ -1,11 +1,10 @@
 package com.thoughtworks.twist.calabash.android;
 
 
+import org.apache.commons.io.FileUtils;
 import org.joda.time.DateTime;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.*;
+import org.junit.rules.ExpectedException;
 
 import java.io.File;
 import java.util.Map;
@@ -16,28 +15,39 @@ import static org.junit.Assert.assertTrue;
 public class AllActionsIT {
 
 
+    public static final String EMULATOR = "emulator-5554";
+    public static final String MAIN_ACTIVITY = "MyActivity";
     private static String packageName;
     private static File tempDir;
     private static File apkPath;
     private static AndroidApplication application;
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
 
     @BeforeClass
     public static void installApp() throws Exception {
         packageName = "com.example.AndroidTestApplication";
         tempDir = TestUtils.createTempDir("TestAndroidApps");
         apkPath = TestUtils.createTempDirWithProj("AndroidTestApplication.apk", tempDir);
-        application = TestUtils.installAppOnEmulator("emulator-5554", packageName, apkPath);
+        application = TestUtils.installAppOnEmulator(EMULATOR, packageName, apkPath);
     }
 
     @AfterClass
-    public static void tearDown() {
-        tempDir.delete();
+    public static void tearDown() throws Exception {
+        FileUtils.deleteDirectory(tempDir);
     }
 
     @After
     public void goToMainActivity() throws CalabashException, OperationTimedoutException {
-        application.goBack();
-        application.waitForActivity("MyActivity", 10);
+        if (!application.getCurrentActivity().equals(MAIN_ACTIVITY)) {
+            application.goBack();
+            try {
+                application.waitForActivity(MAIN_ACTIVITY, 6);
+            } catch (CalabashException e) {
+                application.goBack();
+                application.waitForActivity(MAIN_ACTIVITY, 6);
+            }
+        }
     }
 
     @Test
@@ -54,14 +64,7 @@ public class AllActionsIT {
     public void shouldInspectApplicationElements() throws Exception {
         TestUtils.goToActivity(application, TestUtils.ACTIVITY_NESTED_VIEWS);
         String expectedElementCollection = "Element : com.android.internal.policy.impl.PhoneWindow$DecorView , Nesting : 0\n" +
-                "Element : android.widget.LinearLayout , Nesting : 1\n" +
-                "Element : com.android.internal.widget.ActionBarContainer , Nesting : 2\n" +
-                "Element : com.android.internal.widget.ActionBarView , Nesting : 3\n" +
-                "Element : android.widget.LinearLayout , Nesting : 4\n" +
-                "Element : android.widget.LinearLayout , Nesting : 5\n" +
-                "Element : android.widget.TextView , Nesting : 6\n" +
-                "Element : com.android.internal.widget.ActionBarView$HomeView , Nesting : 4\n" +
-                "Element : android.widget.ImageView , Nesting : 5\n" +
+                "Element : com.android.internal.widget.ActionBarOverlayLayout , Nesting : 1\n" +
                 "Element : android.widget.FrameLayout , Nesting : 2\n" +
                 "Element : android.widget.LinearLayout , Nesting : 3\n" +
                 "Element : android.widget.TableLayout , Nesting : 4\n" +
@@ -81,7 +84,14 @@ public class AllActionsIT {
                 "Element : android.widget.RelativeLayout , Nesting : 7\n" +
                 "Element : android.widget.RelativeLayout , Nesting : 6\n" +
                 "Element : android.widget.TextView , Nesting : 7\n" +
-                "Element : android.widget.TextView , Nesting : 7\n";
+                "Element : android.widget.TextView , Nesting : 7\n" +
+                "Element : com.android.internal.widget.ActionBarContainer , Nesting : 2\n" +
+                "Element : com.android.internal.widget.ActionBarView , Nesting : 3\n" +
+                "Element : android.widget.LinearLayout , Nesting : 4\n" +
+                "Element : com.android.internal.widget.ActionBarView$HomeView , Nesting : 5\n" +
+                "Element : android.widget.ImageView , Nesting : 6\n" +
+                "Element : android.widget.LinearLayout , Nesting : 5\n" +
+                "Element : android.widget.TextView , Nesting : 6\n";
         final StringBuilder actualElementCollection = new StringBuilder();
 
         application.inspect(new InspectCallback() {
@@ -169,7 +179,7 @@ public class AllActionsIT {
     public void shouldPerformScrollActions() throws Exception {
         TestUtils.goToActivity(application, TestUtils.ACTIVITY_SCROLL_LIST);
 
-        String queryForSecondPageElement = "textView marked:'The House of Mirth'";
+        String queryForSecondPageElement = "textView marked:'No Highway'";
         assertEquals(0, application.query(queryForSecondPageElement).size());
 
         application.scrollDown();
@@ -278,4 +288,76 @@ public class AllActionsIT {
         assertEquals("1.5", preferences.get("a float"));
         assertEquals("123", preferences.get("an int"));
     }
+
+    @Test
+    public void shouldTestGoBack() throws Exception {
+        TestUtils.goToActivity(application, TestUtils.ACTIVITY_NESTED_VIEWS);
+        application.goBack();
+
+        application.waitForActivity(MAIN_ACTIVITY, 2);
+        assertEquals(MAIN_ACTIVITY, application.getCurrentActivity());
+    }
+
+    @Test
+    public void shouldTestPerformCalabashAction() throws Exception {
+        final String enteredText = "text";
+        TestUtils.goToActivity(application, TestUtils.ACTIVITY_SIMPLE_ELEMENTS);
+
+        application.performCalabashAction("enter_text_into_numbered_field", enteredText, "1");
+
+        final String actualText = application.query("editText index:0").get(0).getText();
+        assertEquals(actualText, enteredText);
+    }
+
+    @Test
+    public void shouldGetResultForPerformCalabashAction() throws Exception {
+        TestUtils.goToActivity(application, TestUtils.ACTIVITY_SCROLL_LIST);
+
+        ActionResult result = application.performCalabashAction("list_actions");
+
+        assertEquals(100, result.getBonusInformation().size());
+        assertEquals("Available actions", result.getMessage());
+        assertEquals(true, result.isSuccess());
+    }
+
+    @Test
+    public void shouldTakeScreenshotOnFailure() throws CalabashException {
+        final StringBuffer screenshotPath = new StringBuffer();
+        AndroidConfiguration androidConfiguration = new AndroidConfiguration();
+        androidConfiguration.setSerial(EMULATOR);
+        androidConfiguration.setScreenshotListener(new ScreenshotListener() {
+            public void screenshotTaken(String path, String imageType, String fileName) {
+                screenshotPath.append(path);
+            }
+        });
+        try {
+            application.waitFor(new ICondition() {
+                @Override
+                public boolean test() throws CalabashException {
+                    return false;
+                }
+            }, 1);
+        } catch (OperationTimedoutException e) {
+        }
+
+        assertTrue(new File(tempDir, screenshotPath.toString()).exists());
+    }
+
+    @Test
+    public void shouldWaitForAnElementWithId() throws Exception {
+        TestUtils.goToActivity(application, TestUtils.ACTIVITY_SIMPLE_ELEMENTS);
+
+        application.waitForElementWithId("button", 5);
+    }
+
+    @Test
+    public void shouldFailForAnElementWithIdNotFound() throws Exception {
+        expectedException.expect(OperationTimedoutException.class);
+        expectedException.expectMessage("Timed out");
+
+        TestUtils.goToActivity(application, TestUtils.ACTIVITY_SIMPLE_ELEMENTS);
+
+        application.waitForElementWithId("foobarid", 5);
+    }
+
 }
