@@ -9,18 +9,21 @@ import org.jruby.RubyHash;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+
+import static java.lang.Float.parseFloat;
 
 /**
  * Represents an UI element.
  */
 public class UIElement implements AndroidElementAction {
 
-    private final RubyHash data;
+    private final Map<Object, Object> data;
     private final String query;
     private final CalabashWrapper calabashWrapper;
 
     public UIElement(RubyHash data, String query, CalabashWrapper calabashWrapper) {
-        this.data = data;
+        this.data = (Map<Object, Object>) Utils.toJavaHash(data);
         this.query = query;
         this.calabashWrapper = calabashWrapper;
     }
@@ -31,7 +34,7 @@ public class UIElement implements AndroidElementAction {
      * @return the class property
      */
     public String getElementClass() {
-        return Utils.getStringFromHash(data, "class");
+        return Utils.toString(data.get("class"));
     }
 
     /**
@@ -40,7 +43,7 @@ public class UIElement implements AndroidElementAction {
      * @return the id property
      */
     public String getId() {
-        return Utils.getStringFromHash(data, "id");
+        return Utils.toString(data.get("id"));
     }
 
     /**
@@ -49,7 +52,7 @@ public class UIElement implements AndroidElementAction {
      * @return the text property
      */
     public String getText() {
-        return Utils.getStringFromHash(data, "text");
+        return Utils.toString(data.get("text"));
     }
 
     /**
@@ -69,7 +72,7 @@ public class UIElement implements AndroidElementAction {
      * @return the description property
      */
     public String getDescription() {
-        return Utils.getStringFromHash(data, "description");
+        return Utils.toString(data.get("description"));
     }
 
     /**
@@ -78,7 +81,7 @@ public class UIElement implements AndroidElementAction {
      * @return the isEnabled property
      */
     public String isEnabled() {
-        return Utils.getStringFromHash(data, "enabled");
+        return Utils.toString(data.get("enabled"));
     }
 
     /**
@@ -87,7 +90,7 @@ public class UIElement implements AndroidElementAction {
      * @return the contentDescription property
      */
     public String getContentDescription() {
-        return Utils.getStringFromHash(data, "contentDescription");
+        return Utils.toString(data.get("contentDescription"));
     }
 
     /**
@@ -105,17 +108,21 @@ public class UIElement implements AndroidElementAction {
      * @return the rectangle
      */
     public Rect getRect() {
-        RubyHash rect;
+        Map<String, String> rect;
         try {
-            rect = (RubyHash) data.get("rect");
+            rect = (Map<String, String>) data.get("rect");
             if (rect == null)
                 return null;
         } catch (Exception e) {
             return null;
         }
 
-        return new Rect(Utils.getIntFromHash(rect, "x"), Utils.getIntFromHash(rect, "y"), Utils.getIntFromHash(rect, "width"), Utils.getIntFromHash(rect, "height"),
-                Utils.getIntFromHash(rect, "center_x"), Utils.getIntFromHash(rect, "center_y"));
+        return new Rect(parseFloat(rect.get("x")),
+                parseFloat(rect.get("y")),
+                parseFloat(rect.get("width")),
+                parseFloat(rect.get("height")),
+                parseFloat(rect.get("center_x")),
+                parseFloat(rect.get("center_y")));
     }
 
     /**

@@ -76,7 +76,6 @@ final class Utils {
         return map;
     }
 
-
     public static void inspectElement(TreeNode node, int nestingLevel, InspectCallback callback) {
         callback.onEachElement(node.getData(), nestingLevel);
         for (TreeNode childNode : node.getChildren()) {
@@ -166,4 +165,7 @@ final class Utils {
         return Integer.parseInt(javaArray[0].toString());
     }
 
+    public static String toString(Object object) {
+        return object != null ? object.toString() : "null";
+    }
 }
