@@ -5,8 +5,6 @@ import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Test;
 
-import java.io.InputStream;
-
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 
@@ -14,8 +12,8 @@ public class TreeNodeBuilderTest {
     @Test
     public void shouldCreateTreeNodeFromJsonNode() throws Exception {
         CalabashWrapper calabashWrapper = mock(CalabashWrapper.class);
-        final InputStream stream = this.getClass().getClassLoader().getResourceAsStream("resources/simple-button.json");
-        final JsonNode jsonNode = new ObjectMapper().readTree(stream);
+        final String jsonString = TestUtils.readFileFromResources("simple-button.json");
+        final JsonNode jsonNode = new ObjectMapper().readTree(jsonString);
 
         final TreeNodeBuilder treeNodeBuilder = new TreeNodeBuilder(calabashWrapper);
         final TreeNode actualTreeNode = treeNodeBuilder.buildFrom(jsonNode);

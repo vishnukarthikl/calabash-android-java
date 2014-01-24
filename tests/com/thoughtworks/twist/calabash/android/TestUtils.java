@@ -101,4 +101,9 @@ public class TestUtils {
         }
         return false;
     }
+
+    public static String readFileFromResources(final String fileName) throws IOException {
+        final File file = new File("tests/resources/" + fileName);
+        return FileUtils.readFileToString(file, "UTF-8");
+    }
 }

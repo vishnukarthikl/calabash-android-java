@@ -1,16 +1,15 @@
 package com.thoughtworks.twist.calabash.android.unit;
 
 import com.thoughtworks.twist.calabash.android.*;
-import org.apache.commons.io.IOUtils;
 import org.codehaus.jackson.JsonNode;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 
-import java.io.InputStream;
 import java.util.List;
 
+import static com.thoughtworks.twist.calabash.android.TestUtils.readFileFromResources;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
@@ -32,8 +31,7 @@ public class TreeBuilderTest {
 
     @Test
     public void shouldGetDumpInfo() throws Exception {
-        final InputStream stream = this.getClass().getClassLoader().getResourceAsStream("resources/simple-dump.json");
-        final String dump = IOUtils.toString(stream, "UTF-8");
+        String dump = readFileFromResources("simple-dump.json");
         final TreeNode root = mock(TreeNode.class);
         final TreeNode firstLevel = mock(TreeNode.class);
 
@@ -51,8 +49,7 @@ public class TreeBuilderTest {
     public void shouldGetDumpInfoForNestedChildren() throws Exception {
         final CalabashWrapper wrapper = mock(CalabashWrapper.class);
         final CalabashHttpClient httpClient = mock(CalabashHttpClient.class);
-        final InputStream stream = this.getClass().getClassLoader().getResourceAsStream("resources/nested-view-dump.json");
-        final String dump = IOUtils.toString(stream, "UTF-8");
+        final String dump = readFileFromResources("nested-view-dump.json");
         final TreeNode root = mock(TreeNode.class);
         final TreeNode firstLevelChild1 = mock(TreeNode.class);
         final TreeNode firstLevelChild2 = mock(TreeNode.class);
