@@ -47,8 +47,6 @@ public class TreeBuilderTest {
 
     @Test
     public void shouldGetDumpInfoForNestedChildren() throws Exception {
-        final CalabashWrapper wrapper = mock(CalabashWrapper.class);
-        final CalabashHttpClient httpClient = mock(CalabashHttpClient.class);
         final String dump = readFileFromResources("nested-view-dump.json");
         final TreeNode root = mock(TreeNode.class);
         final TreeNode firstLevelChild1 = mock(TreeNode.class);
@@ -71,9 +69,30 @@ public class TreeBuilderTest {
     }
 
     @Test
+    public void shouldAddOnlyVisibleNodes() throws Exception {
+        final String dump = readFileFromResources("nested-invisible-view-dump.json");
+        final TreeNode root = mock(TreeNode.class);
+        final TreeNode visibleChild = mock(TreeNode.class);
+
+        when(httpClient.getViewDump()).thenReturn(dump);
+        when(treeNodeBuilder.buildFrom(any(JsonNode.class))).thenReturn(root).thenReturn(visibleChild);
+        final TreeBuilder treeBuilder = new TreeBuilder(wrapper, httpClient, treeNodeBuilder);
+
+        List<TreeNode> tree = treeBuilder.createTree();
+
+        assertEquals(1, tree.size());
+        ArgumentCaptor<TreeNode> treeNodeCaptor = ArgumentCaptor.forClass(TreeNode.class);
+        verify(root, times(1)).appendChild(treeNodeCaptor.capture());
+        List<TreeNode> capturedTreeNodes = treeNodeCaptor.getAllValues();
+        assertEquals(visibleChild, capturedTreeNodes.get(0));
+
+        verify(treeNodeBuilder, times(2)).buildFrom(any(JsonNode.class));
+
+        verify(root).appendChild(visibleChild);
+    }
+
+    @Test
     public void shouldEmptyTreeNodeForEmptyDump() throws Exception {
-        final CalabashWrapper wrapper = mock(CalabashWrapper.class);
-        final CalabashHttpClient httpClient = mock(CalabashHttpClient.class);
         when(httpClient.getViewDump()).thenReturn("{}");
         final TreeBuilder treeBuilder = new TreeBuilder(wrapper, httpClient, treeNodeBuilder);
 

@@ -203,10 +203,12 @@ public class TreeBuilder {
         final Iterator<JsonNode> children = jsonNode.get("children").getElements();
         while (children.hasNext()) {
             final JsonNode childJsonNode = children.next();
-            final TreeNode childTreeNode = treeNodeBuilder.buildFrom(childJsonNode);
-            addChildren(childTreeNode, childJsonNode);
+            if (childJsonNode.get("visible").getBooleanValue()) {
+                final TreeNode childTreeNode = treeNodeBuilder.buildFrom(childJsonNode);
+                addChildren(childTreeNode, childJsonNode);
 
-            treeNode.appendChild(childTreeNode);
+                treeNode.appendChild(childTreeNode);
+            }
         }
 
     }
