@@ -1,19 +1,34 @@
 package com.thoughtworks.twist.calabash.android;
 
+import org.codehaus.jackson.JsonNode;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.jruby.RubyArray;
 import org.jruby.RubyHash;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
 import java.util.*;
 
 public class TreeBuilder {
 
     public static final String QUERY_ALL = "*";
     private final CalabashWrapper calabashWrapper;
+    private final CalabashHttpClient calabashHttpClient;
+    private final TreeNodeBuilder treeNodeBuilder;
     private List<TreeNode> roots = new ArrayList<TreeNode>();
     private Set<UIElement> inspectedElements = new HashSet<UIElement>();
+    private ObjectMapper mapper;
 
     public TreeBuilder(CalabashWrapper calabashWrapper) {
         this.calabashWrapper = calabashWrapper;
+        this.calabashHttpClient = new CalabashHttpClient();
+        this.treeNodeBuilder = new TreeNodeBuilder(calabashWrapper);
+    }
+
+    public TreeBuilder(CalabashWrapper calabashWrapper, CalabashHttpClient calabashHttpClient, TreeNodeBuilder treeNodeBuilder) {
+        this.calabashWrapper = calabashWrapper;
+        this.calabashHttpClient = calabashHttpClient;
+        this.treeNodeBuilder = treeNodeBuilder;
     }
 
     public List<TreeNode> createTreeFromRoot() throws CalabashException {
@@ -152,5 +167,47 @@ public class TreeBuilder {
 
     private void clearRoot() {
         roots = new ArrayList<TreeNode>();
+    }
+
+    public List<TreeNode> createTree() {
+        List<TreeNode> treeNodes = null;
+        try {
+
+            treeNodes = new ArrayList<TreeNode>();
+
+            mapper = new ObjectMapper();
+            final JsonNode jsonNode = mapper.readTree(calabashHttpClient.getViewDump());
+
+            final JsonNode childNodes = jsonNode.get("children");
+            if (childNodes == null) {
+                return treeNodes;
+            }
+            Iterator<JsonNode> rootJsonNodes = childNodes.getElements();
+            while (rootJsonNodes.hasNext()) {
+                JsonNode rootJsonNode = rootJsonNodes.next();
+                final TreeNode rootTreeNode = treeNodeBuilder.buildFrom(rootJsonNode);
+                addChildren(rootTreeNode, rootJsonNode);
+
+                treeNodes.add(rootTreeNode);
+            }
+
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return treeNodes;
+    }
+
+    private void addChildren(TreeNode treeNode, JsonNode jsonNode) throws IOException {
+        final Iterator<JsonNode> children = jsonNode.get("children").getElements();
+        while (children.hasNext()) {
+            final JsonNode childJsonNode = children.next();
+            final TreeNode childTreeNode = treeNodeBuilder.buildFrom(childJsonNode);
+            addChildren(childTreeNode, childJsonNode);
+
+            treeNode.appendChild(childTreeNode);
+        }
+
     }
 }

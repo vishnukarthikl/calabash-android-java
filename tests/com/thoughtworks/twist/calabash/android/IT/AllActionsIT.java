@@ -1,6 +1,7 @@
-package com.thoughtworks.twist.calabash.android;
+package com.thoughtworks.twist.calabash.android.IT;
 
 
+import com.thoughtworks.twist.calabash.android.*;
 import org.apache.commons.io.FileUtils;
 import org.joda.time.DateTime;
 import org.junit.*;

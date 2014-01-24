@@ -1,5 +1,8 @@
-package com.thoughtworks.twist.calabash.android;
+package com.thoughtworks.twist.calabash.android.unit;
 
+import com.thoughtworks.twist.calabash.android.AndroidConfiguration;
+import com.thoughtworks.twist.calabash.android.AndroidRunner;
+import com.thoughtworks.twist.calabash.android.CalabashException;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -10,15 +13,14 @@ import java.io.IOException;
 public class AndroidRunnerTest {
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
-    private AndroidConfiguration configuration;
+    private AndroidConfiguration configuration = new AndroidConfiguration();
 
     @Test
     public void shouldThrowCalabashExceptionIfApkNotFound() throws Exception {
         expectedException.expect(CalabashException.class);
         expectedException.expectMessage("invalid path to apk file");
         File tempFile = File.createTempFile("foo", "bar");
-        configuration = new AndroidConfiguration();
-        configuration.setLogsDirectory(new File("logs"));
+        new AndroidRunner(tempFile.getAbsolutePath(), configuration);
     }
 
     @Test

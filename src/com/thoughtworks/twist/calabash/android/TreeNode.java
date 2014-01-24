@@ -24,6 +24,10 @@ public class TreeNode {
         children.add(0, child);
     }
 
+    public void appendChild(TreeNode child) {
+        children.add(child);
+    }
+
     public UIElement getData() {
         return data;
     }

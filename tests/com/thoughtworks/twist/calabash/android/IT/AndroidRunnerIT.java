@@ -1,5 +1,6 @@
-package com.thoughtworks.twist.calabash.android;
+package com.thoughtworks.twist.calabash.android.IT;
 
+import com.thoughtworks.twist.calabash.android.*;
 import org.apache.commons.io.FileUtils;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;

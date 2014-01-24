@@ -8,10 +8,11 @@ import org.jruby.RubyArray;
 import org.jruby.RubyHash;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static java.lang.Float.parseFloat;
+import static java.lang.Double.parseDouble;
 
 /**
  * Represents an UI element.
@@ -24,6 +25,12 @@ public class UIElement implements AndroidElementAction {
 
     public UIElement(RubyHash data, String query, CalabashWrapper calabashWrapper) {
         this.data = (Map<Object, Object>) Utils.toJavaHash(data);
+        this.query = query;
+        this.calabashWrapper = calabashWrapper;
+    }
+
+    public UIElement(HashMap<Object, Object> data, String query, CalabashWrapper calabashWrapper) {
+        this.data = data;
         this.query = query;
         this.calabashWrapper = calabashWrapper;
     }
@@ -117,12 +124,12 @@ public class UIElement implements AndroidElementAction {
             return null;
         }
 
-        return new Rect(parseFloat(rect.get("x")),
-                parseFloat(rect.get("y")),
-                parseFloat(rect.get("width")),
-                parseFloat(rect.get("height")),
-                parseFloat(rect.get("center_x")),
-                parseFloat(rect.get("center_y")));
+        return new Rect(parseDouble(rect.get("x")),
+                parseDouble(rect.get("y")),
+                parseDouble(rect.get("width")),
+                parseDouble(rect.get("height")),
+                parseDouble(rect.get("center_x")),
+                parseDouble(rect.get("center_y")));
     }
 
     /**

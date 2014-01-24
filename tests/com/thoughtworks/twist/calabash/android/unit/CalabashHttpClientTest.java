@@ -1,6 +1,7 @@
-package com.thoughtworks.twist.calabash.android;
+package com.thoughtworks.twist.calabash.android.unit;
 
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
+import com.thoughtworks.twist.calabash.android.CalabashHttpClient;
 import org.junit.Rule;
 import org.junit.Test;
 

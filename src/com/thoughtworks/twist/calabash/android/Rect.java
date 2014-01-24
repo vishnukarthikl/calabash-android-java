@@ -9,15 +9,15 @@ package com.thoughtworks.twist.calabash.android;
  */
 public final class Rect {
 
-	private final Float x;
-	private final Float y;
-	private final Float width;
-	private final Float height;
-	private final Float center_x;
-	private final Float center_y;
+	private final Double x;
+	private final Double y;
+	private final Double width;
+	private final Double height;
+	private final Double center_x;
+	private final Double center_y;
 
-	public Rect(Float x, Float y, Float width, Float height,
-                Float center_x, Float center_y) {
+	public Rect(Double x, Double y, Double width, Double height,
+                Double center_x, Double center_y) {
 		this.x = x;
 		this.y = y;
 		this.width = width;
@@ -26,27 +26,27 @@ public final class Rect {
 		this.center_y = center_y;
 	}
 
-	public Float getX() {
+	public Double getX() {
 		return x;
 	}
 
-	public Float getY() {
+	public Double getY() {
 		return y;
 	}
 
-	public Float getWidth() {
+	public Double getWidth() {
 		return width;
 	}
 
-	public Float getHeight() {
+	public Double getHeight() {
 		return height;
 	}
 
-	public Float getCenter_x() {
+	public Double getCenter_x() {
 		return center_x;
 	}
 
-	public Float getCenter_y() {
+	public Double getCenter_y() {
 		return center_y;
 	}
 

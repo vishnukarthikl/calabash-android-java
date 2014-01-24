@@ -1,4 +1,4 @@
-package com.thoughtworks.twist.calabash.android;
+package com.thoughtworks.twist.calabash.android.unit;
 
 import com.thoughtworks.twist.calabash.android.DeviceList;
 import org.junit.Test;
