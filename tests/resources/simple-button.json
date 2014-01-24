@@ -1,29 +1,60 @@
-{
-    "enabled": true,
-    "visible": true,
-    "children": [],
-    "label": null,
-    "rect": {
-        "center_y": 210.0,
-        "center_x": 185.5,
-        "height": 96,
-        "y": 162,
-        "width": 371,
-        "x": 0
+[
+    {
+        "enabled": true,
+        "visible": true,
+        "children": [],
+        "label": null,
+        "rect": {
+            "center_y": 210.0,
+            "center_x": 185.5,
+            "height": 96,
+            "y": 162,
+            "width": 371,
+            "x": 0
+        },
+        "type": "android.widget.Button",
+        "id": "button",
+        "el": null,
+        "name": "New Button",
+        "action": {
+            "gesture": "tap",
+            "type": "touch"
+        },
+        "value": "New Button",
+        "path": [0, 1, 0, 4],
+        "hit-point": {
+            "y": 210.0,
+            "x": 185.5
+        },
+        "entry_types": ["0"]
     },
-    "type": "android.widget.Button",
-    "id": "button",
-    "el": null,
-    "name": "New Button",
-    "action": {
-        "gesture": "tap",
-        "type": "touch"
-    },
-    "value": "New Button",
-    "path": [0, 0, 0],
-    "hit-point": {
-        "y": 210.0,
-        "x": 185.5
-    },
-    "entry_types": ["0"]
-}
+    {
+        "enabled": true,
+        "visible": true,
+        "children": [],
+        "label": null,
+        "rect": {
+            "center_y": 210.0,
+            "center_x": 185.5,
+            "height": 96,
+            "y": 162,
+            "width": 371,
+            "x": 0
+        },
+        "type": "android.widget.Button",
+        "id": "button",
+        "el": null,
+        "name": "New Button",
+        "action": {
+            "gesture": "tap",
+            "type": "touch"
+        },
+        "value": "New Button",
+        "path": [0],
+        "hit-point": {
+            "y": 210.0,
+            "x": 185.5
+        },
+        "entry_types": ["0"]
+    }
+]

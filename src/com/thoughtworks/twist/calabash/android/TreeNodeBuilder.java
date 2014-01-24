@@ -1,6 +1,7 @@
 package com.thoughtworks.twist.calabash.android;
 
 import org.codehaus.jackson.JsonNode;
+import org.codehaus.jackson.node.ArrayNode;
 
 import java.util.HashMap;
 
@@ -18,7 +19,20 @@ public class TreeNodeBuilder {
         map.put("text", getProperty(jsonNode, "value"));
         createRect(jsonNode, map);
 
-        return new TreeNode(new UIElement(map, "foo", calabashWrapper));
+        return new TreeNode(new UIElement(map, createQuery(jsonNode), calabashWrapper));
+    }
+
+    private String createQuery(JsonNode jsonNode) {
+        ArrayNode arrayNode = (ArrayNode) jsonNode.get("path");
+        final StringBuilder queryBuilder = new StringBuilder();
+        int index = 0;
+
+        queryBuilder.append(String.format("* index:%d", arrayNode.get(index).getIntValue()));
+        for (index=1; index < arrayNode.size(); index++) {
+            queryBuilder.append(String.format(" child * index:%d", arrayNode.get(index).getIntValue()));
+        }
+
+        return queryBuilder.toString();
     }
 
     private void createRect(JsonNode jsonNode, HashMap<Object, Object> map) {
