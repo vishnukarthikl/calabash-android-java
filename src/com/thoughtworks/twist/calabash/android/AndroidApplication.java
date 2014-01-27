@@ -35,7 +35,7 @@ public class AndroidApplication {
      * @throws CalabashException
      */
     public void inspect(InspectCallback callback) throws CalabashException {
-        List<TreeNode> tree = new TreeBuilder(calabashWrapper).createTreeFromRoot();
+        List<TreeNode> tree = new TreeBuilder(calabashWrapper).createTree();
         if (tree.isEmpty()) return;
 
         for (TreeNode treeNode : tree) {
@@ -145,6 +145,7 @@ public class AndroidApplication {
 
     /**
      * Wait till an element with id appears
+     *
      * @param id           id of the element
      * @param timeoutInSec wait time in seconds
      * @throws OperationTimedoutException
@@ -238,15 +239,16 @@ public class AndroidApplication {
      * @throws CalabashException
      */
     public List<TreeNode> getRootElements() throws CalabashException {
-        return new TreeBuilder(calabashWrapper).createTreeFromRoot();
+        return new TreeBuilder(calabashWrapper, new CalabashHttpClient(), new TreeNodeBuilder(calabashWrapper)).createTree();
     }
 
     /**
      * click and drag from (fromX, fromY) to (toX, toY) where X and Y axis start at top left corner
+     *
      * @param fromX source x-coordinate normalized to screen width
-     * @param toX destination x-coordinate normalized to screen width
+     * @param toX   destination x-coordinate normalized to screen width
      * @param fromY source y-coordinate normalized to screen height
-     * @param toY destination y-coordinate normalized to screen height
+     * @param toY   destination y-coordinate normalized to screen height
      * @param steps no.of steps that it takes between the two points
      * @throws CalabashException
      */
