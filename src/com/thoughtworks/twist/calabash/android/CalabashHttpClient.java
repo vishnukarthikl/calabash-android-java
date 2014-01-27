@@ -1,7 +1,5 @@
 package com.thoughtworks.twist.calabash.android;
 
-import org.apache.commons.io.IOUtils;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -28,8 +26,10 @@ public class CalabashHttpClient {
             final HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
             final InputStream stream = connection.getInputStream();
-            dump = IOUtils.toString(stream, "UTF-8");
+            dump = Utils.toString(stream);
         } catch (IOException e) {
+            error("Could not fetch view dump", e);
+        } catch (CalabashException e) {
             error("Could not fetch view dump", e);
         }
         return dump;
