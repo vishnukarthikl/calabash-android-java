@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.thoughtworks.twist.calabash.android.CalabashLogger.error;
 import static java.lang.Double.parseDouble;
 
 /**
@@ -78,8 +79,8 @@ public class UIElement implements AndroidElementAction {
      *
      * @return the description property
      */
-    public String getDescription() {
-        return Utils.toString(data.get("description"));
+    public String getDescription() throws CalabashException {
+        return getElementProperty("description");
     }
 
     /**
@@ -87,8 +88,8 @@ public class UIElement implements AndroidElementAction {
      *
      * @return the isEnabled property
      */
-    public String isEnabled() {
-        return Utils.toString(data.get("enabled"));
+    public boolean isEnabled() {
+        return Boolean.parseBoolean(Utils.toString(data.get("enabled")));
     }
 
     /**
@@ -96,8 +97,16 @@ public class UIElement implements AndroidElementAction {
      *
      * @return the contentDescription property
      */
-    public String getContentDescription() {
-        return Utils.toString(data.get("contentDescription"));
+    public String getContentDescription() throws CalabashException {
+        return getElementProperty("contentDescription");
+    }
+
+    private String getElementProperty(String property) throws CalabashException {
+        Object description = data.get(property);
+        if (description == null) {
+            description = getProperty(property);
+        }
+        return Utils.toString(description);
     }
 
     /**
@@ -239,8 +248,6 @@ public class UIElement implements AndroidElementAction {
             return false;
         if (getRect() != null ? !getRect().equals(uiElement.getRect()) : uiElement.getRect() != null) return false;
         if (getText() != null ? !getText().equals(uiElement.getText()) : uiElement.getText() != null) return false;
-        if (getContentDescription() != null ? !getContentDescription().equals(uiElement.getContentDescription()) : uiElement.getContentDescription() != null)
-            return false;
 
         return true;
     }
@@ -260,8 +267,13 @@ public class UIElement implements AndroidElementAction {
     }
 
     public String toString() {
-        return String.format("id: %s, class: %s, text: %s, description: %s, content description: %s, enabled: %s, rect: %s",
-                getId(), getElementClass(), getText(), getDescription(), getContentDescription(), isEnabled(), getRect());
+        try {
+            return String.format("id: %s, class: %s, text: %s, description: %s, content description: %s, enabled: %s, rect: %s",
+                    getId(), getElementClass(), getText(), getDescription(), getContentDescription(), isEnabled(), getRect());
+        } catch (CalabashException e) {
+            error("Unable to get string value of element", e);
+        }
+        return "";
     }
 
 }

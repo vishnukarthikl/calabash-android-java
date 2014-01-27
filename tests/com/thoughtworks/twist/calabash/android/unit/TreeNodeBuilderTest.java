@@ -32,7 +32,7 @@ public class TreeNodeBuilderTest {
         assertEquals(jsonNode.get("type").getTextValue(), data.getElementClass());
         assertEquals(expectedRect, data.getRect());
         assertEquals(jsonNode.get("value").getTextValue(), data.getText());
-
+        assertEquals(jsonNode.get("enabled").getBooleanValue(), data.isEnabled());
     }
 
     @Test
