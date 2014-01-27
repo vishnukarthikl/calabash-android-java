@@ -9,15 +9,15 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.*;
 
+import static com.thoughtworks.twist.calabash.android.CalabashLogger.error;
+import static com.thoughtworks.twist.calabash.android.CalabashLogger.info;
+
 public class TreeBuilder {
 
-    public static final String QUERY_ALL = "*";
     private final CalabashWrapper calabashWrapper;
     private final CalabashHttpClient calabashHttpClient;
     private final TreeNodeBuilder treeNodeBuilder;
-    private List<TreeNode> roots = new ArrayList<TreeNode>();
-    private Set<UIElement> inspectedElements = new HashSet<UIElement>();
-    private ObjectMapper mapper;
+    private ObjectMapper mapper = new ObjectMapper();
 
     public TreeBuilder(CalabashWrapper calabashWrapper) {
         this.calabashWrapper = calabashWrapper;
@@ -31,20 +31,16 @@ public class TreeBuilder {
         this.treeNodeBuilder = treeNodeBuilder;
     }
 
-    public List<TreeNode> createTreeFromRoot() throws CalabashException {
-        RubyArray allElements = calabashWrapper.query(QUERY_ALL);
-        return getTreeNodes(allElements, null, "*");
-    }
-
     public TreeNode createTreeFrom(UIElement root) throws CalabashException {
+        Set<UIElement> inspectedElements = new HashSet<UIElement>();
         String elementQuery = root.getQuery();
         String descendantQuery = elementQuery + " descendant *";
         RubyArray descendants = calabashWrapper.query(descendantQuery);
-        return getTreeNodes(descendants, root, descendantQuery).get(0);
+        return getTreeNodes(descendants, root, descendantQuery, inspectedElements).get(0);
     }
 
-    private List<TreeNode> getTreeNodes(RubyArray allElements, UIElement root, String baseQuery) throws CalabashException {
-        clearRoot();
+    private List<TreeNode> getTreeNodes(RubyArray allElements, UIElement root, String baseQuery, Set<UIElement> inspectedElements) throws CalabashException {
+        List<TreeNode> roots = new ArrayList<TreeNode>();
         for (int i = allElements.size() - 1; i >= 0; i--) {
             final String query = String.format(baseQuery + " index:%d", i);
             RubyHash rubyElement = (RubyHash) allElements.get(i);
@@ -55,10 +51,10 @@ public class TreeBuilder {
 
             uiElements.add(currentElement);
             uiElements.addAll(getAncestors(query, root));
-            merge(uiElements);
+            merge(uiElements, roots);
             inspectedElements.addAll(uiElements);
         }
-        return getRoots();
+        return roots;
     }
 
     private List<UIElement> getAncestors(String query, UIElement root) throws CalabashException {
@@ -98,9 +94,9 @@ public class TreeBuilder {
         return uiElements;
     }
 
-    public void merge(List<UIElement> elements) {
+    public void merge(List<UIElement> elements, List<TreeNode> roots) {
         Collections.reverse(elements);
-        if (isEmpty()) {
+        if (roots.isEmpty()) {
             TreeNode root = createBranch(elements);
             roots.add(root);
         } else {
@@ -157,27 +153,12 @@ public class TreeBuilder {
         return -1;
     }
 
-    private boolean isEmpty() {
-        return roots.size() == 0;
-    }
-
-    public List<TreeNode> getRoots() {
-        return roots;
-    }
-
-    private void clearRoot() {
-        roots = new ArrayList<TreeNode>();
-    }
-
     public List<TreeNode> createTree() {
         List<TreeNode> treeNodes = null;
         try {
-
+            info("Fetching view hiearchy");
             treeNodes = new ArrayList<TreeNode>();
-
-            mapper = new ObjectMapper();
             final JsonNode jsonNode = mapper.readTree(calabashHttpClient.getViewDump());
-
             final JsonNode childNodes = jsonNode.get("children");
             if (childNodes == null) {
                 return treeNodes;
@@ -192,9 +173,9 @@ public class TreeBuilder {
             }
 
         } catch (MalformedURLException e) {
-            e.printStackTrace();
+            error("malformed url", e);
         } catch (IOException e) {
-            e.printStackTrace();
+            error("exception while fetching view hierarchy", e);
         }
         return treeNodes;
     }
