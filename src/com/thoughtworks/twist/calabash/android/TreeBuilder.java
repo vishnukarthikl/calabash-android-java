@@ -156,7 +156,7 @@ public class TreeBuilder {
     public List<TreeNode> createTree() {
         List<TreeNode> treeNodes = null;
         try {
-            info("Fetching view hiearchy");
+            info("Fetching view hierarchy");
             treeNodes = new ArrayList<TreeNode>();
             final JsonNode jsonNode = mapper.readTree(calabashHttpClient.getViewDump());
             final JsonNode childNodes = jsonNode.get("children");
@@ -177,6 +177,7 @@ public class TreeBuilder {
         } catch (IOException e) {
             error("exception while fetching view hierarchy", e);
         }
+        info("Done fetching view hierarchy");
         return treeNodes;
     }
 
