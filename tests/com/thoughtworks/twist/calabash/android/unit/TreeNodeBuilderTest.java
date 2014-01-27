@@ -16,7 +16,7 @@ public class TreeNodeBuilderTest {
         final JsonNode jsonNode = new ObjectMapper().readTree(jsonString).get(0);
 
         final TreeNodeBuilder treeNodeBuilder = new TreeNodeBuilder(calabashWrapper);
-        final TreeNode actualTreeNode = treeNodeBuilder.buildFrom(jsonNode);
+        final TreeNode actualTreeNode = treeNodeBuilder.buildFrom(jsonNode, null);
 
         final UIElement data = actualTreeNode.getData();
         final JsonNode rect = jsonNode.get("rect");
@@ -33,29 +33,5 @@ public class TreeNodeBuilderTest {
         assertEquals(expectedRect, data.getRect());
         assertEquals(jsonNode.get("value").getTextValue(), data.getText());
         assertEquals(jsonNode.get("enabled").getBooleanValue(), data.isEnabled());
-    }
-
-    @Test
-    public void shouldAddQueryWhileCreatingNode() throws Exception {
-        CalabashWrapper calabashWrapper = mock(CalabashWrapper.class);
-        final TreeNodeBuilder treeNodeBuilder = new TreeNodeBuilder(calabashWrapper);
-        final String jsonString = TestUtils.readFileFromResources("simple-button.json");
-        final JsonNode jsonNode = new ObjectMapper().readTree(jsonString);
-
-        final TreeNode treeNode = treeNodeBuilder.buildFrom(jsonNode.get(0));
-
-        assertEquals("* index:0 child * index:1 child * index:0 child * index:4", treeNode.getData().getQuery());
-    }
-
-    @Test
-    public void shouldAddQueryForRootNodeWhileCreatingNode() throws Exception {
-        CalabashWrapper calabashWrapper = mock(CalabashWrapper.class);
-        final TreeNodeBuilder treeNodeBuilder = new TreeNodeBuilder(calabashWrapper);
-        final String jsonString = TestUtils.readFileFromResources("simple-button.json");
-        final JsonNode jsonNode = new ObjectMapper().readTree(jsonString);
-
-        final TreeNode treeNode = treeNodeBuilder.buildFrom(jsonNode.get(1));
-
-        assertEquals("* index:0", treeNode.getData().getQuery());
     }
 }

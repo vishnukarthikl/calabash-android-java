@@ -163,14 +163,10 @@ public class TreeBuilder {
             if (childNodes == null) {
                 return treeNodes;
             }
-            Iterator<JsonNode> rootJsonNodes = childNodes.getElements();
-            while (rootJsonNodes.hasNext()) {
-                JsonNode rootJsonNode = rootJsonNodes.next();
-                final TreeNode rootTreeNode = treeNodeBuilder.buildFrom(rootJsonNode);
-                addChildren(rootTreeNode, rootJsonNode);
-
-                treeNodes.add(rootTreeNode);
-            }
+            JsonNode rootJsonNode = childNodes.get(0);
+            final TreeNode rootTreeNode = treeNodeBuilder.buildFrom(rootJsonNode, "* index:0");
+            addChildren(rootTreeNode, rootJsonNode);
+            treeNodes.add(rootTreeNode);
 
         } catch (MalformedURLException e) {
             error("malformed url", e);
@@ -182,14 +178,17 @@ public class TreeBuilder {
     }
 
     private void addChildren(TreeNode treeNode, JsonNode jsonNode) throws IOException {
+        int i = 0;
         final Iterator<JsonNode> children = jsonNode.get("children").getElements();
         while (children.hasNext()) {
             final JsonNode childJsonNode = children.next();
             if (childJsonNode.get("visible").getBooleanValue()) {
-                final TreeNode childTreeNode = treeNodeBuilder.buildFrom(childJsonNode);
+                final String query = treeNode.getData().getQuery() + " child * index:" + i;
+                final TreeNode childTreeNode = treeNodeBuilder.buildFrom(childJsonNode, query);
                 addChildren(childTreeNode, childJsonNode);
 
                 treeNode.appendChild(childTreeNode);
+                i++;
             }
         }
 

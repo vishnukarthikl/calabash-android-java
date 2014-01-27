@@ -32,11 +32,11 @@ public class TreeBuilderTest {
     @Test
     public void shouldGetDumpInfo() throws Exception {
         String dump = readFileFromResources("simple-dump.json");
-        final TreeNode root = mock(TreeNode.class);
-        final TreeNode firstLevel = mock(TreeNode.class);
+        final TreeNode root = getMockedTreeNodeWithElement();
+        final TreeNode firstLevel = getMockedTreeNodeWithElement();
 
         when(httpClient.getViewDump()).thenReturn(dump);
-        when(treeNodeBuilder.buildFrom(any(JsonNode.class))).thenReturn(root).thenReturn(firstLevel);
+        when(treeNodeBuilder.buildFrom(any(JsonNode.class), anyString())).thenReturn(root).thenReturn(firstLevel);
         final TreeBuilder treeBuilder = new TreeBuilder(wrapper, httpClient, treeNodeBuilder);
 
         List<TreeNode> tree = treeBuilder.createTree();
@@ -48,12 +48,12 @@ public class TreeBuilderTest {
     @Test
     public void shouldGetDumpInfoForNestedChildren() throws Exception {
         final String dump = readFileFromResources("nested-view-dump.json");
-        final TreeNode root = mock(TreeNode.class);
-        final TreeNode firstLevelChild1 = mock(TreeNode.class);
-        final TreeNode firstLevelChild2 = mock(TreeNode.class);
+        final TreeNode root = getMockedTreeNodeWithElement();
+        final TreeNode firstLevelChild1 = getMockedTreeNodeWithElement();
+        final TreeNode firstLevelChild2 = getMockedTreeNodeWithElement();
 
         when(httpClient.getViewDump()).thenReturn(dump);
-        when(treeNodeBuilder.buildFrom(any(JsonNode.class))).thenReturn(root).thenReturn(firstLevelChild1).thenReturn(firstLevelChild2);
+        when(treeNodeBuilder.buildFrom(any(JsonNode.class), anyString())).thenReturn(root).thenReturn(firstLevelChild1).thenReturn(firstLevelChild2);
         final TreeBuilder treeBuilder = new TreeBuilder(wrapper, httpClient, treeNodeBuilder);
 
         List<TreeNode> tree = treeBuilder.createTree();
@@ -71,11 +71,11 @@ public class TreeBuilderTest {
     @Test
     public void shouldAddOnlyVisibleNodes() throws Exception {
         final String dump = readFileFromResources("nested-invisible-view-dump.json");
-        final TreeNode root = mock(TreeNode.class);
+        final TreeNode root = getMockedTreeNodeWithElement();
         final TreeNode visibleChild = mock(TreeNode.class);
 
         when(httpClient.getViewDump()).thenReturn(dump);
-        when(treeNodeBuilder.buildFrom(any(JsonNode.class))).thenReturn(root).thenReturn(visibleChild);
+        when(treeNodeBuilder.buildFrom(any(JsonNode.class), anyString())).thenReturn(root).thenReturn(visibleChild);
         final TreeBuilder treeBuilder = new TreeBuilder(wrapper, httpClient, treeNodeBuilder);
 
         List<TreeNode> tree = treeBuilder.createTree();
@@ -86,9 +86,53 @@ public class TreeBuilderTest {
         List<TreeNode> capturedTreeNodes = treeNodeCaptor.getAllValues();
         assertEquals(visibleChild, capturedTreeNodes.get(0));
 
-        verify(treeNodeBuilder, times(2)).buildFrom(any(JsonNode.class));
+        verify(treeNodeBuilder, times(2)).buildFrom(any(JsonNode.class), anyString());
 
         verify(root).appendChild(visibleChild);
+    }
+
+    @Test
+    public void shouldAddQueryToElements() throws Exception {
+        final String dump = readFileFromResources("nested-view-dump.json");
+        final TreeNode root = getMockedTreeNodeWithElementWithQuery("* index:0");
+        final TreeNode firstLevelChild1 = getMockedTreeNodeWithElement();
+        final TreeNode firstLevelChild2 = getMockedTreeNodeWithElement();
+
+        when(httpClient.getViewDump()).thenReturn(dump);
+        when(treeNodeBuilder.buildFrom(any(JsonNode.class), anyString())).thenReturn(root).thenReturn(firstLevelChild1).thenReturn(firstLevelChild2);
+
+        final TreeBuilder treeBuilder = new TreeBuilder(wrapper, httpClient, treeNodeBuilder);
+        treeBuilder.createTree();
+
+        final ArgumentCaptor<String> queryCaptor = ArgumentCaptor.forClass(String.class);
+        verify(treeNodeBuilder, times(3)).buildFrom(any(JsonNode.class), queryCaptor.capture());
+
+        final List<String> queries = queryCaptor.getAllValues();
+        assertEquals("* index:0", queries.get(0));
+        assertEquals("* index:0 child * index:0", queries.get(1));
+        assertEquals("* index:0 child * index:1", queries.get(2));
+
+    }
+
+    @Test
+    public void shouldGenerateQueryOnlyForVisibleNodes() throws Exception {
+        final String dump = readFileFromResources("nested-invisible-view-dump.json");
+        final TreeNode root = getMockedTreeNodeWithElementWithQuery("* index:0");
+        final TreeNode firstLevelChild1 = getMockedTreeNodeWithElement();
+        final TreeNode firstLevelChild2 = getMockedTreeNodeWithElement();
+
+        when(httpClient.getViewDump()).thenReturn(dump);
+        when(treeNodeBuilder.buildFrom(any(JsonNode.class), anyString())).thenReturn(root).thenReturn(firstLevelChild1).thenReturn(firstLevelChild2);
+
+        final TreeBuilder treeBuilder = new TreeBuilder(wrapper, httpClient, treeNodeBuilder);
+        treeBuilder.createTree();
+
+        final ArgumentCaptor<String> queryCaptor = ArgumentCaptor.forClass(String.class);
+        verify(treeNodeBuilder, times(2)).buildFrom(any(JsonNode.class), queryCaptor.capture());
+
+        final List<String> queries = queryCaptor.getAllValues();
+        assertEquals("* index:0", queries.get(0));
+        assertEquals("* index:0 child * index:0", queries.get(1));
     }
 
     @Test
@@ -99,5 +143,18 @@ public class TreeBuilderTest {
         List<TreeNode> tree = treeBuilder.createTree();
 
         assertEquals(0, tree.size());
+    }
+
+    private TreeNode getMockedTreeNodeWithElementWithQuery(String query) {
+        final TreeNode mockedTreeNodeWithElement = getMockedTreeNodeWithElement();
+        when(mockedTreeNodeWithElement.getData().getQuery()).thenReturn(query);
+        return mockedTreeNodeWithElement;
+    }
+
+    private TreeNode getMockedTreeNodeWithElement() {
+        final TreeNode root = mock(TreeNode.class);
+        final UIElement rootElement = mock(UIElement.class);
+        when(root.getData()).thenReturn(rootElement);
+        return root;
     }
 }
