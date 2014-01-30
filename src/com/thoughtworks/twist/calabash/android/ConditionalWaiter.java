@@ -1,16 +1,13 @@
 package com.thoughtworks.twist.calabash.android;
 
+import static com.thoughtworks.twist.calabash.android.CalabashLogger.info;
+import static java.lang.String.format;
+
 public class ConditionalWaiter {
-    public static final int MAX_RETRIES = 5;
-    public static final int SLEEP_TIME = 1;
     private final ICondition condition;
 
     public ConditionalWaiter(ICondition condition) {
         this.condition = condition;
-    }
-
-    public void run() throws CalabashException {
-        run(MAX_RETRIES, SLEEP_TIME);
     }
 
     public void run(int times, int sleepTimeInSec) throws CalabashException {
@@ -18,6 +15,7 @@ public class ConditionalWaiter {
         int sleepTimeInMilli = sleepTimeInSec * 1000;
         while (!condition.test() && timesTested <= times) {
             try {
+                info("Retrying wait condition: " + condition.getDescription());
                 Thread.sleep(sleepTimeInMilli);
                 timesTested++;
             } catch (InterruptedException e) {
@@ -25,7 +23,7 @@ public class ConditionalWaiter {
             }
         }
         if (timesTested > times)
-            throw new CalabashException(condition.getErrorMessage());
+            throw new CalabashException("Wait condition failed : " + condition.getDescription());
 
     }
 
@@ -36,6 +34,6 @@ public class ConditionalWaiter {
                 return;
             }
         } while ((System.currentTimeMillis() - startTime) < timeoutInMillis);
-        throw new CalabashException(String.format("Wait condition timed out after %s ms", timeoutInMillis));
+        throw new CalabashException(format("Wait condition (%s) timed out after %s ms", condition.getDescription(), timeoutInMillis));
     }
 }

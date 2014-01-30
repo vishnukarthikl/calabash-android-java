@@ -11,6 +11,7 @@ public class AndroidConfiguration {
     private String deviceName;
     private ScreenshotListener screenshotListener;
     private long pauseTimeInMs = -1;
+    private int timeToWaitInSecForEmulatorLaunch = 180;
 
     /**
      * Gets the boolean value indicating whether logging is enabled
@@ -202,5 +203,23 @@ public class AndroidConfiguration {
      */
     public long getPauseTimeInMs() {
         return pauseTimeInMs;
+    }
+
+    /**
+     * specify the time that you want to wait for the emulator to get launched, defaults to 180 seconds.
+     * Usually it takes a while to load the emualator, so it is better to enable snapshot through avd
+     *
+     * @param timeToWaitInSec seconds to wait
+     */
+    public void setEmulatorLaunchWaitTimeout(int timeToWaitInSec) {
+        this.timeToWaitInSecForEmulatorLaunch = timeToWaitInSec;
+    }
+
+    /**
+     *
+     * @return timeToWaitInSecForEmulatorLaunch
+     */
+    public int getTimeToWaitInSecForEmulatorLaunch() {
+        return timeToWaitInSecForEmulatorLaunch;
     }
 }

@@ -16,6 +16,7 @@ public class AndroidBridge {
     private final Environment environment;
     private DeviceList deviceList;
     private DeviceList newDeviceList;
+    public static final int POLL_RATE_IN_SECONDS = 5;
 
     public AndroidBridge(Environment environment) {
         this.environment = environment;
@@ -42,20 +43,20 @@ public class AndroidBridge {
                 throw new CalabashException("Emulator launch Failed");
             }
 
-            ConditionalWaiter waitForBootAnim = new ConditionalWaiter(new ICondition(String.format("Device %s is not ready", newSerial)) {
+            ConditionalWaiter waitForBootAnim = new ConditionalWaiter(new ICondition(format("Wait for Device %s to be ready", newSerial)) {
                 @Override
                 public boolean test() throws CalabashException {
                     return isBootAnimationOver(newSerial);
                 }
             });
-            ConditionalWaiter waitForPackageManager = new ConditionalWaiter(new ICondition(String.format("Package manager is not available on %s", newSerial)) {
+            ConditionalWaiter waitForPackageManager = new ConditionalWaiter(new ICondition(format("Wait for Package manager to be available on %s", newSerial)) {
                 @Override
                 public boolean test() throws CalabashException {
                     return isPackageManagerAvailable(newSerial);
                 }
             });
-            waitForBootAnim.run(20, 5);
-            waitForPackageManager.run(5, 5);
+            waitForBootAnim.run(configuration.getTimeToWaitInSecForEmulatorLaunch() / POLL_RATE_IN_SECONDS, POLL_RATE_IN_SECONDS);
+            waitForPackageManager.run(5, POLL_RATE_IN_SECONDS);
             unlockKeyguard(newSerial);
             return newSerial;
         }
@@ -73,13 +74,13 @@ public class AndroidBridge {
             return launchedDeviceSerial;
         }
         Process process = Utils.runCommandInBackGround(launchCommand, format("failed to launch the emulator %s", deviceName));
-        ConditionalWaiter conditionalWaiter = new ConditionalWaiter(new ICondition(String.format("Unable to launch emulator: %s", deviceName)) {
+        ConditionalWaiter waitForNewEmulatorLaunch = new ConditionalWaiter(new ICondition(format("waiting for emulator with name %s to launch", deviceName)) {
             public boolean test() throws CalabashException {
                 newDeviceList = getDeviceList();
                 return deviceList.size() < newDeviceList.size();
             }
         });
-        conditionalWaiter.run(5, 5);
+        waitForNewEmulatorLaunch.run(5, 5);
 
         return getNewSerial(deviceList, newDeviceList);
     }
@@ -152,7 +153,7 @@ public class AndroidBridge {
         for (Device device : deviceList.devices) {
             if (device.getSerial().equals(serial)) {
                 if (!device.getState().equals("device")) {
-                   throw new CalabashException(format("%s's state: %s. Cannot install app", serial, device.getState()));
+                    throw new CalabashException(format("%s's state: %s. Cannot install app", serial, device.getState()));
                 }
                 return;
             }

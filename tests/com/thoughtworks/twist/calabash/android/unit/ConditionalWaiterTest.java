@@ -14,9 +14,9 @@ public class ConditionalWaiterTest {
     @Test
     public void shouldThrowExceptionWhenWaitFails() throws CalabashException {
         expectedException.expect(CalabashException.class);
-        expectedException.expectMessage("Wait condition timed out after 1000 ms");
+        expectedException.expectMessage("Wait condition (wait description) timed out after 1000 ms");
 
-        ConditionalWaiter conditionalWaiter = new ConditionalWaiter(new ICondition() {
+        ConditionalWaiter conditionalWaiter = new ConditionalWaiter(new ICondition("wait description") {
             @Override
             public boolean test() throws CalabashException {
                 return false;

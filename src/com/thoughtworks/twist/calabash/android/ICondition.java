@@ -1,20 +1,20 @@
 package com.thoughtworks.twist.calabash.android;
 
 public abstract class ICondition {
-    private final String errorMessage;
+    private final String description;
 
-    public ICondition(String errorMessage){
-        this.errorMessage = errorMessage;
+    public ICondition(String description){
+        this.description = description;
     }
 
     protected ICondition() {
-        errorMessage = null;
+        description = null;
     }
 
     public abstract boolean test() throws CalabashException;
 
-    public String getErrorMessage() {
-        return errorMessage;
+    public String getDescription() {
+        return description;
     }
 
 }
