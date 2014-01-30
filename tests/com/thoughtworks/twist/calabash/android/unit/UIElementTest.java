@@ -1,5 +1,7 @@
-package com.thoughtworks.twist.calabash.android;
+package com.thoughtworks.twist.calabash.android.unit;
 
+import com.thoughtworks.twist.calabash.android.CalabashWrapper;
+import com.thoughtworks.twist.calabash.android.UIElement;
 import org.jruby.RubyArray;
 import org.junit.Test;
 
@@ -22,7 +24,7 @@ public class UIElementTest {
         when(rubyHash.get(0)).thenReturn(descriptionValue).thenReturn(contentDescriptionValue);
         when(data.get(descriptionField)).thenReturn(null);
         when(wrapper.query("query", descriptionField)).thenReturn(rubyHash);
-
+        when(wrapper.query("query", contentDescriptionField)).thenReturn(rubyHash);
         final UIElement element = new UIElement(data, "query", wrapper);
 
         final String description = element.getDescription();
