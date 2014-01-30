@@ -132,21 +132,6 @@ public class AndroidRunnerIT {
     }
 
     @Test
-    public void shouldFailWaitingForActivity() throws Exception {
-        expectedException.expect(OperationTimedoutException.class);
-        expectedException.expectMessage("Timed out");
-        final AndroidApplication application = TestUtils.installAppOnEmulator(EMULATOR, packageName, tempAndroidApkPath);
-
-        application.waitFor(new ICondition() {
-            @Override
-            public boolean test() throws CalabashException {
-                return application.getCurrentActivity().contains("foo");
-            }
-        }, 5);
-
-    }
-
-    @Test
     public void shouldRetryTimesSpecified() throws Exception {
         final List<Integer> times = new ArrayList<Integer>();
         final String timeoutMessage = "custom timeout message";

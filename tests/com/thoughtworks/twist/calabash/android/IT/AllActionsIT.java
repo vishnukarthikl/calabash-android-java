@@ -361,4 +361,11 @@ public class AllActionsIT {
         application.waitForElementWithId("foobarid", 5);
     }
 
+    @Test
+    public void shouldFailWaitingForActivity() throws Exception {
+        expectedException.expect(OperationTimedoutException.class);
+        expectedException.expectMessage("Timed out");
+
+        application.waitForActivity("foo", 5);
+    }
 }
