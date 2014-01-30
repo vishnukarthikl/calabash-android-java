@@ -15,7 +15,7 @@ import static org.mockito.MockitoAnnotations.initMocks;
 
 public class CalabashHttpClientTest {
 
-    public static final int DEFAULT_PORT = 34777;
+    public static final int DEFAULT_PORT = 34776;
     @Rule
     public WireMockRule wireMockRule = new WireMockRule(DEFAULT_PORT);
     @Mock
