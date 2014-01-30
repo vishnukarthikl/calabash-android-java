@@ -7,16 +7,21 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import static com.thoughtworks.twist.calabash.android.CalabashLogger.error;
+import static java.lang.Integer.parseInt;
+import static java.lang.String.format;
 
 public class CalabashHttpClient {
-    private static final String TEST_SERVER_DUMP_URL = "http://localhost:34782/dump";
+    private static final String TEST_SERVER_DUMP_URL = "http://localhost:%s/dump";
     private URL url;
 
-    public CalabashHttpClient() {
+    public CalabashHttpClient(CalabashWrapper calabashWrapper) {
         try {
-            url = new URL(TEST_SERVER_DUMP_URL);
+            final int serverPort = parseInt(calabashWrapper.getTestServerPort());
+            url = new URL(format(TEST_SERVER_DUMP_URL, serverPort));
         } catch (MalformedURLException e) {
-            //should never happen
+            throw new RuntimeException(e);
+        } catch (CalabashException e) {
+            throw new RuntimeException(e);
         }
     }
 

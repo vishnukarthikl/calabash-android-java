@@ -2,16 +2,30 @@ package com.thoughtworks.twist.calabash.android.unit;
 
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import com.thoughtworks.twist.calabash.android.CalabashHttpClient;
+import com.thoughtworks.twist.calabash.android.CalabashWrapper;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.mockito.Mock;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.when;
+import static org.mockito.MockitoAnnotations.initMocks;
 
 public class CalabashHttpClientTest {
 
+    public static final int DEFAULT_PORT = 34777;
     @Rule
-    public WireMockRule wireMockRule = new WireMockRule(34782);
+    public WireMockRule wireMockRule = new WireMockRule(DEFAULT_PORT);
+    @Mock
+    public CalabashWrapper calabashWrapper;
+
+    @Before
+    public void setUp() throws Exception {
+        initMocks(this);
+        when(calabashWrapper.getTestServerPort()).thenReturn(String.valueOf(DEFAULT_PORT));
+    }
 
     @Test
     public void shouldFetchViewDump() {
@@ -22,7 +36,7 @@ public class CalabashHttpClientTest {
                         .withHeader("Content-Type", "application/json;charset=utf-8")
                         .withBody(expectedBody)));
 
-        final CalabashHttpClient calabashHttpClient = new CalabashHttpClient();
+        final CalabashHttpClient calabashHttpClient = new CalabashHttpClient(calabashWrapper);
         final String actualBody = calabashHttpClient.getViewDump();
 
         assertEquals(expectedBody, actualBody);
@@ -36,9 +50,9 @@ public class CalabashHttpClientTest {
                 .willReturn(aResponse()
                         .withStatus(500)
                         .withHeader("Content-Type", "application/json;charset=utf-8")
-                        ));
+                ));
 
-        final CalabashHttpClient calabashHttpClient = new CalabashHttpClient();
+        final CalabashHttpClient calabashHttpClient = new CalabashHttpClient(calabashWrapper);
         final String actualBody = calabashHttpClient.getViewDump();
 
         assertEquals(expectedBody, actualBody);

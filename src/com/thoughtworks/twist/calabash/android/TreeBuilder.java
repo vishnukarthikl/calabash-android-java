@@ -21,7 +21,7 @@ public class TreeBuilder {
 
     public TreeBuilder(CalabashWrapper calabashWrapper) {
         this.calabashWrapper = calabashWrapper;
-        this.calabashHttpClient = new CalabashHttpClient();
+        this.calabashHttpClient = new CalabashHttpClient(calabashWrapper);
         this.treeNodeBuilder = new TreeNodeBuilder(calabashWrapper);
     }
 

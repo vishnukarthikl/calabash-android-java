@@ -578,4 +578,10 @@ public class CalabashWrapper {
         container.put(cajEnv, envValue);
         container.runScriptlet(format("ENV['%s'] = %s", envName, cajEnv));
     }
+
+    public String getTestServerPort() throws CalabashException {
+        addRequiresAndIncludes("Calabash::Android::Operations");
+        final Object serverPort = container.runScriptlet("default_device.default_server_port");
+        return serverPort.toString();
+    }
 }

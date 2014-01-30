@@ -239,7 +239,10 @@ public class AndroidApplication {
      * @throws CalabashException
      */
     public List<TreeNode> getRootElements() throws CalabashException {
-        return new TreeBuilder(calabashWrapper, new CalabashHttpClient(), new TreeNodeBuilder(calabashWrapper)).createTree();
+        final CalabashHttpClient calabashHttpClient = new CalabashHttpClient(calabashWrapper);
+        final TreeNodeBuilder treeNodeBuilder = new TreeNodeBuilder(calabashWrapper);
+        final TreeBuilder treeBuilder = new TreeBuilder(calabashWrapper, calabashHttpClient, treeNodeBuilder);
+        return treeBuilder.createTree();
     }
 
     /**
