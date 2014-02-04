@@ -24,10 +24,16 @@ public class EnvironmentInitializer {
                 throw new CalabashException(ENV_JAVA_HOME + " is not set");
             }
             File bin = new File(javaHome, "bin");
-            keytool = new File(bin, KEYTOOL).getAbsolutePath();
-            jarsigner = new File(bin, JARSIGNER).getAbsolutePath();
+            keytool = getPathIfExists(new File(bin, KEYTOOL), KEYTOOL);
+            jarsigner = getPathIfExists(new File(bin, JARSIGNER), JARSIGNER);
         }
         return new Environment(androidHome, javaHome, keytool, jarsigner);
+    }
+
+    private static String getPathIfExists(File keyToolFile, String executable) throws CalabashException {
+        if (!keyToolFile.exists())
+            throw new CalabashException("Could not find " + executable + ". Ensure JDK is installed");
+        return keyToolFile.getAbsolutePath();
     }
 
     private static String findExecutableFromPath(String execName) {
@@ -86,7 +92,6 @@ public class EnvironmentInitializer {
         return androidHome;
 
     }
-
 
     private static boolean isNotEmpty(String value) {
         return value != null && !value.isEmpty();
