@@ -96,7 +96,7 @@ public class AndroidBridge {
                 }
             } catch (IOException e) {
                 CalabashLogger.error(e);
-                throw new CalabashException("could not get the device name from serial %s", e);
+                throw new CalabashException("could not get the device name from serial " + deviceName, e);
             }
         }
         return null;

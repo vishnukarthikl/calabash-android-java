@@ -11,8 +11,10 @@ import org.jruby.embed.ScriptingContainer;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -98,6 +100,7 @@ public class CalabashWrapper {
         return loadPaths;
     }
 
+
     public void setup() throws CalabashException {
         try {
             createDebugCertificateIfMissing();
@@ -140,6 +143,7 @@ public class CalabashWrapper {
             container.runScriptlet("start_test_server_in_background");
             info("Started the app");
         } catch (Exception e) {
+            error("Error starting the app: ", e);
             throw new CalabashException("Error starting the app:" + e.getMessage(), e);
         }
     }
@@ -203,7 +207,7 @@ public class CalabashWrapper {
         }};
     }
 
-    private String getClasspathFor(String resource) throws CalabashException {
+    private String getClasspathFor(String resource) throws CalabashException, UnsupportedEncodingException {
         if (environment.getJrubyHome() != null) {
             return environment.getJrubyHome();
         }
@@ -218,8 +222,9 @@ public class CalabashWrapper {
         URL[] urls = urlClassLoader.getURLs();
         for (URL url : urls) {
             if (url.toString().contains(resource)) {
-                info("Found %s in classpath at : %s", resource, url.getFile());
-                return url.getFile();
+                String jrubyPath = URLDecoder.decode(url.getFile(), "UTF-8");
+                info("Found %s in classpath at : %s", resource, jrubyPath);
+                return jrubyPath;
             }
         }
         error("Could not find %s in classpath", resource);
