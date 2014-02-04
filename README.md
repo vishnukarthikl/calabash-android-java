@@ -17,9 +17,9 @@ Getting started
 Note: AndroidRunner starts the emulator if the device name is specified in the configuration, but it is not very stable. So it is advised that the emulator is manually started and serial(e.g emulator-5554) is set in the configuration.
 
 ```java
-import com.thoughtworks.twist.calabash.android.AndroidConfiguration;
-import com.thoughtworks.twist.calabash.android.AndroidRunner;
-import com.thoughtworks.twist.calabash.android.CalabashException;
+import com.thoughtworks.calabash.android.AndroidConfiguration;
+import com.thoughtworks.calabash.android.AndroidRunner;
+import com.thoughtworks.calabash.android.CalabashException;
 
 public class Main {
     public static void main(String[] args) throws CalabashException {
