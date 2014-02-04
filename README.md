@@ -1,7 +1,7 @@
-calabash-android-java
+Calabash Android Java
 =====================
 
-This project implements a calabash android client in Java.
+This project implements a calabash android client in Java. So that you can write tests for android apps in java. 
 
 Download
 =========
@@ -114,7 +114,7 @@ Licence
 
 The MIT License (MIT)
 
-Copyright (c) 2013 Thoughtworks Studios
+Copyright (c) 2014 Thoughtworks Studios
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
