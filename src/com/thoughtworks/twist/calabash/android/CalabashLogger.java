@@ -22,9 +22,9 @@ class CalabashLogger {
                 fileAppender.setAppend(true);
                 fileAppender.activateOptions();
 
-                Logger.getRootLogger().removeAllAppenders();
-                Logger.getRootLogger().addAppender(fileAppender);
                 log = Logger.getLogger(CalabashLogger.class);
+                log.setAdditivity(false);
+                log.addAppender(fileAppender);
                 log.setLevel(Level.INFO);
                 shouldLog = true;
             } catch (IOException e) {
