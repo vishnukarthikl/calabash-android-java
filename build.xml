@@ -35,7 +35,7 @@
 
 
     <target name="doc">
-		<javadoc packagenames="com.thoughtworks.twist.calabash.android.*" sourcepath="src" defaultexcludes="yes" destdir="${doc.dir}" author="true" version="true" use="true" windowtitle="Calabash-android-java" classpathref="classpath">
+		<javadoc packagenames="com.thoughtworks.calabash.android.*" sourcepath="src" defaultexcludes="yes" destdir="${doc.dir}" author="true" version="true" use="true" windowtitle="Calabash-android-java" classpathref="classpath">
 			<link href="http://developer.java.sun.com/developer/products/xml/docs/api/" />
 		</javadoc>
 	</target>
