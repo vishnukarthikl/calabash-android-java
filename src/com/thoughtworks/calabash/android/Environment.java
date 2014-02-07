@@ -24,8 +24,12 @@ public class Environment {
             envVariables.put(ENV_JAVA_HOME, javaHome);
     }
 
-    private static String getPlatformExecutable(String executable) {
+    public static String getPlatformExecutable(String executable) {
         return Utils.isWindows() ? executable + ".exe" : executable;
+    }
+
+    public static String getPathSeparator() {
+        return Utils.isWindows() ? ";" : ":";
     }
 
     public String getJrubyHome() {

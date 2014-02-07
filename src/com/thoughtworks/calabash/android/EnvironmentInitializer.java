@@ -7,15 +7,16 @@ import static com.thoughtworks.calabash.android.Environment.ENV_JAVA_HOME;
 
 public class EnvironmentInitializer {
 
-    public static final String KEYTOOL = "keytool";
-    public static final String JARSIGNER = "jarsigner";
+    public static final String KEYTOOL = Environment.getPlatformExecutable("keytool");
+    public static final String JARSIGNER = Environment.getPlatformExecutable("jarsigner");
     public static final String PROPERTY_JAVA_HOME = "java.home";
+    public static final String PATH_SEPARATOR = Environment.getPathSeparator();
 
     public static Environment initialize(AndroidConfiguration configuration) throws CalabashException {
         String javaHome = null;
         String androidHome = findAndroidHome(configuration);
-        String keytool = findExecutableFromPath("keytool");
-        String jarsigner = findExecutableFromPath("jarsigner");
+        String keytool = findExecutableFromPath(KEYTOOL);
+        String jarsigner = findExecutableFromPath(JARSIGNER);
         if (keytool == null || jarsigner == null) {
             CalabashLogger.info("Finding executables relative to " + ENV_JAVA_HOME);
             javaHome = findJavaHome(configuration);
@@ -38,7 +39,7 @@ public class EnvironmentInitializer {
 
     private static String findExecutableFromPath(String execName) {
         String path = System.getenv("PATH");
-        String[] pathEntries = path.split(":");
+        String[] pathEntries = path.split(PATH_SEPARATOR);
         for (String pathEntry : pathEntries) {
             File executable = new File(pathEntry, execName);
             if (executable.exists()) {
