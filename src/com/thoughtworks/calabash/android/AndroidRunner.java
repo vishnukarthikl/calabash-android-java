@@ -14,6 +14,7 @@ import static com.thoughtworks.calabash.android.CalabashLogger.info;
 public class AndroidRunner {
 
     public static final String TEST_SERVERS = "test_servers";
+    public static final String GEMS_ZIP = "gems_android.zip";
     private final AndroidConfiguration configuration;
     private final File apk;
     private Environment environment;
@@ -123,9 +124,9 @@ public class AndroidRunner {
             return extractedDir;
         }
         CalabashLogger.info("Extracting gems to temp dir");
-        copyFileFromBundleTo("scripts", "gems.zip", extractedDir);
+        copyFileFromBundleTo("scripts", GEMS_ZIP, extractedDir);
         try {
-            File gemsZip = new File(extractedDir, "gems.zip");
+            File gemsZip = new File(extractedDir, "gems_android.zip");
             unzipWithPermission(extractedDir, gemsZip);
             gemsZip.delete();
             extracted.createNewFile();
