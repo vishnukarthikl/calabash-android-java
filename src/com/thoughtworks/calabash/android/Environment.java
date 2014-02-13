@@ -49,12 +49,10 @@ public class Environment {
     }
 
     public String getKeytool() {
-        String keytool = getPlatformExecutable(this.keytool);
         return quoteIfWindows(keytool);
     }
 
     public String getJarsigner() {
-        String jarsigner = getPlatformExecutable(this.jarsigner);
         return quoteIfWindows(jarsigner);
     }
 
