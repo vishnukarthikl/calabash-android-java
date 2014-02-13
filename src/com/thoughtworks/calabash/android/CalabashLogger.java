@@ -23,6 +23,8 @@ class CalabashLogger {
                 fileAppender.activateOptions();
 
                 log = Logger.getLogger(CalabashLogger.class);
+                log.removeAllAppenders();
+
                 log.setAdditivity(false);
                 log.addAppender(fileAppender);
                 log.setLevel(Level.INFO);
