@@ -1,7 +1,8 @@
 Calabash Android Java
 =====================
 
-This project implements a calabash android client in Java. So that you can write tests for android apps in java. 
+Implementation of calabash android client in java.
+Write functional tests for android in java!
 
 Download
 =========
