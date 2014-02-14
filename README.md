@@ -6,7 +6,7 @@ This project implements a calabash android client in Java. So that you can write
 Download
 =========
 
-[calabash-android-java](https://github.com/vishnukarthikl/calabash-android-java/releases/)
+Download the latest release [calabash-android-java](https://github.com/vishnukarthikl/calabash-android-java/releases/)
 
 Getting started
 ===============
@@ -17,9 +17,6 @@ Getting started
 Note: AndroidRunner starts the emulator if the device name is specified in the configuration, but it is not very stable. So it is advised that the emulator is manually started and serial(e.g emulator-5554) is set in the configuration.
 
 ```java
-import com.thoughtworks.calabash.android.AndroidConfiguration;
-import com.thoughtworks.calabash.android.AndroidRunner;
-import com.thoughtworks.calabash.android.CalabashException;
 
 public class Main {
     public static void main(String[] args) throws CalabashException {
@@ -38,10 +35,6 @@ Writing tests
 Finding an element and touching it. In the below example, we query for a button and then touch the first one.
 
 ```java
-import calabash.java.IOSApplication;
-import calabash.java.CalabashException;
-import calabash.java.CalabashRunner;
-import calabash.java.UIElement;
 
 public class Main {
     public static void main(String[] args) throws CalabashException {
