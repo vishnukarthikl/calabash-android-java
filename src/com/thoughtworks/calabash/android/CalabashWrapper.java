@@ -103,6 +103,7 @@ public class CalabashWrapper {
 
     public void setup() throws CalabashException {
         try {
+            addSystemCommandHack();
             createDebugCertificateIfMissing();
             String jrubyClasspath = getClasspathFor("jruby");
             addContainerEnv("CLASSPATH", jrubyClasspath);
@@ -125,6 +126,7 @@ public class CalabashWrapper {
     public void start(String serial) throws CalabashException {
         try {
             addRequiresAndIncludes("Calabash::Android::Operations");
+            addSystemCommandHack();
             container.runScriptlet(format("Dir.chdir '%s'", apk.getParentFile().getAbsolutePath()));
             addContainerEnv(ADB_DEVICE_ARG, serial);
             addContainerEnv(APP_PATH, apk.getAbsolutePath());
@@ -148,6 +150,21 @@ public class CalabashWrapper {
         }
     }
 
+    //HACK - Jruby system call fails crashing the JVM on attempting to start test server command which redirects error stream to input stream.
+    //Overriding kernel system call to execute command via backtick for the particular edge case. Rest of the calls will be executed via the regular
+    //kernel system call. Bug has been reported on jruby - https://github.com/jruby/jruby/issues/1500
+    //TODO: Remove this once the bug is fixed on jruby and the new jruby jar is added.
+    private void addSystemCommandHack() {
+        StringBuilder script = new StringBuilder();
+
+        script.append(" def system(cmd)\n" +
+                "  `#{cmd}`\n" +
+                "  return $?.success?\n" +
+                " end\n");
+
+        container.runScriptlet(script.toString());
+    }
+
     private void addRequiresAndIncludes(String... modules) throws CalabashException {
         StringBuilder script = new StringBuilder("require 'calabash-android'\n");
         for (String module : modules) {
@@ -163,19 +180,6 @@ public class CalabashWrapper {
         } else {
             script.append("def embed(path,image_type,file_name)\nend\n");
         }
-
-        //HACK - Jruby system call fails crashing the JVM on attempting to start test server command which redirects error stream to input stream.
-        //Overriding kernel system call to execute command via backick for the particular edge case. Rest of the calls will be executed via the regular
-        //kernel system call. Bug has been reported on jruby - https://github.com/jruby/jruby/issues/1500
-        //TODO: Remove this once the bug is fixed on jruby and the new jruby jar is added.
-        script.append(" def system(cmd)\n" +
-                "if (cmd.include? \"sh.calaba.instrumentationbackend.InstrumentationBackend\")\n" +
-                "     `#{cmd}`\n" +
-                "     return $?.success?\n" +
-                "  else\n" +
-                "   Kernel.system cmd\n" +
-                "  end\n" +
-                " end");
 
         container.runScriptlet(script.toString());
     }
