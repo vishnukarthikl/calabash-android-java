@@ -316,7 +316,7 @@ public class AllActionsIT {
 
         ActionResult result = application.performCalabashAction("list_actions");
 
-        assertEquals(100, result.getBonusInformation().size());
+        assertEquals(102, result.getBonusInformation().size());
         assertEquals("Available actions", result.getMessage());
         assertEquals(true, result.isSuccess());
     }
