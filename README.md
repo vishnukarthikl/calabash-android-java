@@ -33,7 +33,7 @@ public class Main {
 Writing tests
 ==============
 
-Finding an element and touching it. In the below example, we query for a button and then touch the first one.
+Finding an element and touching it. In the below example, we query for a button and then touch the first one. And if that adds a textview with text "button was touched", we can assert on it.
 
 ```java
 
@@ -46,6 +46,8 @@ public class Main {
 
         UIElements button = application.query("button");
         button.touch();
+        UIElements text = application.query("textview");
+        assertEquals("button was touched", text.get(0).getText());
     }
 }
 ```
