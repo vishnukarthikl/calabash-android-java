@@ -13,13 +13,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.thoughtworks.calabash.android.IT.AllActionsIT.EMULATOR;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 //Just run all the test. Can't help with emulator state dependency.
 public class AndroidRunnerIT {
 
-    public static final String EMULATOR = "emulator-5554";
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
     private File tempDir;
