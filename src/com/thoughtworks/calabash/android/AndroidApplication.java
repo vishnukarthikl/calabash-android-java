@@ -25,7 +25,7 @@ public class AndroidApplication {
     public UIElements query(String query) throws CalabashException {
         RubyArray array = calabashWrapper.query(query);
         return new UIElements(array, query, calabashWrapper);
-    }
+    }    
 
     /**
      * Fetches all elements in this application and executes callback for each
@@ -198,6 +198,12 @@ public class AndroidApplication {
             case RIGHT:
                 calabashWrapper.drag(99, 1, 50, 50, 5);
                 break;
+            case UP:
+            	calabashWrapper.drag(50, 50, 70, 90, 10);
+            	break;
+            case DOWN:
+            	calabashWrapper.drag(50, 50, 90, 70, 10);
+            	break;
         }
     }
 

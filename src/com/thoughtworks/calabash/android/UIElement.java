@@ -53,6 +53,24 @@ public class UIElement implements AndroidElementAction {
     public String getId() {
         return Utils.toString(data.get("id"));
     }
+    
+    /**
+     * Gets the value
+     *
+     * @return the text property
+     */
+    public String getValue() {
+        return Utils.toString(data.get("value"));
+    }
+    
+    /**
+     * Gets the text content
+     *
+     * @return the text property
+     */
+    public String getTextContent() {
+        return Utils.toString(data.get("textContent"));
+    }
 
     /**
      * Gets the label

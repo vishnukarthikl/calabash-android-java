@@ -284,6 +284,13 @@ public class CalabashWrapper {
 
     public void touch(String query) throws CalabashException {
         try {
+        	query = query.substring(0, query.indexOf("index:"));
+        	/* Remove index from query to avoid: 
+        	 *  
+        	 *   Failed to touch on: webView css:'#Server' index:0. (RuntimeError) No elements found. Query: webView css:'#Server' index:0
+        	 *   
+        	 *   This could potentially by solved by not appending the index to the query in UIElements?
+        	 */
             info("Touching - %s", query);
             container.put(QUERY_STRING, query);
             container.runScriptlet(String.format("touch(%s)", QUERY_STRING));
@@ -606,4 +613,15 @@ public class CalabashWrapper {
         final Object serverPort = container.runScriptlet("default_device.default_server_port");
         return serverPort.toString();
     }
+    
+	public boolean elementExistsById(String id) throws CalabashException {
+		try {
+			info("Checking for element's existence");
+			return (Boolean) container.runScriptlet("element_exists(\"webView css:'#" + id	+ "'\")");
+		} catch (Exception e) {
+			String message = "Failed to check for element's existence";
+			error(message, e);
+			throw new CalabashException(message, e);
+		}
+	}
 }
