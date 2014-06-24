@@ -1,0 +1,1 @@
+ant distro -Dgems.zip.path=scripts/gems_android.zip
