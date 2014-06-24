@@ -17,7 +17,7 @@ import com.thoughtworks.calabash.android.EnvironmentInitializer;
  */
 public class Keyboard {
 	
-	private static AndroidBridge bridge;
+    private static AndroidBridge bridge;
 	
     public Keyboard(AndroidConfiguration androidConfiguration) {
     	try {
