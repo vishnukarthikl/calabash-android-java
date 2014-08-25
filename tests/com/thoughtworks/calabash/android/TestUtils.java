@@ -19,6 +19,7 @@ public class TestUtils {
     public static final String ACTIVITY_SWIPE_PAGE = "Swipe Page";
     public static final String ACTIVITY_SIMPLE_ELEMENTS = "Simple Elements";
     public static final String ACTIVITY_DATE_TIME_ELEMENTS = "DateTime Elements";
+    public static final String ACTIVITY_WEB_VIEW = "Web view";
     public static HashMap<String, String> activityMap = new HashMap<String, String>() {{
         put(ACTIVITY_SIMPLE_ELEMENTS, "SimpleElementsActivity");
         put(ACTIVITY_SWIPE_PAGE, "SwipePageActivity");
@@ -27,6 +28,7 @@ public class TestUtils {
         put(ACTIVITY_CURRENT_LOCATION, "CurrentLocationActivity");
         put(ACTIVITY_MAIN, "MyActivity");
         put(ACTIVITY_DATE_TIME_ELEMENTS, "DateTimeElementsActivity");
+        put(ACTIVITY_WEB_VIEW, "WebViewActivity");
     }};
 
     public static File createTempDir(String directoryName) throws IOException {

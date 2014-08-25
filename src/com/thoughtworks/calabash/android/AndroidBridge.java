@@ -6,7 +6,6 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 
-import static com.thoughtworks.calabash.android.CalabashLogger.info;
 import static java.lang.String.format;
 
 public class AndroidBridge {
@@ -187,4 +186,5 @@ public class AndroidBridge {
     private String[] getPackageManagerAvailableCommand(String serial) {
         return new String[]{environment.getAdb(), "-s", serial, "shell", "pm", "path", "android"};
     }
+    
 }

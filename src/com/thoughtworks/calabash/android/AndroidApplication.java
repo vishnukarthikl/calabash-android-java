@@ -22,10 +22,51 @@ public class AndroidApplication {
         return installedOn;
     }
 
+    /**
+     * returns a list of UIElements corresponding to the calabash query
+     *
+     * @param query calabash query
+     * @return
+     * @throws CalabashException
+     */
     public UIElements query(String query) throws CalabashException {
         RubyArray array = calabashWrapper.query(query);
         return new UIElements(array, query, calabashWrapper);
     }
+
+
+    /**
+     * returns a list of visible WebElements in the WebView corresponding to the css. It is recommended to query for a single element uniquely
+     * by css, since indexed query doesn't work for webelements
+     *
+     * @param css elements' css property
+     * @return
+     * @throws CalabashException
+     */
+    public WebElements queryByCss(String css) throws CalabashException {
+        return queryByCss(css, false);
+    }
+
+    /**
+     * returns a list of WebElements in the WebView corresponding to the css. It is recommended to query for a single element uniquely
+     * by css, since indexed query doesn't work for webelements
+     *
+     * @param css                     elements' css property
+     * @param disableVisibilityFilter should search for all the elements including those not visible in the viewport?
+     * @return
+     * @throws CalabashException
+     */
+    public WebElements queryByCss(String css, boolean disableVisibilityFilter) throws CalabashException {
+        String query;
+        if (disableVisibilityFilter) {
+            query = String.format("all webView css:'%s'", css);
+        } else {
+            query = String.format("webView css:'%s'", css);
+        }
+        RubyArray array = calabashWrapper.query(query);
+        return new WebElements(array, query, calabashWrapper);
+    }
+
 
     /**
      * Fetches all elements in this application and executes callback for each
@@ -135,12 +176,7 @@ public class AndroidApplication {
      * @throws CalabashException
      */
     public void waitForActivity(final String activityName, int timeout) throws CalabashException, OperationTimedoutException {
-        waitFor(new ICondition() {
-            @Override
-            public boolean test() throws CalabashException {
-                return getCurrentActivity().contains(activityName);
-            }
-        }, timeout);
+        calabashWrapper.waitForActivity(activityName, timeout);
     }
 
     /**
@@ -155,27 +191,27 @@ public class AndroidApplication {
         waitFor(new ICondition() {
             @Override
             public boolean test() throws CalabashException {
-                return calabashWrapper.query(format("* id:'%s'", id)).size() > 0;
+                return calabashWrapper.elementExistsById(id);
             }
         }, timeoutInSec);
     }
 
     /**
-     * Scroll Down by one page
+     * Scrolls the first instance of 'android.widget.ScrollView' down
      */
     public void scrollDown() throws CalabashException {
         calabashWrapper.scrollDown();
     }
 
     /**
-     * Scroll Up by one page
+     * Scrolls the first instance of 'android.widget.ScrollView' up
      */
     public void scrollUp() throws CalabashException {
         calabashWrapper.scrollUp();
     }
 
     /**
-     * Selects a menu item from the menu
+     * Selects a menu item from the menu or com.android.internal.view.menu.ActionMenuItemView with label
      *
      * @param menuItem The name of the menu item to be selected
      * @throws CalabashException
@@ -197,6 +233,12 @@ public class AndroidApplication {
                 break;
             case RIGHT:
                 calabashWrapper.drag(99, 1, 50, 50, 5);
+                break;
+            case UP:
+                calabashWrapper.drag(50, 50, 70, 90, 10);
+                break;
+            case DOWN:
+                calabashWrapper.drag(50, 50, 90, 70, 10);
                 break;
         }
     }
@@ -260,9 +302,9 @@ public class AndroidApplication {
     }
 
     /**
-     * call calabash's performAction function with action and its corresponding args
+     * call calabash's perform_action function with action and its corresponding args
      * eg:
-     * performCalabashAction("enter_text_into_numbered_field","text to be entered","1");
+     * performCalabashAction("click_on_screen","50","100");
      *
      * @param action action to be performed
      * @param args   list of arguments for the action
@@ -275,5 +317,14 @@ public class AndroidApplication {
         final boolean success = Boolean.parseBoolean(rubyResult.get("success").toString());
         final Object[] bonusInformation = Utils.toJavaArray(bonusInformationArray);
         return new ActionResult(bonusInformation, message, success);
+    }
+
+    /**
+     * hides the keyboard if shown in the screen
+     *
+     * @throws CalabashException
+     */
+    public void hideKeyboard() throws CalabashException {
+        calabashWrapper.hideKeyboard();
     }
 }

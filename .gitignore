@@ -2,3 +2,6 @@ out/**
 build/**
 src/scripts/**
 .idea/**
+/.classpath
+/.project
+/build.bat

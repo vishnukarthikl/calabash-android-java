@@ -36,8 +36,7 @@ public final class UIElements extends ArrayList<UIElement> implements AndroidEle
                     q += " index:" + i;
                 this.add(new UIElement(object, q, wrapper));
             } catch (Exception e) {
-                throw new CalabashException("Unsupported result format.\n"
-                        + elements.toString(), e);
+                throw new CalabashException("Unsupported result format.\n" + elements.toString(), e);
             }
         }
     }
@@ -58,8 +57,7 @@ public final class UIElements extends ArrayList<UIElement> implements AndroidEle
 
     private void ensureCollectionIsNotEmpty() throws CalabashException {
         if (this.size() == 0) {
-            throw new CalabashException(
-                    "Cannot perform action on an empty list");
+            throw new CalabashException("Cannot perform action on an empty list");
         }
     }
 
