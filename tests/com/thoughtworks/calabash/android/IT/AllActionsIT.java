@@ -41,6 +41,7 @@ public class AllActionsIT {
     @After
     public void goToMainActivity() throws CalabashException, OperationTimedoutException {
         if (!application.getCurrentActivity().equals(MAIN_ACTIVITY)) {
+            application.hideKeyboard();
             application.goBack();
             try {
                 application.waitForActivity(MAIN_ACTIVITY, 6);
@@ -301,13 +302,12 @@ public class AllActionsIT {
 
     @Test
     public void shouldTestPerformCalabashAction() throws Exception {
-        final String enteredText = "text";
-        TestUtils.goToActivity(application, TestUtils.ACTIVITY_SIMPLE_ELEMENTS);
+        TestUtils.goToActivity(application, TestUtils.ACTIVITY_SWIPE_PAGE);
 
-        application.performCalabashAction("enter_text_into_numbered_field", enteredText, "1");
+        application.performCalabashAction("drag", "99", "1", "50", "50", "5");
 
-        final String actualText = application.query("editText index:0").get(0).getText();
-        assertEquals(actualText, enteredText);
+        int index = Integer.parseInt((String) application.query("* id:'pager'").first().getProperty("currentItem"));
+        assertEquals(1, index);
     }
 
     @Test
@@ -316,7 +316,7 @@ public class AllActionsIT {
 
         ActionResult result = application.performCalabashAction("list_actions");
 
-        assertEquals(102, result.getBonusInformation().size());
+        assertEquals(53, result.getBonusInformation().size());
         assertEquals("Available actions", result.getMessage());
         assertEquals(true, result.isSuccess());
     }
@@ -362,10 +362,68 @@ public class AllActionsIT {
     }
 
     @Test
-    public void shouldFailWaitingForActivity() throws Exception {
+    public void shouldWaitForAnWebElementWithId() throws Exception {
+        TestUtils.goToActivity(application, TestUtils.ACTIVITY_WEB_VIEW);
+
+        application.waitForElementWithId("second_input", 5);
+    }
+
+    @Test
+    public void shouldFailForAWebViewElementWithIdNotFound() throws Exception {
         expectedException.expect(OperationTimedoutException.class);
         expectedException.expectMessage("Timed out");
 
+        TestUtils.goToActivity(application, TestUtils.ACTIVITY_WEB_VIEW);
+
+        application.waitForElementWithId("foobarid", 5);
+    }
+
+    @Test
+    public void shouldFailWaitingForActivity() throws Exception {
+        expectedException.expect(OperationTimedoutException.class);
+        expectedException.expectMessage("Activity 'foo' did not appear within 5 seconds");
+
         application.waitForActivity("foo", 5);
     }
+
+    @Test
+    public void shouldGetPropertiesOfWebViewElement() throws Exception {
+        TestUtils.goToActivity(application, TestUtils.ACTIVITY_WEB_VIEW);
+        WebElements input = application.queryByCss("#first_input");
+        input.setText("text");
+
+
+        WebElements resultingElement = application.queryByCss("#first_input");
+
+        assertEquals("input_text", resultingElement.getElementClass());
+        assertEquals("first_input", resultingElement.getId());
+        assertEquals("text", resultingElement.getValue());
+    }
+
+
+    @Test
+    public void shouldTouchWebViewElement() throws Exception {
+        TestUtils.goToActivity(application, TestUtils.ACTIVITY_WEB_VIEW);
+        WebElements button = application.queryByCss("button");
+
+        button.touch();
+
+        WebElements div = application.queryByCss("div");
+        String result = div.getText();
+        assertEquals("button was pressed", result);
+    }
+
+    @Test
+    public void shouldEnterTextForWebViewElement() throws Exception {
+        String textToEnter = "random text";
+        TestUtils.goToActivity(application, TestUtils.ACTIVITY_WEB_VIEW);
+        WebElements input = application.queryByCss("input");
+
+        input.setText(textToEnter);
+
+        WebElements result = application.queryByCss("input");
+        assertEquals(textToEnter, result.getValue());
+    }
+
+
 }

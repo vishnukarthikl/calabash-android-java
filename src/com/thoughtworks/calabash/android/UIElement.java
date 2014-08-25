@@ -198,7 +198,7 @@ public class UIElement implements AndroidElementAction {
      * get the <code>selector</code> property of the element
      *
      * @param selector the property of the element
-     * @return the value of the selector property
+     * @return the getValue of the selector property
      * @throws CalabashException
      */
     public Object getProperty(String selector) throws CalabashException {
@@ -215,15 +215,7 @@ public class UIElement implements AndroidElementAction {
     }
 
     public void longPress() throws CalabashException {
-        String elementId = getId();
-        String text = getText();
-        if (elementId != null)
-            calabashWrapper.longPress(PropertyType.id, elementId);
-        else if (text != null && !text.isEmpty()) {
-            calabashWrapper.longPress(PropertyType.text, text);
-        } else {
-            throw new CalabashException("Failed to long press - The element doesn't have an id or text property");
-        }
+        calabashWrapper.longPress(query);
     }
 
     /**

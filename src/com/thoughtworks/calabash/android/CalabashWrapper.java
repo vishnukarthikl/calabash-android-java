@@ -284,13 +284,6 @@ public class CalabashWrapper {
 
     public void touch(String query) throws CalabashException {
         try {
-        	query = query.substring(0, query.indexOf("index:"));
-        	/* Remove index from query to avoid: 
-        	 *  
-        	 *   Failed to touch on: webView css:'#Server' index:0. (RuntimeError) No elements found. Query: webView css:'#Server' index:0
-        	 *   
-        	 *   This could potentially by solved by not appending the index to the query in UIElements?
-        	 */
             info("Touching - %s", query);
             container.put(QUERY_STRING, query);
             container.runScriptlet(String.format("touch(%s)", QUERY_STRING));
@@ -306,8 +299,8 @@ public class CalabashWrapper {
         try {
             info("Entering text %s into %s", text, query);
             container.put(QUERY_STRING, query);
-            String setText = String.format("{:setText => '%s'}", text);
-            container.runScriptlet(String.format("query(%s, %s)", QUERY_STRING, setText));
+            container.put("TEXT", text);
+            container.runScriptlet(String.format("enter_text(%s,%s)", QUERY_STRING, "TEXT"));
             pause();
         } catch (Exception e) {
             error("Failed to enter text %s into %s", e, text, query);
@@ -354,7 +347,7 @@ public class CalabashWrapper {
     public String getCurrentActivity() throws CalabashException {
         try {
             info("Getting current activity");
-            RubyHash activityInfoMap = (RubyHash) container.runScriptlet("performAction('get_activity_name')");
+            RubyHash activityInfoMap = (RubyHash) container.runScriptlet("perform_action('get_activity_name')");
             String activityName = (String) Utils.toJavaHash(activityInfoMap).get("message");
             info("Current activity: %s", activityName);
             return activityName;
@@ -400,7 +393,7 @@ public class CalabashWrapper {
     public void performGoBack() throws CalabashException {
         try {
             info("Pressing back button");
-            container.runScriptlet("performAction('go_back')");
+            container.runScriptlet("press_back_button");
             pause();
         } catch (Exception e) {
             String message = "Failed to go back";
@@ -413,7 +406,7 @@ public class CalabashWrapper {
     public void pressEnterKey() throws CalabashException {
         try {
             info("Pressing enter key");
-            container.runScriptlet("performAction('send_key_enter')");
+            container.runScriptlet("perform_action('send_key_enter')");
             pause();
         } catch (Exception e) {
             String message = "Failed to press enter key";
@@ -425,7 +418,7 @@ public class CalabashWrapper {
     public void scrollDown() throws CalabashException {
         try {
             info("Scrolling down");
-            container.runScriptlet("performAction('scroll_down')");
+            container.runScriptlet("scroll_down");
         } catch (Exception e) {
             String message = "Failed to scroll down";
             error(message, e);
@@ -436,7 +429,7 @@ public class CalabashWrapper {
     public void scrollUp() throws CalabashException {
         try {
             info("Scrolling up");
-            container.runScriptlet("performAction('scroll_up')");
+            container.runScriptlet("scroll_up");
         } catch (Exception e) {
             String message = "Failed to scroll up";
             error(message, e);
@@ -445,22 +438,28 @@ public class CalabashWrapper {
     }
 
     public void selectMenuItem(String menuItem) throws CalabashException {
+        info("Selecting menu item %s", menuItem);
         try {
-            info("Selecting menu item %s", menuItem);
+            touch(String.format("com.android.internal.view.menu.ActionMenuItemView marked:\"%s\"", menuItem));
+        } catch (CalabashException ce) {
+            selectOptionsMenuItem(menuItem);
+        }
+    }
+
+    private void selectOptionsMenuItem(String menuItem) throws CalabashException {
+        try {
             container.put(MENU_ITEM, menuItem);
-            container.runScriptlet(String.format("performAction('select_from_menu', %s)", MENU_ITEM));
+            container.runScriptlet(String.format("select_options_menu_item %s", MENU_ITEM));
             pause();
         } catch (Exception e) {
-            String message = "Failed to Select menu item " + menuItem;
-            error(message, e);
-            throw new CalabashException(message, e);
+            throw new CalabashException(String.format("Failed to select menu item '%s'", menuItem));
         }
     }
 
     public void drag(Integer fromX, Integer toX, Integer fromY, Integer toY, Integer steps) throws CalabashException {
         try {
-            info("Performing drag from: (%s,%s) to: (%s,%s) in %s steps", fromX, toX, fromY, toY, steps);
-            container.runScriptlet(String.format("performAction('drag', '%d', '%d', '%d', '%d', '%d')", fromX, toX, fromY, toY, steps));
+            info("Performing drag from: (%s,%s) to: (%s,%s) in %s steps", fromX, fromY, toX, toY, steps);
+            container.runScriptlet(String.format("perform_action('drag', '%d', '%d', '%d', '%d', '%d')", fromX, toX, fromY, toY, steps));
         } catch (Exception e) {
             String message = "Error performing drag";
             error(message, e);
@@ -468,17 +467,10 @@ public class CalabashWrapper {
         }
     }
 
-    public void longPress(PropertyType withProperty, String property) throws CalabashException {
-        String actionName = null;
+    public void longPress(String query) throws CalabashException {
         try {
-            switch (withProperty) {
-                case id:
-                    actionName = "long_press_on_view_by_id";
-                    break;
-                case text:
-                    actionName = "press_long_on_text";
-            }
-            container.runScriptlet(String.format("performAction('%s', '%s')", actionName, property));
+            info("Long pressing element: %s", query);
+            container.runScriptlet(String.format("long_press_when_element_exists(\"%s\")", query));
             pause();
         } catch (Exception e) {
             String message = "Failed to long press";
@@ -529,7 +521,7 @@ public class CalabashWrapper {
             info("performing action %s with args %s", action, Utils.getStringFromArray(args));
             container.put(ACTION, action);
             container.put(ACTION_ARGS, args);
-            return (RubyHash) container.runScriptlet(String.format("performAction(%s,*%s)", ACTION, ACTION_ARGS));
+            return (RubyHash) container.runScriptlet(String.format("perform_action(%s,*%s)", ACTION, ACTION_ARGS));
         } catch (Exception e) {
             String message = String.format("Failed to perform action %s with args %s", action, Utils.getStringFromArray(args));
             error(message, e);
@@ -583,10 +575,10 @@ public class CalabashWrapper {
             container.put(WAIT_SHOULD_TAKE_SCREENSHOT,
                     options.shouldScreenshotOnError());
             return String.format("{:timeout => %s, " +
-                    ":retry_frequency => %s, " +
-                    ":post_timeout => %s, " +
-                    ":timeout_message => %s, " +
-                    ":screenshot_on_error => %s}",
+                            ":retry_frequency => %s, " +
+                            ":post_timeout => %s, " +
+                            ":timeout_message => %s, " +
+                            ":screenshot_on_error => %s}",
                     WAIT_TIMEOUT,
                     WAIT_RETRY_FREQ,
                     WAIT_POST_TIMEOUT,
@@ -613,15 +605,39 @@ public class CalabashWrapper {
         final Object serverPort = container.runScriptlet("default_device.default_server_port");
         return serverPort.toString();
     }
-    
-	public boolean elementExistsById(String id) throws CalabashException {
-		try {
-			info("Checking for element's existence");
-			return (Boolean) container.runScriptlet("element_exists(\"webView css:'#" + id	+ "'\")");
-		} catch (Exception e) {
-			String message = "Failed to check for element's existence";
-			error(message, e);
-			throw new CalabashException(message, e);
-		}
-	}
+
+    public boolean elementExistsById(String id) throws CalabashException {
+        try {
+            info("Checking for element's existence");
+            Boolean existsAsUIElement = (Boolean) container.runScriptlet(String.format("element_exists(\"%s\")", id));
+            Boolean existsAsWebView = (Boolean) container.runScriptlet("element_exists(\"webView css:'#" + id + "'\")");
+            return existsAsUIElement || existsAsWebView;
+        } catch (Exception e) {
+            String message = "Failed to check for element's existence";
+            error(message, e);
+            throw new CalabashException(message, e);
+        }
+    }
+
+    public void hideKeyboard() throws CalabashException {
+        try {
+            info("hiding keyboard");
+            container.runScriptlet("hide_soft_keyboard");
+        } catch (Exception e) {
+            String message = "Failed hide keyboard";
+            error(message, e);
+            throw new CalabashException(message, e);
+        }
+    }
+
+    public void waitForActivity(String activityName, int timeout) throws OperationTimedoutException {
+        try {
+            info("waiting for activity %s for %d seconds", activityName, timeout);
+            container.runScriptlet(String.format("wait_for_activity('%s',%d)", activityName, timeout));
+        } catch (Exception e) {
+            String message = String.format("Activity '%s' did not appear within %d seconds", activityName, timeout);
+            error(message, e);
+            throw new OperationTimedoutException(message);
+        }
+    }
 }

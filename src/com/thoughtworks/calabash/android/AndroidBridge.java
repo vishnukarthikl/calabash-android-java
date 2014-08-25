@@ -6,7 +6,6 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 
-import static com.thoughtworks.calabash.android.CalabashLogger.info;
 import static java.lang.String.format;
 
 public class AndroidBridge {
@@ -137,14 +136,6 @@ public class AndroidBridge {
         }
         return null;
     }
-    
-    public void sendTextEvent(String text) throws CalabashException {
-    	Utils.runCommand(getSendTextEventCommand(text), "Could not send text event");
-    }
-    
-    public void sendKeyEvent(String text) throws CalabashException {
-    	Utils.runCommand(getSendKeyEventCommand(text), "Could not send key event");
-    }
 
     private DeviceList getDeviceList() throws CalabashException {
         String listDeviceOutput = Utils.runCommand(getDeviceListCommand(), "could not list all devices");
@@ -196,11 +187,4 @@ public class AndroidBridge {
         return new String[]{environment.getAdb(), "-s", serial, "shell", "pm", "path", "android"};
     }
     
-    private String[] getSendKeyEventCommand(String event) {
-    	return new String[]{environment.getAdb(), "shell", "input", "keyevent", event};
-    }
-    
-    private String[] getSendTextEventCommand(String text) {
-    	return new String[]{environment.getAdb(), "shell", "input", "text", text};
-    }
 }

@@ -50,6 +50,11 @@ class CalabashLogger {
             log.info(String.format(message, args));
     }
 
+    public static void warn(String message) {
+        if (shouldLog && isNotEmpty(message))
+            log.warn(String.format(message));
+    }
+
     public static void error(Object message) {
         if (shouldLog && isNotEmpty(message))
             log.error(message);
