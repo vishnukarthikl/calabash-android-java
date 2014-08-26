@@ -18,16 +18,11 @@ Getting started
 Note: AndroidRunner starts the emulator if the device name is specified in the configuration, but it is not very stable. So it is advised that the emulator is manually started and serial(e.g emulator-5554) is set in the configuration.
 
 ```java
-
-public class Main {
-    public static void main(String[] args) throws CalabashException {
         AndroidConfiguration androidConfiguration = new AndroidConfiguration();
         androidConfiguration.setSerial("emulator-5554");
         AndroidRunner androidRunner = new AndroidRunner("res/AndroidTestApplication.apk", androidConfiguration);
         androidRunner.setup();
         androidRunner.start();
-    }
-}
 ```
 
 Writing tests
@@ -36,9 +31,6 @@ Writing tests
 Finding an element and touching it. In the below example, we query for a button and then touch the first one. And if that adds a textview with text "button was touched", we can assert on it.
 
 ```java
-
-public class Main {
-    public static void main(String[] args) throws CalabashException {
         AndroidConfiguration androidConfiguration = new AndroidConfiguration();
         androidConfiguration.setSerial("emulator-5554");
         AndroidRunner androidRunner = new AndroidRunner("res/AndroidTestApplication.apk", androidConfiguration);
@@ -48,8 +40,7 @@ public class Main {
         button.touch();
         UIElements text = application.query("textview");
         assertEquals("button was touched", text.get(0).getText());
-    }
-}
+
 ```
 
 For the query syntax, please take a look at [Calabash Wiki](http://blog.lesspainful.com/2012/12/18/Android-Query/). You can use Junit asserts to perform assertions. For more information, visit [Calabash](https://github.com/calabash/calabash-android) page.
@@ -60,8 +51,6 @@ Inspecting elements
 If you need to know how elements are structured in your application, you can use `inspect()` method on `Application` or `UIElement` instances. It will iterate over each element and it's child elements from which you can build a tree view.
 
 ```java
-public class Main {
-    public static void main(String[] args) throws CalabashException {
         AndroidConfiguration androidConfiguration = new AndroidConfiguration();
         androidConfiguration.setSerial("emulator-5554");
         AndroidRunner androidRunner = new AndroidRunner("res/AndroidTestApplication.apk", androidConfiguration);
@@ -77,33 +66,61 @@ public class Main {
    			}
    		});
 
-    }
-}
 ```
 
 Screenshots
-==============
+===========
 
 `takeScreenshot()` function can be used to take the screenshot. You can also listen to screenshot events which will be called whenever a screenshot is taken. Calabash ruby client takes screenshots when there is a failure. Hooking on to this event handler will let you know when screenshots are taken.
 
-```java
-public class Main {
-    public static void main(String[] args) throws CalabashException, OperationTimedoutException {
-            AndroidConfiguration androidConfiguration = new AndroidConfiguration();
-            androidConfiguration.setSerial("emulator-5554");
-            AndroidRunner androidRunner = new AndroidRunner("res/AndroidTestApplication.apk", androidConfiguration);
-            androidRunner.setup();
-            AndroidApplication application = androidRunner.start();
+````java
+        File screenshotsDir = new File("screenshots_path");
+        application.takeScreenshot(screenshotsDir, "first");
+        File screenshot = new File(screenshotsDir, "first_0.png");
+        assertTrue(screenshot.exists());
+````
 
-            application.waitFor(new ICondition() {
-                @Override
-                public boolean test() throws CalabashException {
-                    return false;
-                }
-            }, 1);
-        }
-}
+```java
+        final StringBuffer screenshotPath = new StringBuffer();
+        AndroidConfiguration androidConfiguration = new AndroidConfiguration();
+        androidConfiguration.setScreenshotListener(new ScreenshotListener() {
+            public void screenshotTaken(String path, String imageType, String fileName) {
+                screenshotPath.append(path);
+            }
+        });
+            
+        AndroidApplication application = androidRunner.start();
+        application.waitFor(new ICondition() {
+            @Override
+            public boolean test() throws CalabashException {
+                return false;
+            }
+        }, 1);
+        
+        assertTrue(new File(screenshotPath.toString()).exists());
+        
 ```
+
+Web View Support
+================
+
+`queryByCss()` function can be used to query for webview elements in the webview. It is recommended that you query for unique elements corresponding to the css. touch, setText and other actions work only on the first element if the query returns multiple webelements
+
+````java
+        WebElements input = application.queryByCss("input");
+        input.setText(textToEnter);
+        
+        WebElements button = application.queryByCss("button");
+        button.touch();
+        
+        //search for all the non visisble elements also
+        WebElements div = application.queryByCss("div",true);
+        String result = div.getText();
+        assertEquals("button was pressed", result);
+        
+````
+
+
 
 Licence
 ==========
