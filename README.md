@@ -57,14 +57,14 @@ If you need to know how elements are structured in your application, you can use
         androidRunner.setup();
         AndroidApplication application = androidRunner.start();
 
-           application.inspect(new InspectCallback() {
-   			public void onEachElement(UIElement element, int nestingLevel) {
-   				for (int i = 0; i < nestingLevel; i++) {
-   					System.out.print("-");
-   				}
-   				System.out.print(element.getElementClass() + "\n");
-   			}
-   		});
+        application.inspect(new InspectCallback() {
+  	        public void onEachElement(UIElement element, int nestingLevel) {
+   			for (int i = 0; i < nestingLevel; i++) {
+   				System.out.print("-");
+  			}
+   			System.out.print(element.getElementClass() + "\n");
+  		}
+   	});
 
 ```
 
