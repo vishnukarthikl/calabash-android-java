@@ -1,6 +1,27 @@
 Calabash-Android-Java developer guide
 =====================================
 
+Building package after clone
+----------------------------
+```shell
+ant -Dgems.zip.path=scripts/gems_android.zip distro 
+```
+this will generate the all the jar files into `build` directory. You can now add those jar to your project as dependency
+
+```
+├── calabash-android-java-<version>-javadoc.jar
+├── calabash-android-java-<version>.jar
+├── commons-io-2.4.jar
+├── jackson-core-asl-1.9.13.jar
+├── jackson-mapper-asl-1.9.13.jar
+├── jruby-1.7.5.jar
+├── log4j-1.2.17.jar
+└── zip4j_1.3.1.jar
+```
+
+Making a new package with latest calabash
+-----------------------------------------
+
 Calabash-android-java uses `JRuby` to invoke the Ruby client maintained by calabash-android developers. calabash-android gem and all other dependent gems are zipped and put it to the distributable JAR file of `calabash-android-java`.  While executing, `calabash-android-java` will extract the gems from the JAR and sets up the gem path for the JRuby runtime.
 
 To create a distributable package, follow the below instructions.
@@ -36,13 +57,13 @@ gem install --local <path>/gherkin-2.12.2-java.gem
 Create a zip of all the contents.
 
 ```shell
-zip -r gems.zip .
+zip -r gems_android.zip .
 ```
 
-Move the `gems.zip` file to `calabash-android-java` directory and make the distro.
+Move the `gems_android.zip` file to `calabash-android-java/scripts` directory and make the distro.
 
 ```shell
-ant -Dgems.zip.path=gems.zip distro 
+ant -Dgems.zip.path=scripts/gems_android.zip distro 
 ```
 
 This will make the distributable files inside the `build` directory. Grab the JAR from the distribution, test it and release!
