@@ -22,7 +22,7 @@ this will generate the all the jar files into `build` directory. You can now add
 Making a new package with latest calabash
 -----------------------------------------
 
-Calabash-android-java uses `JRuby` to invoke the Ruby client maintained by calabash-android developers. calabash-android gem and all other dependent gems are zipped and put it to the distributable JAR file of `calabash-android-java`.  While executing, `calabash-android-java` will extract the gems from the JAR and sets up the gem path for the JRuby runtime.
+If you want to package latest calabash gem or some custom gems or libraries you can follow these steps. Calabash-android-java uses `JRuby` to invoke the Ruby client maintained by calabash-android developers. calabash-android gem and all other dependent gems are zipped and put it to the distributable JAR file of `calabash-android-java`.  While executing, `calabash-android-java` will extract the gems from the JAR and sets up the gem path for the JRuby runtime.
 
 To create a distributable package, follow the below instructions.
 
