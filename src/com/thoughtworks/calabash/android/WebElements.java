@@ -84,6 +84,16 @@ public class WebElements extends ArrayList<UIElement> {
         return getFirstElement().getId();
     }
 
+    /**
+     * get a custom property on the webelement
+     * @param propertyName the property name of the element
+     * @return the property value
+     * @throws CalabashException
+     */
+    public Object getProperty(String propertyName) throws CalabashException {
+        return getFirstElement().getProperty(propertyName);
+    }
+
     private void ensureCollectionIsNotEmpty() throws CalabashException {
         if (this.size() == 0) {
             throw new CalabashException("Cannot perform action on an empty list");
