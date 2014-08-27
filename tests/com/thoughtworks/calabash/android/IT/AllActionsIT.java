@@ -178,23 +178,6 @@ public class AllActionsIT {
     }
 
     @Test
-    public void shouldPerformScrollActions() throws Exception {
-        TestUtils.goToActivity(application, TestUtils.ACTIVITY_SCROLL_LIST);
-
-        String queryForSecondPageElement = "textView marked:'No Highway'";
-        assertEquals(0, application.query(queryForSecondPageElement).size());
-
-        application.scrollDown();
-        assertEquals(1, application.query(queryForSecondPageElement).size());
-
-        String queryForFirstPageElement = "textView marked:'A Time to Kill'";
-        assertEquals(0, application.query(queryForFirstPageElement).size());
-
-        application.scrollUp();
-        assertEquals(1, application.query(queryForFirstPageElement).size());
-    }
-
-    @Test
     public void shouldTakeScreenshot() throws Exception {
         TestUtils.goToActivity(application, TestUtils.ACTIVITY_NESTED_VIEWS);
         File screenshotsDir = new File(tempDir, "screenshots");
