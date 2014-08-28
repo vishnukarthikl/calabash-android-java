@@ -670,4 +670,15 @@ public class CalabashWrapper {
             throw new OperationTimedoutException(message);
         }
     }
+
+    public Object executeCommand(String calabashCommand) throws CalabashException {
+        try {
+            info("Executing : %s", calabashCommand);
+            return container.runScriptlet(calabashCommand);
+        } catch (Exception e) {
+            String message = String.format("Failed executing command : %s", calabashCommand);
+            error(message, e);
+            throw new CalabashException(message);
+        }
+    }
 }

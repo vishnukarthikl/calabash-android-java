@@ -497,5 +497,16 @@ public class AllActionsIT {
         assertEquals(textToEnter, result.getValue());
     }
 
+    @Test
+    public void shouldExecuteCalabashCommand() throws Exception {
+        TestUtils.goToActivity(application, TestUtils.ACTIVITY_SIMPLE_ELEMENTS);
+
+        application.query("EditText").first().setText("sample text");
+
+        application.execute("clear_text(\"editText\")");
+
+        assertEquals("", application.query("EditText").first().getText());
+    }
+
 
 }

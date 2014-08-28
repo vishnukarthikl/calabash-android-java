@@ -7,8 +7,6 @@ import java.io.File;
 import java.util.List;
 import java.util.Map;
 
-import static java.lang.String.format;
-
 public class AndroidApplication {
     private String installedOn;
     private CalabashWrapper calabashWrapper;
@@ -317,6 +315,20 @@ public class AndroidApplication {
         final boolean success = Boolean.parseBoolean(rubyResult.get("success").toString());
         final Object[] bonusInformation = Utils.toJavaArray(bonusInformationArray);
         return new ActionResult(bonusInformation, message, success);
+    }
+
+    /**
+     * execute a calabash api directly like how it is done in irb for calabash ruby
+     * eg:
+     * <p/>
+     * String command = "clear_text(\"editText\")"
+     * application.execute(command)
+     *
+     * @param calabashCommand calabash api command
+     * @throws CalabashException
+     */
+    public Object execute(String calabashCommand) throws CalabashException {
+        return calabashWrapper.executeCommand(calabashCommand);
     }
 
     /**
