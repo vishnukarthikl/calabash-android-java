@@ -197,14 +197,14 @@ public class AndroidApplication {
     }
 
     /**
-     * Scrolls the first instance of 'android.widget.ScrollView' down
+     * Scrolls the first instance of 'android.widget.ScrollView' or 'android.widget.AbsListView' or 'android.webkit.WebView' down
      */
     public void scrollDown() throws CalabashException {
         calabashWrapper.scrollDown();
     }
 
     /**
-     * Scrolls the first instance of 'android.widget.ScrollView' up
+     * Scrolls the first instance of 'android.widget.ScrollView' or 'android.widget.AbsListView' or 'android.webkit.WebView' up
      */
     public void scrollUp() throws CalabashException {
         calabashWrapper.scrollUp();

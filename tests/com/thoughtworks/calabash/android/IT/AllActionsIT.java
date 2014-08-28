@@ -1,6 +1,7 @@
 package com.thoughtworks.calabash.android.IT;
 
 
+import com.sun.deploy.util.StringUtils;
 import com.thoughtworks.calabash.android.*;
 import org.apache.commons.io.FileUtils;
 import org.joda.time.DateTime;
@@ -8,6 +9,8 @@ import org.junit.*;
 import org.junit.rules.ExpectedException;
 
 import java.io.File;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
@@ -230,6 +233,24 @@ public class AllActionsIT {
     }
 
     @Test
+    public void shouldPerformScrollActions() throws Exception {
+        TestUtils.goToActivity(application, TestUtils.ACTIVITY_SCROLL_LIST);
+
+        String queryForSecondPageElement = "textView marked:'No Highway'";
+        assertEquals(0, application.query(queryForSecondPageElement).size());
+
+        application.scrollDown();
+        assertEquals(1, application.query(queryForSecondPageElement).size());
+
+        String queryForFirstPageElement = "textView marked:'A Time to Kill'";
+        assertEquals(0, application.query(queryForFirstPageElement).size());
+
+        application.scrollUp();
+        assertEquals(1, application.query(queryForFirstPageElement).size());
+    }
+
+    @Ignore
+    @Test
     public void shouldSetGPSCoordinates() throws Exception {
         TestUtils.goToActivity(application, TestUtils.ACTIVITY_CURRENT_LOCATION);
 
@@ -275,7 +296,7 @@ public class AllActionsIT {
 
         String actualTime = timePicker.getTime();
 
-        assertEquals("13:50",actualTime);
+        assertEquals("13:50", actualTime);
     }
 
     @Test
@@ -309,11 +330,65 @@ public class AllActionsIT {
 
     @Test
     public void shouldGetResultForPerformCalabashAction() throws Exception {
+        String expectedActions = "backdoor\n" +
+                "clear_preferences\n" +
+                "click_on_screen\n" +
+                "double_tap_coordinate\n" +
+                "drag\n" +
+                "drag_coordinates\n" +
+                "dump_body_html\n" +
+                "dump_html\n" +
+                "enter_text_by_selector\n" +
+                "execute_async_javascript\n" +
+                "execute_javascript\n" +
+                "finish_opened_activities\n" +
+                "get_activity_name\n" +
+                "get_load_progress\n" +
+                "get_map_bounds\n" +
+                "get_map_center\n" +
+                "get_map_marker\n" +
+                "get_map_markers\n" +
+                "get_map_zoom\n" +
+                "get_preferences\n" +
+                "get_url\n" +
+                "go_back\n" +
+                "hide_soft_keyboard\n" +
+                "is_current_activity_focused\n" +
+                "keyboard_enter_text\n" +
+                "list_actions\n" +
+                "long_press_coordinate\n" +
+                "nullAction\n" +
+                "pan_map_to\n" +
+                "press_key\n" +
+                "press_l10n_element\n" +
+                "press_menu\n" +
+                "press_user_action_button\n" +
+                "scroll_to\n" +
+                "send_key_down\n" +
+                "send_key_enter\n" +
+                "send_key_left\n" +
+                "send_key_right\n" +
+                "send_key_up\n" +
+                "set_activity_orientation\n" +
+                "set_gps_coordinates\n" +
+                "set_map_center\n" +
+                "set_map_zoom\n" +
+                "set_preferences\n" +
+                "set_property_by_css_selector\n" +
+                "swipe\n" +
+                "tap_map_away_from_markers\n" +
+                "tap_map_marker_by_title\n" +
+                "touch_coordinate\n" +
+                "version\n" +
+                "wait_for_l10n_element";
         TestUtils.goToActivity(application, TestUtils.ACTIVITY_SCROLL_LIST);
 
         ActionResult result = application.performCalabashAction("list_actions");
 
-        assertEquals(53, result.getBonusInformation().size());
+        List<String> actions = result.getBonusInformation();
+        Collections.sort(actions);
+        String actualActions = StringUtils.join(actions, "\n");
+        assertEquals(expectedActions, actualActions);
         assertEquals("Available actions", result.getMessage());
         assertEquals(true, result.isSuccess());
     }
