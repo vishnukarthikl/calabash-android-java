@@ -360,7 +360,7 @@ public class CalabashWrapper {
 
     public DateTime getDate(String query) throws CalabashException {
         try {
-            info("Getting date");
+            info("Getting date from %s", query);
             container.put(QUERY_STRING, query);
             RubyArray rubyArray = (RubyArray) container.runScriptlet(String.format("query(%s, :getYear)", QUERY_STRING));
             int year = Utils.getFirstIntValue(rubyArray);
@@ -373,7 +373,25 @@ public class CalabashWrapper {
 
             return new DateTime(year, month + 1, day, 0, 0);
         } catch (Exception e) {
-            String message = "Error getting date";
+            String message = "Error getting date from " + query;
+            throw new CalabashException(message, e);
+        }
+    }
+
+    public String getTime(String query) throws CalabashException {
+        try {
+            info("Getting time from %s", query);
+            container.put(QUERY_STRING, query);
+            RubyArray rubyArray = (RubyArray) container.runScriptlet(String.format("query(%s, :getCurrentHour)", QUERY_STRING));
+            int hour = Utils.getFirstIntValue(rubyArray);
+
+            rubyArray = (RubyArray) container.runScriptlet(String.format("query(%s, :getCurrentMinute)", QUERY_STRING));
+            int minute = Utils.getFirstIntValue(rubyArray);
+
+
+            return hour + ":" + minute;
+        } catch (Exception e) {
+            String message = "Error getting time from " + query;
             throw new CalabashException(message, e);
         }
     }
@@ -507,13 +525,25 @@ public class CalabashWrapper {
         try {
             info("Setting date: %d-%d-%d - format yyyy-mm-dd", year, month, day);
             container.put(QUERY_STRING, query);
-            container.runScriptlet(String.format("query(%s, {:method_name => :updateDate, :arguments => [%d,%d,%d]})", QUERY_STRING, year, month - 1, day));
+            container.runScriptlet(String.format("set_date(%s,%d,%d,%d)", QUERY_STRING, year, month, day));
         } catch (Exception e) {
             String message = String.format("Failed to set date : %d-%d-%d", year, month, day);
             error(message, e);
             throw new CalabashException(message, e);
         }
 
+    }
+
+    public void setTime(String query, int hour, int minute) throws CalabashException {
+        try {
+            info("Setting time: %d:%d ", hour, minute);
+            container.put(QUERY_STRING, query);
+            container.runScriptlet(String.format("set_time(%s,%d,%d)", QUERY_STRING, hour, minute));
+        } catch (Exception e) {
+            String message = String.format("Failed to set time : %d:%d", hour, minute);
+            error(message, e);
+            throw new CalabashException(message, e);
+        }
     }
 
     public RubyHash performAction(String action, String[] args) throws CalabashException {

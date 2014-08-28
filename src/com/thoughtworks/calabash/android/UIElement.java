@@ -53,7 +53,7 @@ public class UIElement implements AndroidElementAction {
     public String getId() {
         return Utils.toString(data.get("id"));
     }
-    
+
     /**
      * Gets the value
      *
@@ -62,7 +62,7 @@ public class UIElement implements AndroidElementAction {
     public String getValue() {
         return Utils.toString(data.get("value"));
     }
-    
+
     /**
      * Gets the text content
      *
@@ -227,6 +227,14 @@ public class UIElement implements AndroidElementAction {
     }
 
     /**
+     * @return the time value represented by the UI element if it is a time picker in HH:mm (24 hour) format
+     * @throws CalabashException
+     */
+    public String getTime() throws CalabashException {
+        return calabashWrapper.getTime(getQuery());
+    }
+
+    /**
      * set the date if it is a date picker
      *
      * @param date date to be set
@@ -234,6 +242,10 @@ public class UIElement implements AndroidElementAction {
      */
     public void setDate(DateTime date) throws CalabashException {
         calabashWrapper.setDate(getQuery(), date.getYear(), date.getMonthOfYear(), date.getDayOfMonth());
+    }
+
+    public void setTime(int hour, int minute) throws CalabashException {
+        calabashWrapper.setTime(getQuery(), hour, minute);
     }
 
     /**
@@ -285,5 +297,4 @@ public class UIElement implements AndroidElementAction {
         }
         return "";
     }
-
 }

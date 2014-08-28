@@ -265,6 +265,20 @@ public class AllActionsIT {
     }
 
     @Test
+    public void shouldSetTimeOnTimePicker() throws Exception {
+        TestUtils.goToActivity(application, TestUtils.ACTIVITY_DATE_TIME_ELEMENTS);
+
+        UIElement timePicker = application.query("timePicker").first();
+        timePicker.setTime(13, 50);
+
+        timePicker = application.query("timePicker").first();
+
+        String actualTime = timePicker.getTime();
+
+        assertEquals("13:50",actualTime);
+    }
+
+    @Test
     public void shouldGetSharedPreferences() throws Exception {
         Map<String, String> preferences = application.getSharedPreferences("my_preferences");
 
