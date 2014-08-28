@@ -424,7 +424,7 @@ public class CalabashWrapper {
     public void pressEnterKey() throws CalabashException {
         try {
             info("Pressing enter key");
-            container.runScriptlet("perform_action('send_key_enter')");
+            container.runScriptlet("press_user_action_button");
             pause();
         } catch (Exception e) {
             String message = "Failed to press enter key";

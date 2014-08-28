@@ -160,7 +160,7 @@ public class AndroidApplication {
     }
 
     /**
-     * press the 'enter' key on the keypad
+     * press the 'enter'(action) key on the keypad
      *
      * @throws CalabashException
      */
