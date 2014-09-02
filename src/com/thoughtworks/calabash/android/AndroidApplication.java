@@ -24,7 +24,7 @@ public class AndroidApplication {
      * returns a list of UIElements corresponding to the calabash query
      *
      * @param query calabash query
-     * @return
+     * @return UIElements corresponding to the query
      * @throws CalabashException
      */
     public UIElements query(String query) throws CalabashException {
@@ -34,33 +34,14 @@ public class AndroidApplication {
 
 
     /**
-     * returns a list of visible WebElements in the WebView corresponding to the css. It is recommended to query for a single element uniquely
-     * by css, since indexed query doesn't work for webelements
+     * returns a list of WebElements corresponding to the calabash query
+     * eg: application.queryWebElements("webview css:'div' textContent:'login successful'");
      *
-     * @param css elements' css property
-     * @return
+     * @param query calabash query
+     * @return WebElements corresponding to the query
      * @throws CalabashException
      */
-    public WebElements queryByCss(String css) throws CalabashException {
-        return queryByCss(css, false);
-    }
-
-    /**
-     * returns a list of WebElements in the WebView corresponding to the css. It is recommended to query for a single element uniquely
-     * by css, since indexed query doesn't work for webelements
-     *
-     * @param css                     elements' css property
-     * @param disableVisibilityFilter should search for all the elements including those not visible in the viewport?
-     * @return
-     * @throws CalabashException
-     */
-    public WebElements queryByCss(String css, boolean disableVisibilityFilter) throws CalabashException {
-        String query;
-        if (disableVisibilityFilter) {
-            query = String.format("all webView css:'%s'", css);
-        } else {
-            query = String.format("webView css:'%s'", css);
-        }
+    public WebElements queryWebElements(String query) throws CalabashException {
         RubyArray array = calabashWrapper.query(query);
         return new WebElements(array, query, calabashWrapper);
     }

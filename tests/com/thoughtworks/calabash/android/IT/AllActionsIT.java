@@ -187,7 +187,14 @@ public class AllActionsIT {
         screenshotsDir.mkdirs();
 
         application.takeScreenshot(screenshotsDir, "first");
-        File screenshot = new File(screenshotsDir, "first_0.png");
+        final File screenshot = new File(screenshotsDir, "first_0.png");
+
+        new ConditionalWaiter(new ICondition() {
+            @Override
+            public boolean test() throws CalabashException {
+                return screenshot.exists();
+            }
+        }).run(2000);
 
         assertTrue(screenshot.exists());
     }
@@ -461,26 +468,38 @@ public class AllActionsIT {
     @Test
     public void shouldGetPropertiesOfWebViewElement() throws Exception {
         TestUtils.goToActivity(application, TestUtils.ACTIVITY_WEB_VIEW);
-        WebElements input = application.queryByCss("#first_input");
+        WebElements input = application.queryWebElements("webview css:'#first_input'");
         input.setText("text");
 
 
-        WebElements resultingElement = application.queryByCss("#first_input");
+        WebElements resultingElement = application.queryWebElements("webview css:'#first_input'");
 
         assertEquals("input_text", resultingElement.getElementClass());
         assertEquals("first_input", resultingElement.getId());
         assertEquals("text", resultingElement.getValue());
     }
 
+    @Test
+    public void shouldGetWebElementByCssAndPropertyFilter() throws Exception {
+        TestUtils.goToActivity(application, TestUtils.ACTIVITY_WEB_VIEW);
+        WebElements button = application.queryWebElements("webview css:'button' id:'first_button'");
+
+        button.touch();
+
+        WebElements resultingElement = application.queryWebElements("webview css:'div' textContent:'button was pressed'");
+
+        assertEquals(1, resultingElement.size());
+    }
+
 
     @Test
     public void shouldTouchWebViewElement() throws Exception {
         TestUtils.goToActivity(application, TestUtils.ACTIVITY_WEB_VIEW);
-        WebElements button = application.queryByCss("button");
+        WebElements button = application.queryWebElements("webview css:'button'");
 
         button.touch();
 
-        WebElements div = application.queryByCss("div");
+        WebElements div = application.queryWebElements("webview css:'div'");
         String result = div.getText();
         assertEquals("button was pressed", result);
     }
@@ -489,11 +508,11 @@ public class AllActionsIT {
     public void shouldEnterTextForWebViewElement() throws Exception {
         String textToEnter = "random text";
         TestUtils.goToActivity(application, TestUtils.ACTIVITY_WEB_VIEW);
-        WebElements input = application.queryByCss("input");
+        WebElements input = application.queryWebElements("webview css:'input'");
 
         input.setText(textToEnter);
 
-        WebElements result = application.queryByCss("input");
+        WebElements result = application.queryWebElements("webview css:'input'");
         assertEquals(textToEnter, result.getValue());
     }
 
