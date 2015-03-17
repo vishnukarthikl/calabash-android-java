@@ -104,17 +104,17 @@ Screenshots
 Web View Support
 ================
 
-`queryByCss()` function can be used to query for webview elements in the webview. It is recommended that you query for unique elements corresponding to the css. touch, setText and other actions work only on the first element if the query returns multiple webelements
+`queryWebElements()` function can be used to query for webview elements in the webview. It is recommended that you query for unique elements corresponding to the css. touch, setText and other actions work only on the first element if the query returns multiple webelements
 
 ````java
-        WebElements input = application.queryByCss("input");
+        WebElements input = application.queryWebElements("webview css:'input'");
         input.setText(textToEnter);
         
-        WebElements button = application.queryByCss("button");
+        WebElements button = application.queryWebElements("webview css:'button'");
         button.touch();
         
         //search for all the non visisble elements also
-        WebElements div = application.queryByCss("div",true);
+        WebElements div = application.queryWebElements("all webview css:'div'");
         String result = div.getText();
         assertEquals("button was pressed", result);
         
