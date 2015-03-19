@@ -12,7 +12,16 @@ Download the latest release [calabash-android-java](https://github.com/vishnukar
 Getting started
 ===============
 * Download [Android Sdk](https://developer.android.com/sdk/index.html) and set up ANDROID_HOME and JAVA_HOME in your environment.
-* Calabash-android-java depends on Jruby,log4j and Zip4j. You need to add those jars also into the classpath. Download the JAR file and add all the JAR files to the class path.
+* Calabash-android-java depends on few jars. So add the following jars to class path while running the test.
+```
+├── calabash-android-java-<version>.jar
+├── commons-io-2.4.jar
+├── jackson-core-asl-1.9.13.jar
+├── jackson-mapper-asl-1.9.13.jar
+├── jruby-1.7.5.jar
+├── log4j-1.2.17.jar
+└── zip4j_1.3.1.jar
+```
 * If you have an existing apk, point to it in the AndroidRunner, see example below on how to write tests.
 
 Note: AndroidRunner starts the emulator if the device name is specified in the configuration, but it is not very stable. So it is advised that the emulator is manually started and serial(e.g emulator-5554) is set in the configuration.
