@@ -1,10 +1,28 @@
 Calabash-Android-Java developer guide
 =====================================
 
+Development
+-----------
+* Clone the repo. It is around 100Mb because of bundling all the dependencies. 
+* Open the project in your favorite IDE.
+```
+├── lib (dependent jars)
+├── src (java source files) 
+└── tests
+    ├── lib (dependent jars for test)
+    └── resources (sample android apk)
+
+```
+* Add lib/ to classpath
+* Add tests/lib to classpath while running tests
+* If you have Intellij IDEA, you can add Junit to the project automatically, else you will have to download it manually.
+
+
+
 Building package after clone
 ----------------------------
 ```shell
-ant -Dgems.zip.path=scripts/gems_android.zip distro 
+ant -Dgems.zip.path=src/scripts/gems_android.zip distro 
 ```
 this will generate the all the jar files into `build` directory. You can now add those jar to your project as dependency
 
