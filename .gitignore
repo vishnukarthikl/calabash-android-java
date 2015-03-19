@@ -1,7 +1,6 @@
 out/**
 build/**
-src/scripts/**
-.idea/**
+logs/
 /.classpath
 /.project
 /build.bat
